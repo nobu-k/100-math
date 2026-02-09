@@ -1,0 +1,19 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", sans-serif;
+  display: flex;
+  justify-content: center;
+  background: #fff;
+  color: #000;
+}
+
+#root {
+  width: 100%;
+}
