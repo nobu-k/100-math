@@ -32,11 +32,11 @@
 .grid th,
 .grid td {
   border: 2px solid #000;
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
   text-align: center;
   vertical-align: middle;
-  font-size: 24px;
+  font-size: 32px;
   font-weight: bold;
   padding: 0;
 }
@@ -71,9 +71,9 @@
 
   .grid th,
   .grid td {
-    width: 44px;
-    height: 44px;
-    font-size: 22px;
+    width: 17mm;
+    height: 17mm;
+    font-size: 28px;
   }
 
   @page {
