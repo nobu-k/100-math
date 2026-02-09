@@ -65,7 +65,9 @@ function getInitialProblem(): Problem {
 
 function App() {
   const [problem, setProblem] = useState(getInitialProblem);
-  const [showAnswers, setShowAnswers] = useState(false);
+  const [showAnswers, setShowAnswers] = useState(() => {
+    return new URLSearchParams(window.location.search).get("answers") === "1";
+  });
 
   const handleNewProblem = useCallback(() => {
     const newProblem = generateProblem();
@@ -83,6 +85,7 @@ function App() {
   const qrUrl = useMemo(() => {
     const url = new URL(window.location.href);
     url.searchParams.set("q", encodeProblem(problem));
+    url.searchParams.set("answers", "1");
     return url.toString();
   }, [problem]);
 
