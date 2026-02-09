@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import "./App.css";
 
 interface Problem {
@@ -79,6 +80,12 @@ function App() {
 
   const { rowHeaders, colHeaders } = problem;
 
+  const qrUrl = useMemo(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("q", encodeProblem(problem));
+    return url.toString();
+  }, [problem]);
+
   return (
     <div className="app">
       <div className="no-print controls">
@@ -128,6 +135,10 @@ function App() {
           ))}
         </tbody>
       </table>
+      <div className="qr-section">
+        <QRCodeSVG value={qrUrl} size={80} />
+        <span className="qr-label">答え / Answers</span>
+      </div>
     </div>
   );
 }

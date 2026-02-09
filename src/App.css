@@ -60,6 +60,18 @@
   background: #fff;
 }
 
+.qr-section {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qr-label {
+  font-size: 14px;
+  color: #555;
+}
+
 @media print {
   .no-print {
     display: none !important;
