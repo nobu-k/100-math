@@ -1,6 +1,11 @@
 import { useState, useCallback } from "react";
 import "./App.css";
 
+interface Problem {
+  rowHeaders: number[];
+  colHeaders: number[];
+}
+
 function shuffleArray(arr: number[]): number[] {
   const shuffled = [...arr];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -10,7 +15,27 @@ function shuffleArray(arr: number[]): number[] {
   return shuffled;
 }
 
-function generateProblem(): { rowHeaders: number[]; colHeaders: number[] } {
+function encodeProblem(problem: Problem): string {
+  return (
+    problem.rowHeaders.join("") + "-" + problem.colHeaders.join("")
+  );
+}
+
+function decodeProblem(encoded: string): Problem | null {
+  const parts = encoded.split("-");
+  if (parts.length !== 2) return null;
+  const rows = parts[0].split("").map(Number);
+  const cols = parts[1].split("").map(Number);
+  if (rows.length !== 9 || cols.length !== 9) return null;
+  const isValidPerm = (arr: number[]) => {
+    const sorted = [...arr].sort();
+    return sorted.every((v, i) => v === i + 1);
+  };
+  if (!isValidPerm(rows) || !isValidPerm(cols)) return null;
+  return { rowHeaders: rows, colHeaders: cols };
+}
+
+function generateProblem(): Problem {
   const digits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   return {
     rowHeaders: shuffleArray(digits),
@@ -18,12 +43,33 @@ function generateProblem(): { rowHeaders: number[]; colHeaders: number[] } {
   };
 }
 
+function updateUrl(problem: Problem) {
+  const encoded = encodeProblem(problem);
+  const url = new URL(window.location.href);
+  url.searchParams.set("q", encoded);
+  window.history.replaceState(null, "", url.toString());
+}
+
+function getInitialProblem(): Problem {
+  const params = new URLSearchParams(window.location.search);
+  const q = params.get("q");
+  if (q) {
+    const decoded = decodeProblem(q);
+    if (decoded) return decoded;
+  }
+  const problem = generateProblem();
+  updateUrl(problem);
+  return problem;
+}
+
 function App() {
-  const [problem, setProblem] = useState(generateProblem);
+  const [problem, setProblem] = useState(getInitialProblem);
   const [showAnswers, setShowAnswers] = useState(false);
 
   const handleNewProblem = useCallback(() => {
-    setProblem(generateProblem());
+    const newProblem = generateProblem();
+    updateUrl(newProblem);
+    setProblem(newProblem);
     setShowAnswers(false);
   }, []);
 
