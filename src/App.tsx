@@ -44,10 +44,14 @@ function generateProblem(): Problem {
   };
 }
 
-function updateUrl(problem: Problem) {
-  const encoded = encodeProblem(problem);
+function updateUrl(problem: Problem, showAnswers: boolean) {
   const url = new URL(window.location.href);
-  url.searchParams.set("q", encoded);
+  url.searchParams.set("q", encodeProblem(problem));
+  if (showAnswers) {
+    url.searchParams.set("answers", "1");
+  } else {
+    url.searchParams.delete("answers");
+  }
   window.history.replaceState(null, "", url.toString());
 }
 
@@ -59,7 +63,7 @@ function getInitialProblem(): Problem {
     if (decoded) return decoded;
   }
   const problem = generateProblem();
-  updateUrl(problem);
+  updateUrl(problem, false);
   return problem;
 }
 
@@ -71,14 +75,17 @@ function App() {
 
   const handleNewProblem = useCallback(() => {
     const newProblem = generateProblem();
-    updateUrl(newProblem);
+    updateUrl(newProblem, false);
     setProblem(newProblem);
     setShowAnswers(false);
   }, []);
 
   const handleToggleAnswers = useCallback(() => {
-    setShowAnswers((prev) => !prev);
-  }, []);
+    setShowAnswers((prev) => {
+      updateUrl(problem, !prev);
+      return !prev;
+    });
+  }, [problem]);
 
   const { rowHeaders, colHeaders } = problem;
 
