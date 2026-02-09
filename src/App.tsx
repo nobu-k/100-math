@@ -20,9 +20,15 @@ function generateProblem(): { rowHeaders: number[]; colHeaders: number[] } {
 
 function App() {
   const [problem, setProblem] = useState(generateProblem);
+  const [showAnswers, setShowAnswers] = useState(false);
 
   const handleNewProblem = useCallback(() => {
     setProblem(generateProblem());
+    setShowAnswers(false);
+  }, []);
+
+  const handleToggleAnswers = useCallback(() => {
+    setShowAnswers((prev) => !prev);
   }, []);
 
   const { rowHeaders, colHeaders } = problem;
@@ -31,6 +37,9 @@ function App() {
     <div className="app">
       <div className="no-print controls">
         <button onClick={handleNewProblem}>新しい問題 / New Problem</button>
+        <button onClick={handleToggleAnswers}>
+          {showAnswers ? "答えを隠す / Hide Answers" : "答え / Show Answers"}
+        </button>
       </div>
       <table className="grid">
         <thead>
@@ -64,8 +73,10 @@ function App() {
           {rowHeaders.map((rowNum, ri) => (
             <tr key={ri}>
               <th className="header-cell">{rowNum}</th>
-              {colHeaders.map((_, ci) => (
-                <td key={ci} className="answer-cell" />
+              {colHeaders.map((colNum, ci) => (
+                <td key={ci} className="answer-cell">
+                  {showAnswers ? rowNum + colNum : ""}
+                </td>
               ))}
             </tr>
           ))}
