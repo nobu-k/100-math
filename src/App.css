@@ -201,6 +201,21 @@
   border-bottom: 4px solid #000;
 }
 
+.hissan-answer-row td {
+  color: red;
+}
+
+.hissan-carry-row td {
+  font-size: 18px;
+  font-weight: bold;
+  height: 24px;
+  color: red;
+  border: 2px dotted transparent;
+  text-align: center;
+  vertical-align: bottom;
+  padding: 0;
+}
+
 .hissan-no-grid .hissan-cell {
   border-color: transparent;
 }
@@ -309,6 +324,11 @@
     width: 12mm;
     height: 12mm;
     font-size: 20px;
+  }
+
+  .hissan-carry-row td {
+    font-size: 10px;
+    height: 5mm;
   }
 
   @page {

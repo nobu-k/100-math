@@ -211,11 +211,30 @@ function HissanProblem({
   const sumDigits = toDigitCells(sum, totalCols);
   const last = problem.length - 1;
 
+  // Compute carries: iterate columns right-to-left
+  const operandDigits = problem.map((op) => toDigitCells(op, totalCols));
+  const carries = new Array<number>(totalCols).fill(0);
+  let carry = 0;
+  for (let col = totalCols - 1; col >= 0; col--) {
+    let colSum = carry;
+    for (const digits of operandDigits) {
+      const d = digits[col];
+      if (d !== "") colSum += d;
+    }
+    carries[col] = carry;
+    carry = Math.floor(colSum / 10);
+  }
+
   return (
     <div className="hissan-problem">
       <span className="hissan-number">({index + 1})</span>
       <table className="hissan-grid">
         <tbody>
+          <tr className="hissan-carry-row">
+            {carries.map((c, i) => (
+              <td key={i}>{showAnswers && c > 0 ? c : ""}</td>
+            ))}
+          </tr>
           {problem.map((operand, ri) => {
             const digits = toDigitCells(operand, totalCols);
             if (ri < last) {
@@ -236,7 +255,7 @@ function HissanProblem({
               </tr>
             );
           })}
-          <tr>
+          <tr className="hissan-answer-row">
             {sumDigits.map((d, i) => (
               <td key={i} className="hissan-cell">
                 {showAnswers ? d : ""}
