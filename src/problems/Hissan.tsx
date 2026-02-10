@@ -18,6 +18,7 @@ interface HissanConfig {
   maxDigits: number;
   numOperands: number;
   consecutiveCarries: boolean;
+  showGrid: boolean;
 }
 
 /** Pick a random integer in [lo, hi] inclusive. */
@@ -148,6 +149,11 @@ const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
   } else {
     url.searchParams.delete("hcc");
   }
+  if (!cfg.showGrid) {
+    url.searchParams.set("hgrid", "0");
+  } else {
+    url.searchParams.delete("hgrid");
+  }
   window.history.replaceState(null, "", url.toString());
 };
 
@@ -161,7 +167,8 @@ const getInitialConfig = (): HissanConfig => {
   if (minDigits > maxDigits) maxDigits = minDigits;
   if (!(numOperands >= 2 && numOperands <= 3)) numOperands = 2;
   const consecutiveCarries = params.get("hcc") === "1";
-  return { minDigits, maxDigits, numOperands, consecutiveCarries };
+  const showGrid = params.get("hgrid") !== "0";
+  return { minDigits, maxDigits, numOperands, consecutiveCarries, showGrid };
 };
 
 const getInitialSeed = (): number => {
@@ -287,6 +294,14 @@ function Hissan() {
     [],
   );
 
+  const handleToggleGrid = useCallback(() => {
+    setCfg((prev) => {
+      const next = { ...prev, showGrid: !prev.showGrid };
+      updateUrl(seed, showAnswers, next);
+      return next;
+    });
+  }, [seed, showAnswers]);
+
   const qrUrl = useMemo(() => {
     const url = new URL(window.location.href);
     url.searchParams.set("hq", seedToHex(seed));
@@ -295,6 +310,7 @@ function Hissan() {
     url.searchParams.set("hmax", String(cfg.maxDigits));
     url.searchParams.set("hops", String(cfg.numOperands));
     if (cfg.consecutiveCarries) url.searchParams.set("hcc", "1");
+    if (!cfg.showGrid) url.searchParams.set("hgrid", "0");
     return url.toString();
   }, [seed, cfg]);
 
@@ -333,9 +349,13 @@ function Hissan() {
             <input type="checkbox" checked={cfg.consecutiveCarries} onChange={handleConfigChange("consecutiveCarries")} />
             連続繰り上がり
           </label>
+          <label>
+            <input type="checkbox" checked={cfg.showGrid} onChange={handleToggleGrid} />
+            補助グリッド
+          </label>
         </div>
       )}
-      <div className="hissan-page">
+      <div className={`hissan-page${cfg.showGrid ? "" : " hissan-no-grid"}`}>
         {problems.map((problem, i) => (
           <HissanProblem
             key={i}

@@ -197,6 +197,14 @@
   border-bottom: 4px solid #000;
 }
 
+.hissan-no-grid .hissan-cell {
+  border-color: transparent;
+}
+
+.hissan-no-grid .hissan-operator-row td {
+  border-bottom-color: #000;
+}
+
 @media print {
   .no-print {
     display: none !important;
