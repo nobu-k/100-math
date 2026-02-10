@@ -3,7 +3,7 @@ import { QRCodeSVG } from "qrcode.react";
 import type { ProblemTypeDefinition } from "./types";
 import "../App.css";
 
-type Operator = "add" | "mul";
+type Operator = "add" | "sub" | "mul";
 
 interface Problem {
   rowHeaders: number[];
@@ -62,7 +62,8 @@ function updateUrl(problem: Problem, showAnswers: boolean, operator: Operator) {
 function getInitialOperator(): Operator {
   const params = new URLSearchParams(window.location.search);
   const op = params.get("op");
-  return op === "mul" ? "mul" : "add";
+  if (op === "mul" || op === "sub") return op;
+  return "add";
 }
 
 function getInitialProblem(): Problem {
@@ -127,6 +128,12 @@ function Grid100() {
             たし算 / +
           </button>
           <button
+            className={operator === "sub" ? "active" : ""}
+            onClick={() => handleSetOperator("sub")}
+          >
+            ひき算 / −
+          </button>
+          <button
             className={operator === "mul" ? "active" : ""}
             onClick={() => handleSetOperator("mul")}
           >
@@ -142,11 +149,11 @@ function Grid100() {
         <thead>
           <tr>
             <th className="corner-cell">
-              {operator === "mul" ? "×" : "+"}
+              {operator === "mul" ? "×" : operator === "sub" ? "−" : "+"}
             </th>
             {colHeaders.map((num, i) => (
               <th key={i} className="header-cell">
-                {num}
+                {operator === "sub" ? num + 10 : num}
               </th>
             ))}
           </tr>
@@ -160,7 +167,9 @@ function Grid100() {
                   {showAnswers
                     ? operator === "mul"
                       ? rowNum * colNum
-                      : rowNum + colNum
+                      : operator === "sub"
+                        ? colNum + 10 - rowNum
+                        : rowNum + colNum
                     : ""}
                 </td>
               ))}
