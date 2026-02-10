@@ -109,13 +109,13 @@ function Grid100() {
           value={operator}
           onChange={(e) => handleSetOperator(e.target.value as Operator)}
         >
-          <option value="add">たし算 / +</option>
-          <option value="sub">ひき算 / −</option>
-          <option value="mul">かけ算 / ×</option>
+          <option value="add">たし算</option>
+          <option value="sub">ひき算</option>
+          <option value="mul">かけ算</option>
         </select>
-        <button onClick={handleNewProblem}>新しい問題 / New Problem</button>
+        <button onClick={handleNewProblem}>新しい問題</button>
         <button onClick={handleToggleAnswers}>
-          {showAnswers ? "答えを隠す / Hide Answers" : "答え / Show Answers"}
+          {showAnswers ? "答えを隠す" : "答え"}
         </button>
       </div>
       <table className="grid">
@@ -152,7 +152,7 @@ function Grid100() {
       </table>
       <div className="qr-section">
         <QRCodeSVG value={qrUrl} size={80} />
-        <span className="qr-label">答え / Answers</span>
+        <span className="qr-label">答え</span>
       </div>
     </>
   );
@@ -161,6 +161,5 @@ function Grid100() {
 export const grid100: ProblemTypeDefinition = {
   id: "100grid",
   label: "百マス計算",
-  labelEn: "100 Grid Math",
   Component: Grid100,
 };

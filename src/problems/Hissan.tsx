@@ -317,12 +317,12 @@ function Hissan() {
   return (
     <>
       <div className="no-print controls">
-        <button onClick={handleNewProblems}>新しい問題 / New Problems</button>
+        <button onClick={handleNewProblems}>新しい問題</button>
         <button onClick={handleToggleAnswers}>
-          {showAnswers ? "答えを隠す / Hide Answers" : "答え / Show Answers"}
+          {showAnswers ? "答えを隠す" : "答え"}
         </button>
         <button onClick={() => setShowSettings((prev) => !prev)}>
-          設定 / Settings
+          設定
         </button>
       </div>
       {showSettings && (
@@ -368,7 +368,7 @@ function Hissan() {
       </div>
       <div className="qr-section">
         <QRCodeSVG value={qrUrl} size={80} />
-        <span className="qr-label">答え / Answers</span>
+        <span className="qr-label">答え</span>
       </div>
     </>
   );
@@ -377,6 +377,5 @@ function Hissan() {
 export const hissan: ProblemTypeDefinition = {
   id: "hissan",
   label: "ひっ算",
-  labelEn: "Column Addition",
   Component: Hissan,
 };

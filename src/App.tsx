@@ -47,7 +47,7 @@ function App() {
         </button>
       </div>
       <nav className={`sidebar no-print${menuOpen ? " menu-open" : ""}`}>
-        <h2 className="sidebar-title">問題の種類 / Type</h2>
+        <h2 className="sidebar-title">問題の種類</h2>
         <ul className="sidebar-menu">
           {problemTypes.map((type) => (
             <li
@@ -56,14 +56,13 @@ function App() {
               onClick={() => handleSelectType(type.id)}
             >
               <span className="sidebar-item-label">{type.label}</span>
-              <span className="sidebar-item-label-en">{type.labelEn}</span>
             </li>
           ))}
         </ul>
       </nav>
       <div className="app">
         <h1 className="print-title">
-          {currentType.label} / {currentType.labelEn}
+          {currentType.label}
         </h1>
         <Component />
       </div>

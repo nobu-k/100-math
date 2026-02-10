@@ -46,13 +46,6 @@
   font-weight: 600;
 }
 
-.sidebar-item-label-en {
-  display: block;
-  font-size: 12px;
-  color: #888;
-  margin-top: 2px;
-}
-
 .mobile-toolbar {
   display: none;
 }
