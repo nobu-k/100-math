@@ -17,15 +17,93 @@ interface HissanConfig {
   minDigits: number;
   maxDigits: number;
   numOperands: number;
+  consecutiveCarries: boolean;
 }
+
+/** Pick a random integer in [lo, hi] inclusive. */
+const randInt = (rng: () => number, lo: number, hi: number): number =>
+  lo + Math.floor(rng() * (hi - lo + 1));
+
+/** Generate n digits (each 0-9) whose sum >= minSum. */
+const digitsWithMinSum = (rng: () => number, n: number, minSum: number): number[] => {
+  const result: number[] = [];
+  let need = minSum;
+  for (let i = 0; i < n; i++) {
+    const left = n - i - 1;
+    const lo = Math.max(0, need - left * 9);
+    const d = randInt(rng, lo, 9);
+    result.push(d);
+    need = Math.max(0, need - d);
+  }
+  return result;
+};
+
+/** Generate n digits (each 0-9) whose sum = exactSum. */
+const digitsWithExactSum = (rng: () => number, n: number, exactSum: number): number[] => {
+  const result: number[] = [];
+  let remaining = exactSum;
+  for (let i = 0; i < n; i++) {
+    const left = n - i - 1;
+    const lo = Math.max(0, remaining - left * 9);
+    const hi = Math.min(9, remaining);
+    const d = randInt(rng, lo, hi);
+    result.push(d);
+    remaining -= d;
+  }
+  return result;
+};
+
+/**
+ * Constructively generate a problem with carries in every column.
+ * - Ones column: digit sum >= 10 (produces carry).
+ * - Middle columns: digit sum = 10 - carry_in (corner case, total = 10, carry out = 1).
+ * - Highest column: digit sum + carry_in >= 10 (carries out).
+ */
+const generateCarryChainProblem = (rng: () => number, cfg: HissanConfig): Problem => {
+  const width = cfg.maxDigits;
+  const numOps = cfg.numOperands;
+  const minVal = cfg.minDigits <= 1 ? 1 : Math.pow(10, cfg.minDigits - 1);
+
+  for (let attempt = 0; attempt < 100; attempt++) {
+    const opDigits: number[][] = Array.from({ length: numOps }, () => []);
+    let carry = 0;
+
+    for (let col = 0; col < width; col++) {
+      let colDigits: number[];
+      if (col === 0) {
+        colDigits = digitsWithMinSum(rng, numOps, 10);
+      } else if (col < width - 1) {
+        colDigits = digitsWithExactSum(rng, numOps, 10 - carry);
+      } else {
+        colDigits = digitsWithMinSum(rng, numOps, 10 - carry);
+      }
+      const total = colDigits.reduce((a, b) => a + b, 0) + carry;
+      carry = Math.floor(total / 10);
+      for (let op = 0; op < numOps; op++) opDigits[op].push(colDigits[op]);
+    }
+
+    const numbers = opDigits.map((digits) =>
+      digits.reduce((num, d, col) => num + d * Math.pow(10, col), 0),
+    );
+    if (numbers.every((n) => n >= minVal)) return numbers;
+  }
+
+  // Fallback (should rarely happen)
+  return Array.from({ length: numOps }, () =>
+    generateNumber(rng, cfg.minDigits, cfg.maxDigits),
+  );
+};
+
+const generateProblem = (rng: () => number, cfg: HissanConfig): Problem => {
+  if (cfg.consecutiveCarries) return generateCarryChainProblem(rng, cfg);
+  return Array.from({ length: cfg.numOperands }, () =>
+    generateNumber(rng, cfg.minDigits, cfg.maxDigits),
+  );
+};
 
 const generateProblems = (seed: number, cfg: HissanConfig): Problem[] => {
   const rng = mulberry32(seed);
-  return Array.from({ length: 12 }, () =>
-    Array.from({ length: cfg.numOperands }, () =>
-      generateNumber(rng, cfg.minDigits, cfg.maxDigits),
-    ),
-  );
+  return Array.from({ length: 12 }, () => generateProblem(rng, cfg));
 };
 
 const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
@@ -39,6 +117,11 @@ const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
   url.searchParams.set("hmin", String(cfg.minDigits));
   url.searchParams.set("hmax", String(cfg.maxDigits));
   url.searchParams.set("hops", String(cfg.numOperands));
+  if (cfg.consecutiveCarries) {
+    url.searchParams.set("hcc", "1");
+  } else {
+    url.searchParams.delete("hcc");
+  }
   window.history.replaceState(null, "", url.toString());
 };
 
@@ -51,7 +134,8 @@ const getInitialConfig = (): HissanConfig => {
   if (!(maxDigits >= 1 && maxDigits <= 4)) maxDigits = 2;
   if (minDigits > maxDigits) maxDigits = minDigits;
   if (!(numOperands >= 2 && numOperands <= 3)) numOperands = 2;
-  return { minDigits, maxDigits, numOperands };
+  const consecutiveCarries = params.get("hcc") === "1";
+  return { minDigits, maxDigits, numOperands, consecutiveCarries };
 };
 
 const getInitialSeed = (): number => {
@@ -157,9 +241,12 @@ function Hissan() {
   }, [seed, cfg]);
 
   const handleConfigChange = useCallback(
-    (field: keyof HissanConfig) => (e: React.ChangeEvent<HTMLSelectElement>) => {
+    (field: keyof HissanConfig) => (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
       setCfg((prev) => {
-        const next = { ...prev, [field]: parseInt(e.target.value, 10) };
+        const value = e.target instanceof HTMLInputElement && e.target.type === "checkbox"
+          ? e.target.checked
+          : parseInt(e.target.value, 10);
+        const next = { ...prev, [field]: value };
         if (field === "minDigits" && next.minDigits > next.maxDigits)
           next.maxDigits = next.minDigits;
         if (field === "maxDigits" && next.maxDigits < next.minDigits)
@@ -181,6 +268,7 @@ function Hissan() {
     url.searchParams.set("hmin", String(cfg.minDigits));
     url.searchParams.set("hmax", String(cfg.maxDigits));
     url.searchParams.set("hops", String(cfg.numOperands));
+    if (cfg.consecutiveCarries) url.searchParams.set("hcc", "1");
     return url.toString();
   }, [seed, cfg]);
 
@@ -214,6 +302,10 @@ function Hissan() {
             <select className="operator-select" value={cfg.numOperands} onChange={handleConfigChange("numOperands")}>
               {[2, 3].map((n) => <option key={n} value={n}>{n}</option>)}
             </select>
+          </label>
+          <label>
+            <input type="checkbox" checked={cfg.consecutiveCarries} onChange={handleConfigChange("consecutiveCarries")} />
+            連続繰り上がり
           </label>
         </div>
       )}
