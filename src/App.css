@@ -137,6 +137,45 @@
   color: #555;
 }
 
+/* Hissan (column addition) styles */
+.hissan-page {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 24px 32px;
+}
+
+.hissan-problem {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.hissan-number {
+  font-size: 14px;
+  color: #555;
+  margin-top: 4px;
+}
+
+.hissan-grid {
+  border-collapse: collapse;
+}
+
+.hissan-cell {
+  width: 48px;
+  height: 48px;
+  border: 2px solid #000;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 28px;
+  font-weight: bold;
+  padding: 0;
+}
+
+.hissan-operator-row td {
+  border-bottom: 4px solid #000;
+}
+
 @media print {
   .no-print {
     display: none !important;
@@ -161,6 +200,16 @@
     width: 17mm;
     height: 17mm;
     font-size: 28px;
+  }
+
+  .hissan-page {
+    gap: 16px 24px;
+  }
+
+  .hissan-cell {
+    width: 14mm;
+    height: 14mm;
+    font-size: 24px;
   }
 
   @page {

@@ -1,9 +1,28 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { problemTypes } from "./problems";
 import "./App.css";
 
+function getInitialType(): string {
+  const params = new URLSearchParams(window.location.search);
+  const type = params.get("type");
+  if (type && problemTypes.some((t) => t.id === type)) return type;
+  return problemTypes[0].id;
+}
+
 function App() {
-  const [selectedType, setSelectedType] = useState(problemTypes[0].id);
+  const [selectedType, setSelectedType] = useState(getInitialType);
+
+  const handleSelectType = useCallback((id: string) => {
+    setSelectedType(id);
+    const url = new URL(window.location.href);
+    // Clear stale problem params from other types
+    url.searchParams.delete("q");
+    url.searchParams.delete("hq");
+    url.searchParams.delete("answers");
+    url.searchParams.delete("op");
+    url.searchParams.set("type", id);
+    window.history.replaceState(null, "", url.toString());
+  }, []);
 
   const currentType = problemTypes.find((t) => t.id === selectedType)!;
   const { Component } = currentType;
@@ -17,7 +36,7 @@ function App() {
             <li
               key={type.id}
               className={`sidebar-item${type.id === selectedType ? " active" : ""}`}
-              onClick={() => setSelectedType(type.id)}
+              onClick={() => handleSelectType(type.id)}
             >
               <span className="sidebar-item-label">{type.label}</span>
               <span className="sidebar-item-label-en">{type.labelEn}</span>
