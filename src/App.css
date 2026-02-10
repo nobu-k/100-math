@@ -85,29 +85,14 @@
   background: #f0f0f0;
 }
 
-.operator-toggle {
-  display: flex;
-  gap: 0;
-}
-
-.operator-toggle button {
-  border-radius: 0;
-  border-right-width: 1px;
-}
-
-.operator-toggle button:first-child {
-  border-radius: 6px 0 0 6px;
-}
-
-.operator-toggle button:last-child {
-  border-radius: 0 6px 6px 0;
-  border-right-width: 2px;
-}
-
-.operator-toggle button.active {
-  background: #1a73e8;
-  color: #fff;
-  border-color: #1a73e8;
+.operator-select {
+  font-size: 18px;
+  padding: 10px 24px;
+  cursor: pointer;
+  border: 2px solid #333;
+  border-radius: 6px;
+  background: #fff;
+  color: #333;
 }
 
 .grid {

@@ -120,26 +120,15 @@ function Grid100() {
   return (
     <>
       <div className="no-print controls">
-        <div className="operator-toggle">
-          <button
-            className={operator === "add" ? "active" : ""}
-            onClick={() => handleSetOperator("add")}
-          >
-            たし算 / +
-          </button>
-          <button
-            className={operator === "sub" ? "active" : ""}
-            onClick={() => handleSetOperator("sub")}
-          >
-            ひき算 / −
-          </button>
-          <button
-            className={operator === "mul" ? "active" : ""}
-            onClick={() => handleSetOperator("mul")}
-          >
-            かけ算 / ×
-          </button>
-        </div>
+        <select
+          className="operator-select"
+          value={operator}
+          onChange={(e) => handleSetOperator(e.target.value as Operator)}
+        >
+          <option value="add">たし算 / +</option>
+          <option value="sub">ひき算 / −</option>
+          <option value="mul">かけ算 / ×</option>
+        </select>
         <button onClick={handleNewProblem}>新しい問題 / New Problem</button>
         <button onClick={handleToggleAnswers}>
           {showAnswers ? "答えを隠す / Hide Answers" : "答え / Show Answers"}
