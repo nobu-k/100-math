@@ -67,11 +67,24 @@ function getInitialProblem(): Problem {
   return problem;
 }
 
+interface ProblemType {
+  id: string;
+  label: string;
+  labelEn: string;
+}
+
+const problemTypes: ProblemType[] = [
+  { id: "100grid", label: "百マス計算", labelEn: "100 Grid Math" },
+];
+
 function App() {
+  const [selectedType, setSelectedType] = useState("100grid");
   const [problem, setProblem] = useState(getInitialProblem);
   const [showAnswers, setShowAnswers] = useState(() => {
     return new URLSearchParams(window.location.search).get("answers") === "1";
   });
+
+  const currentType = problemTypes.find((t) => t.id === selectedType)!;
 
   const handleNewProblem = useCallback(() => {
     const newProblem = generateProblem();
@@ -97,57 +110,77 @@ function App() {
   }, [problem]);
 
   return (
-    <div className="app">
-      <div className="no-print controls">
-        <button onClick={handleNewProblem}>新しい問題 / New Problem</button>
-        <button onClick={handleToggleAnswers}>
-          {showAnswers ? "答えを隠す / Hide Answers" : "答え / Show Answers"}
-        </button>
-      </div>
-      <table className="grid">
-        <thead>
-          <tr>
-            <th className="corner-cell">
-              <svg viewBox="0 0 100 100" className="corner-svg">
-                <line
-                  x1="0"
-                  y1="0"
-                  x2="100"
-                  y2="100"
-                  stroke="black"
-                  strokeWidth="2"
-                />
-                <text x="68" y="38" fontSize="32" textAnchor="middle">
-                  →
-                </text>
-                <text x="32" y="78" fontSize="32" textAnchor="middle">
-                  ↓
-                </text>
-              </svg>
-            </th>
-            {colHeaders.map((num, i) => (
-              <th key={i} className="header-cell">
-                {num}
+    <div className="layout">
+      <nav className="sidebar no-print">
+        <h2 className="sidebar-title">問題の種類 / Type</h2>
+        <ul className="sidebar-menu">
+          {problemTypes.map((type) => (
+            <li
+              key={type.id}
+              className={`sidebar-item${type.id === selectedType ? " active" : ""}`}
+              onClick={() => setSelectedType(type.id)}
+            >
+              <span className="sidebar-item-label">{type.label}</span>
+              <span className="sidebar-item-label-en">{type.labelEn}</span>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div className="app">
+        <h1 className="print-title">
+          {currentType.label} / {currentType.labelEn}
+        </h1>
+        <div className="no-print controls">
+          <button onClick={handleNewProblem}>新しい問題 / New Problem</button>
+          <button onClick={handleToggleAnswers}>
+            {showAnswers ? "答えを隠す / Hide Answers" : "答え / Show Answers"}
+          </button>
+        </div>
+        <table className="grid">
+          <thead>
+            <tr>
+              <th className="corner-cell">
+                <svg viewBox="0 0 100 100" className="corner-svg">
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="100"
+                    y2="100"
+                    stroke="black"
+                    strokeWidth="2"
+                  />
+                  <text x="68" y="38" fontSize="32" textAnchor="middle">
+                    →
+                  </text>
+                  <text x="32" y="78" fontSize="32" textAnchor="middle">
+                    ↓
+                  </text>
+                </svg>
               </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rowHeaders.map((rowNum, ri) => (
-            <tr key={ri}>
-              <th className="header-cell">{rowNum}</th>
-              {colHeaders.map((colNum, ci) => (
-                <td key={ci} className="answer-cell">
-                  {showAnswers ? rowNum + colNum : ""}
-                </td>
+              {colHeaders.map((num, i) => (
+                <th key={i} className="header-cell">
+                  {num}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="qr-section">
-        <QRCodeSVG value={qrUrl} size={80} />
-        <span className="qr-label">答え / Answers</span>
+          </thead>
+          <tbody>
+            {rowHeaders.map((rowNum, ri) => (
+              <tr key={ri}>
+                <th className="header-cell">{rowNum}</th>
+                {colHeaders.map((colNum, ci) => (
+                  <td key={ci} className="answer-cell">
+                    {showAnswers ? rowNum + colNum : ""}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="qr-section">
+          <QRCodeSVG value={qrUrl} size={80} />
+          <span className="qr-label">答え / Answers</span>
+        </div>
       </div>
     </div>
   );
