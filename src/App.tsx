@@ -2,6 +2,8 @@ import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import "./App.css";
 
+type Operator = "add" | "mul";
+
 interface Problem {
   rowHeaders: number[];
   colHeaders: number[];
@@ -44,7 +46,7 @@ function generateProblem(): Problem {
   };
 }
 
-function updateUrl(problem: Problem, showAnswers: boolean) {
+function updateUrl(problem: Problem, showAnswers: boolean, operator: Operator) {
   const url = new URL(window.location.href);
   url.searchParams.set("q", encodeProblem(problem));
   if (showAnswers) {
@@ -52,7 +54,14 @@ function updateUrl(problem: Problem, showAnswers: boolean) {
   } else {
     url.searchParams.delete("answers");
   }
+  url.searchParams.set("op", operator);
   window.history.replaceState(null, "", url.toString());
+}
+
+function getInitialOperator(): Operator {
+  const params = new URLSearchParams(window.location.search);
+  const op = params.get("op");
+  return op === "mul" ? "mul" : "add";
 }
 
 function getInitialProblem(): Problem {
@@ -63,7 +72,7 @@ function getInitialProblem(): Problem {
     if (decoded) return decoded;
   }
   const problem = generateProblem();
-  updateUrl(problem, false);
+  updateUrl(problem, false, getInitialOperator());
   return problem;
 }
 
@@ -80,6 +89,7 @@ const problemTypes: ProblemType[] = [
 function App() {
   const [selectedType, setSelectedType] = useState("100grid");
   const [problem, setProblem] = useState(getInitialProblem);
+  const [operator, setOperator] = useState<Operator>(getInitialOperator);
   const [showAnswers, setShowAnswers] = useState(() => {
     return new URLSearchParams(window.location.search).get("answers") === "1";
   });
@@ -88,17 +98,25 @@ function App() {
 
   const handleNewProblem = useCallback(() => {
     const newProblem = generateProblem();
-    updateUrl(newProblem, false);
+    updateUrl(newProblem, false, operator);
     setProblem(newProblem);
     setShowAnswers(false);
-  }, []);
+  }, [operator]);
 
   const handleToggleAnswers = useCallback(() => {
     setShowAnswers((prev) => {
-      updateUrl(problem, !prev);
+      updateUrl(problem, !prev, operator);
       return !prev;
     });
-  }, [problem]);
+  }, [problem, operator]);
+
+  const handleSetOperator = useCallback(
+    (op: Operator) => {
+      setOperator(op);
+      updateUrl(problem, showAnswers, op);
+    },
+    [problem, showAnswers],
+  );
 
   const { rowHeaders, colHeaders } = problem;
 
@@ -106,8 +124,9 @@ function App() {
     const url = new URL(window.location.href);
     url.searchParams.set("q", encodeProblem(problem));
     url.searchParams.set("answers", "1");
+    url.searchParams.set("op", operator);
     return url.toString();
-  }, [problem]);
+  }, [problem, operator]);
 
   return (
     <div className="layout">
@@ -131,6 +150,20 @@ function App() {
           {currentType.label} / {currentType.labelEn}
         </h1>
         <div className="no-print controls">
+          <div className="operator-toggle">
+            <button
+              className={operator === "add" ? "active" : ""}
+              onClick={() => handleSetOperator("add")}
+            >
+              たし算 / +
+            </button>
+            <button
+              className={operator === "mul" ? "active" : ""}
+              onClick={() => handleSetOperator("mul")}
+            >
+              かけ算 / ×
+            </button>
+          </div>
           <button onClick={handleNewProblem}>新しい問題 / New Problem</button>
           <button onClick={handleToggleAnswers}>
             {showAnswers ? "答えを隠す / Hide Answers" : "答え / Show Answers"}
@@ -140,22 +173,7 @@ function App() {
           <thead>
             <tr>
               <th className="corner-cell">
-                <svg viewBox="0 0 100 100" className="corner-svg">
-                  <line
-                    x1="0"
-                    y1="0"
-                    x2="100"
-                    y2="100"
-                    stroke="black"
-                    strokeWidth="2"
-                  />
-                  <text x="68" y="38" fontSize="32" textAnchor="middle">
-                    →
-                  </text>
-                  <text x="32" y="78" fontSize="32" textAnchor="middle">
-                    ↓
-                  </text>
-                </svg>
+                {operator === "mul" ? "×" : "+"}
               </th>
               {colHeaders.map((num, i) => (
                 <th key={i} className="header-cell">
@@ -170,7 +188,11 @@ function App() {
                 <th className="header-cell">{rowNum}</th>
                 {colHeaders.map((colNum, ci) => (
                   <td key={ci} className="answer-cell">
-                    {showAnswers ? rowNum + colNum : ""}
+                    {showAnswers
+                      ? operator === "mul"
+                        ? rowNum * colNum
+                        : rowNum + colNum
+                      : ""}
                   </td>
                 ))}
               </tr>
