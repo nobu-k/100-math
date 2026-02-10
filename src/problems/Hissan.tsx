@@ -60,32 +60,47 @@ const digitsWithExactSum = (rng: () => number, n: number, exactSum: number): num
  * - Highest column: digit sum + carry_in >= 10 (carries out).
  */
 const generateCarryChainProblem = (rng: () => number, cfg: HissanConfig): Problem => {
-  const width = cfg.maxDigits;
   const numOps = cfg.numOperands;
-  const minVal = cfg.minDigits <= 1 ? 1 : Math.pow(10, cfg.minDigits - 1);
 
   for (let attempt = 0; attempt < 100; attempt++) {
+    // Choose digit count for each operand independently
+    const opWidths = Array.from({ length: numOps }, () =>
+      cfg.minDigits + Math.floor(rng() * (cfg.maxDigits - cfg.minDigits + 1)),
+    );
+    const width = Math.max(...opWidths);
     const opDigits: number[][] = Array.from({ length: numOps }, () => []);
     let carry = 0;
 
     for (let col = 0; col < width; col++) {
+      const active: number[] = [];
+      for (let op = 0; op < numOps; op++) {
+        if (col < opWidths[op]) active.push(op);
+      }
+
       let colDigits: number[];
       if (col === 0) {
-        colDigits = digitsWithMinSum(rng, numOps, 10);
+        colDigits = digitsWithMinSum(rng, active.length, 10);
       } else if (col < width - 1) {
-        colDigits = digitsWithExactSum(rng, numOps, 10 - carry);
+        colDigits = digitsWithExactSum(rng, active.length, 10 - carry);
       } else {
-        colDigits = digitsWithMinSum(rng, numOps, 10 - carry);
+        colDigits = digitsWithMinSum(rng, active.length, 10 - carry);
       }
+
       const total = colDigits.reduce((a, b) => a + b, 0) + carry;
       carry = Math.floor(total / 10);
-      for (let op = 0; op < numOps; op++) opDigits[op].push(colDigits[op]);
+      let ai = 0;
+      for (let op = 0; op < numOps; op++) {
+        opDigits[op].push(col < opWidths[op] ? colDigits[ai++] : 0);
+      }
     }
 
     const numbers = opDigits.map((digits) =>
       digits.reduce((num, d, col) => num + d * Math.pow(10, col), 0),
     );
-    if (numbers.every((n) => n >= minVal)) return numbers;
+    // Verify each operand actually has its intended digit count
+    if (numbers.every((n, i) => n >= (opWidths[i] <= 1 ? 1 : Math.pow(10, opWidths[i] - 1)))) {
+      return numbers;
+    }
   }
 
   // Fallback (should rarely happen)
