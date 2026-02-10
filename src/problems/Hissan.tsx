@@ -135,6 +135,7 @@ function Hissan() {
   });
   const [minDigits, setMinDigits] = useState(() => getInitialDigits().minDigits);
   const [maxDigits, setMaxDigits] = useState(() => getInitialDigits().maxDigits);
+  const [showSettings, setShowSettings] = useState(false);
 
   const problems = useMemo(
     () => generateProblems(seed, minDigits, maxDigits),
@@ -199,29 +200,42 @@ function Hissan() {
         <button onClick={handleToggleAnswers}>
           {showAnswers ? "答えを隠す / Hide Answers" : "答え / Show Answers"}
         </button>
-        <select
-          className="operator-select"
-          value={minDigits}
-          onChange={handleMinDigitsChange}
-        >
-          {[1, 2, 3, 4].map((d) => (
-            <option key={d} value={d}>
-              最小 {d} 桁
-            </option>
-          ))}
-        </select>
-        <select
-          className="operator-select"
-          value={maxDigits}
-          onChange={handleMaxDigitsChange}
-        >
-          {[1, 2, 3, 4].map((d) => (
-            <option key={d} value={d}>
-              最大 {d} 桁
-            </option>
-          ))}
-        </select>
+        <button onClick={() => setShowSettings((prev) => !prev)}>
+          設定 / Settings
+        </button>
       </div>
+      {showSettings && (
+        <div className="no-print settings-panel">
+          <label>
+            最小桁数:{" "}
+            <select
+              className="operator-select"
+              value={minDigits}
+              onChange={handleMinDigitsChange}
+            >
+              {[1, 2, 3, 4].map((d) => (
+                <option key={d} value={d}>
+                  {d} 桁
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            最大桁数:{" "}
+            <select
+              className="operator-select"
+              value={maxDigits}
+              onChange={handleMaxDigitsChange}
+            >
+              {[1, 2, 3, 4].map((d) => (
+                <option key={d} value={d}>
+                  {d} 桁
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
       <div className="hissan-page">
         {problems.map((problem, i) => (
           <HissanProblem
