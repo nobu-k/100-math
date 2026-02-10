@@ -68,6 +68,9 @@ const generateCarryChainProblem = (rng: () => number, cfg: HissanConfig): Proble
       cfg.minDigits + Math.floor(rng() * (cfg.maxDigits - cfg.minDigits + 1)),
     );
     const width = Math.max(...opWidths);
+    // Carry chain spans 2..width columns from ones (or 1 if width=1)
+    const minChain = Math.min(2, width);
+    const chainLen = minChain + Math.floor(rng() * (width - minChain + 1));
     const opDigits: number[][] = Array.from({ length: numOps }, () => []);
     let carry = 0;
 
@@ -78,12 +81,20 @@ const generateCarryChainProblem = (rng: () => number, cfg: HissanConfig): Proble
       }
 
       let colDigits: number[];
-      if (col === 0) {
-        colDigits = digitsWithMinSum(rng, active.length, 10);
-      } else if (col < width - 1) {
-        colDigits = digitsWithExactSum(rng, active.length, 10 - carry);
+      if (col < chainLen) {
+        // Carry chain: each column must produce a carry
+        if (col === 0) {
+          colDigits = digitsWithMinSum(rng, active.length, 10);
+        } else if (col === 1 || col < chainLen - 1) {
+          // Tens column is always a corner case (digit sum = 9);
+          // other middle chain columns likewise
+          colDigits = digitsWithExactSum(rng, active.length, 10 - carry);
+        } else {
+          colDigits = digitsWithMinSum(rng, active.length, 10 - carry);
+        }
       } else {
-        colDigits = digitsWithMinSum(rng, active.length, 10 - carry);
+        // Beyond the chain: random digits, carry absorbed naturally
+        colDigits = active.map(() => randInt(rng, 0, 9));
       }
 
       const total = colDigits.reduce((a, b) => a + b, 0) + carry;
