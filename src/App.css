@@ -97,20 +97,27 @@
 
 .settings-panel {
   display: flex;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 12px 16px;
   align-items: center;
   margin-bottom: 20px;
   padding: 12px 16px;
   border: 2px solid #ddd;
   border-radius: 6px;
   background: #fafafa;
+  max-width: 480px;
 }
 
 .settings-panel label {
   display: flex;
   gap: 8px;
   align-items: center;
-  font-size: 16px;
+  font-size: 14px;
+}
+
+.settings-panel .operator-select {
+  font-size: 14px;
+  padding: 4px 8px;
 }
 
 .grid {
