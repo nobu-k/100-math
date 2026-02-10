@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import type { ProblemTypeDefinition } from "./types";
+import { mulberry32, randomSeed, seedToHex, hexToSeed } from "./random";
 import "../App.css";
 
 interface Problem {
@@ -8,53 +9,36 @@ interface Problem {
   b: number;
 }
 
-function encodeProblems(problems: Problem[]): string {
-  return problems
-    .map((p) => String(p.a).padStart(2, "0") + String(p.b).padStart(2, "0"))
-    .join("");
-}
-
-function decodeProblems(encoded: string): Problem[] | null {
-  if (encoded.length !== 48) return null;
-  const problems: Problem[] = [];
-  for (let i = 0; i < 48; i += 4) {
-    const a = parseInt(encoded.slice(i, i + 2), 10);
-    const b = parseInt(encoded.slice(i + 2, i + 4), 10);
-    if (a < 1 || a > 99 || b < 1 || b > 99) return null;
-    problems.push({ a, b });
-  }
-  return problems;
-}
-
-function generateProblems(): Problem[] {
+const generateProblems = (seed: number): Problem[] => {
+  const rng = mulberry32(seed);
   return Array.from({ length: 12 }, () => ({
-    a: Math.floor(Math.random() * 99) + 1,
-    b: Math.floor(Math.random() * 99) + 1,
+    a: Math.floor(rng() * 99) + 1,
+    b: Math.floor(rng() * 99) + 1,
   }));
-}
+};
 
-function updateUrl(problems: Problem[], showAnswers: boolean) {
+const updateUrl = (seed: number, showAnswers: boolean) => {
   const url = new URL(window.location.href);
-  url.searchParams.set("hq", encodeProblems(problems));
+  url.searchParams.set("hq", seedToHex(seed));
   if (showAnswers) {
     url.searchParams.set("answers", "1");
   } else {
     url.searchParams.delete("answers");
   }
   window.history.replaceState(null, "", url.toString());
-}
+};
 
-function getInitialProblems(): Problem[] {
+const getInitialSeed = (): number => {
   const params = new URLSearchParams(window.location.search);
   const hq = params.get("hq");
   if (hq) {
-    const decoded = decodeProblems(hq);
-    if (decoded) return decoded;
+    const parsed = hexToSeed(hq);
+    if (parsed !== null) return parsed;
   }
-  const problems = generateProblems();
-  updateUrl(problems, false);
-  return problems;
-}
+  const seed = randomSeed();
+  updateUrl(seed, false);
+  return seed;
+};
 
 function HissanProblem({
   index,
@@ -110,31 +94,33 @@ function HissanProblem({
 }
 
 function Hissan() {
-  const [problems, setProblems] = useState(getInitialProblems);
+  const [seed, setSeed] = useState(getInitialSeed);
   const [showAnswers, setShowAnswers] = useState(() => {
     return new URLSearchParams(window.location.search).get("answers") === "1";
   });
 
+  const problems = useMemo(() => generateProblems(seed), [seed]);
+
   const handleNewProblems = useCallback(() => {
-    const newProblems = generateProblems();
-    updateUrl(newProblems, false);
-    setProblems(newProblems);
+    const newSeed = randomSeed();
+    updateUrl(newSeed, false);
+    setSeed(newSeed);
     setShowAnswers(false);
   }, []);
 
   const handleToggleAnswers = useCallback(() => {
     setShowAnswers((prev) => {
-      updateUrl(problems, !prev);
+      updateUrl(seed, !prev);
       return !prev;
     });
-  }, [problems]);
+  }, [seed]);
 
   const qrUrl = useMemo(() => {
     const url = new URL(window.location.href);
-    url.searchParams.set("hq", encodeProblems(problems));
+    url.searchParams.set("hq", seedToHex(seed));
     url.searchParams.set("answers", "1");
     return url.toString();
-  }, [problems]);
+  }, [seed]);
 
   return (
     <>

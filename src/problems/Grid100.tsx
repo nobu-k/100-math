@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import type { ProblemTypeDefinition } from "./types";
+import { mulberry32, randomSeed, seedToHex, hexToSeed } from "./random";
 import "../App.css";
 
 type Operator = "add" | "sub" | "mul";
@@ -10,46 +11,27 @@ interface Problem {
   colHeaders: number[];
 }
 
-function shuffleArray(arr: number[]): number[] {
+const seededShuffle = (arr: number[], rng: () => number): number[] => {
   const shuffled = [...arr];
   for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
-}
+};
 
-function encodeProblem(problem: Problem): string {
-  return (
-    problem.rowHeaders.join("") + "-" + problem.colHeaders.join("")
-  );
-}
-
-function decodeProblem(encoded: string): Problem | null {
-  const parts = encoded.split("-");
-  if (parts.length !== 2) return null;
-  const rows = parts[0].split("").map(Number);
-  const cols = parts[1].split("").map(Number);
-  if (rows.length !== 9 || cols.length !== 9) return null;
-  const isValidPerm = (arr: number[]) => {
-    const sorted = [...arr].sort();
-    return sorted.every((v, i) => v === i + 1);
-  };
-  if (!isValidPerm(rows) || !isValidPerm(cols)) return null;
-  return { rowHeaders: rows, colHeaders: cols };
-}
-
-function generateProblem(): Problem {
+const generateProblem = (seed: number): Problem => {
+  const rng = mulberry32(seed);
   const digits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   return {
-    rowHeaders: shuffleArray(digits),
-    colHeaders: shuffleArray(digits),
+    rowHeaders: seededShuffle(digits, rng),
+    colHeaders: seededShuffle(digits, rng),
   };
-}
+};
 
-function updateUrl(problem: Problem, showAnswers: boolean, operator: Operator) {
+const updateUrl = (seed: number, showAnswers: boolean, operator: Operator) => {
   const url = new URL(window.location.href);
-  url.searchParams.set("q", encodeProblem(problem));
+  url.searchParams.set("q", seedToHex(seed));
   if (showAnswers) {
     url.searchParams.set("answers", "1");
   } else {
@@ -57,65 +39,67 @@ function updateUrl(problem: Problem, showAnswers: boolean, operator: Operator) {
   }
   url.searchParams.set("op", operator);
   window.history.replaceState(null, "", url.toString());
-}
+};
 
-function getInitialOperator(): Operator {
+const getInitialOperator = (): Operator => {
   const params = new URLSearchParams(window.location.search);
   const op = params.get("op");
   if (op === "mul" || op === "sub") return op;
   return "add";
-}
+};
 
-function getInitialProblem(): Problem {
+const getInitialSeed = (): number => {
   const params = new URLSearchParams(window.location.search);
   const q = params.get("q");
   if (q) {
-    const decoded = decodeProblem(q);
-    if (decoded) return decoded;
+    const parsed = hexToSeed(q);
+    if (parsed !== null) return parsed;
   }
-  const problem = generateProblem();
-  updateUrl(problem, false, getInitialOperator());
-  return problem;
-}
+  const seed = randomSeed();
+  updateUrl(seed, false, getInitialOperator());
+  return seed;
+};
 
 function Grid100() {
-  const [problem, setProblem] = useState(getInitialProblem);
+  const [seed, setSeed] = useState(getInitialSeed);
   const [operator, setOperator] = useState<Operator>(getInitialOperator);
   const [showAnswers, setShowAnswers] = useState(() => {
     return new URLSearchParams(window.location.search).get("answers") === "1";
   });
 
+  const problem = useMemo(() => generateProblem(seed), [seed]);
+
   const handleNewProblem = useCallback(() => {
-    const newProblem = generateProblem();
-    updateUrl(newProblem, false, operator);
-    setProblem(newProblem);
+    const newSeed = randomSeed();
+    updateUrl(newSeed, false, operator);
+    setSeed(newSeed);
     setShowAnswers(false);
   }, [operator]);
 
   const handleToggleAnswers = useCallback(() => {
     setShowAnswers((prev) => {
-      updateUrl(problem, !prev, operator);
+      updateUrl(seed, !prev, operator);
       return !prev;
     });
-  }, [problem, operator]);
+  }, [seed, operator]);
 
   const handleSetOperator = useCallback(
     (op: Operator) => {
       setOperator(op);
-      updateUrl(problem, showAnswers, op);
+      updateUrl(seed, showAnswers, op);
     },
-    [problem, showAnswers],
+    [seed, showAnswers],
   );
 
   const { rowHeaders, colHeaders } = problem;
 
   const qrUrl = useMemo(() => {
     const url = new URL(window.location.href);
-    url.searchParams.set("q", encodeProblem(problem));
+    url.searchParams.set("q", seedToHex(seed));
     url.searchParams.set("answers", "1");
     url.searchParams.set("op", operator);
     return url.toString();
-  }, [problem, operator]);
+  }, [seed, operator]);
 
   return (
     <>
