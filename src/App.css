@@ -53,6 +53,10 @@
   margin-top: 2px;
 }
 
+.mobile-toolbar {
+  display: none;
+}
+
 .app {
   flex: 1;
   display: flex;
@@ -210,6 +214,72 @@
 
 .hissan-no-grid .hissan-operator-row td {
   border-bottom-color: #000;
+}
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .mobile-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .mobile-toolbar button {
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 12px;
+  }
+
+  .sidebar {
+    display: none;
+    width: 100%;
+    border-right: none;
+    border-bottom: 2px solid #ddd;
+    padding: 8px 0;
+  }
+
+  .sidebar.menu-open {
+    display: block;
+  }
+
+  .sidebar-item {
+    border-left: none;
+    padding: 8px 16px;
+  }
+
+  .sidebar-item.active {
+    border-left: none;
+    background: #e8f0fe;
+  }
+
+  .app {
+    padding: 10px;
+  }
+
+  .controls {
+    display: none;
+  }
+
+  .controls-open .controls {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .controls-open .controls button {
+    font-size: 14px;
+    padding: 6px 14px;
+  }
+
+  .settings-panel {
+    max-width: 100%;
+  }
 }
 
 @media print {

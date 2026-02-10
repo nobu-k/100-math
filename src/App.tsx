@@ -11,9 +11,12 @@ function getInitialType(): string {
 
 function App() {
   const [selectedType, setSelectedType] = useState(getInitialType);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [controlsOpen, setControlsOpen] = useState(false);
 
   const handleSelectType = useCallback((id: string) => {
     setSelectedType(id);
+    setMenuOpen(false);
     const url = new URL(window.location.href);
     // Clear stale problem params from other types
     url.searchParams.delete("q");
@@ -28,8 +31,22 @@ function App() {
   const { Component } = currentType;
 
   return (
-    <div className="layout">
-      <nav className="sidebar no-print">
+    <div className={`layout${controlsOpen ? " controls-open" : ""}`}>
+      <div className="mobile-toolbar no-print">
+        <button
+          className="menu-toggle"
+          onClick={() => setMenuOpen((v) => !v)}
+        >
+          ☰
+        </button>
+        <button
+          className="controls-toggle"
+          onClick={() => setControlsOpen((v) => !v)}
+        >
+          ⚙
+        </button>
+      </div>
+      <nav className={`sidebar no-print${menuOpen ? " menu-open" : ""}`}>
         <h2 className="sidebar-title">問題の種類 / Type</h2>
         <ul className="sidebar-menu">
           {problemTypes.map((type) => (
