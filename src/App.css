@@ -210,7 +210,7 @@
   font-weight: bold;
   height: 24px;
   color: red;
-  border: 2px dotted transparent;
+  border: none;
   text-align: center;
   vertical-align: bottom;
   padding: 0;
