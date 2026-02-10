@@ -211,7 +211,7 @@ function HissanProblem({
         <tbody>
           {problem.map((operand, ri) => {
             const digits = toDigitCells(operand, totalCols);
-            if (ri === 0) {
+            if (ri < last) {
               return (
                 <tr key={ri}>
                   {digits.map((d, i) => (
@@ -221,7 +221,7 @@ function HissanProblem({
               );
             }
             return (
-              <tr key={ri} className={ri === last ? "hissan-operator-row" : undefined}>
+              <tr key={ri} className="hissan-operator-row">
                 <td className="hissan-cell">+</td>
                 {digits.slice(1).map((d, i) => (
                   <td key={i} className="hissan-cell">{d}</td>
