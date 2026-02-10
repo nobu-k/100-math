@@ -9,18 +9,22 @@ interface Problem {
   b: number;
 }
 
+const generateNumber = (rng: () => number, minDigits: number, maxDigits: number): number => {
+  const digits = minDigits + Math.floor(rng() * (maxDigits - minDigits + 1));
+  const lo = digits === 1 ? 1 : Math.pow(10, digits - 1);
+  const hi = Math.pow(10, digits) - 1;
+  return Math.floor(rng() * (hi - lo + 1)) + lo;
+};
+
 const generateProblems = (
   seed: number,
   minDigits: number,
   maxDigits: number,
 ): Problem[] => {
   const rng = mulberry32(seed);
-  const min = minDigits === 1 ? 1 : Math.pow(10, minDigits - 1);
-  const max = Math.pow(10, maxDigits) - 1;
-  const range = max - min + 1;
   return Array.from({ length: 12 }, () => ({
-    a: Math.floor(rng() * range) + min,
-    b: Math.floor(rng() * range) + min,
+    a: generateNumber(rng, minDigits, maxDigits),
+    b: generateNumber(rng, minDigits, maxDigits),
   }));
 };
 
