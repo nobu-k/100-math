@@ -265,6 +265,63 @@ export const parseConfig = (params: URLSearchParams): HissanConfig => {
   return { minDigits, maxDigits, numOperands, consecutiveCarries, showGrid, operator };
 };
 
+/** Convert a number to an array of digits, padded to `width` with empty strings on the left. */
+export const toDigitCells = (n: number, width: number): (number | "")[] => {
+  const str = String(n);
+  const cells: (number | "")[] = Array(width).fill("");
+  for (let i = 0; i < str.length; i++) {
+    cells[width - str.length + i] = parseInt(str[i], 10);
+  }
+  return cells;
+};
+
+export interface Indicators {
+  indicators: number[];
+  borrowOut: number[];
+  borrowDisplay: (number | "")[];
+}
+
+/** Compute carry/borrow indicators for a problem. */
+export const computeIndicators = (problem: Problem, maxDigits: number, operator: HissanOperator): Indicators => {
+  const totalCols = maxDigits + 1;
+  const operandDigits = problem.map((op) => toDigitCells(op, totalCols));
+  const indicators = new Array<number>(totalCols).fill(0);
+  const borrowOut = new Array<number>(totalCols).fill(0);
+  const borrowDisplay = new Array<number | "">(totalCols).fill("");
+
+  if (operator === "sub") {
+    let borrow = 0;
+    for (let col = totalCols - 1; col >= 0; col--) {
+      const minuendDigit = operandDigits[0][col] === "" ? 0 : operandDigits[0][col] as number;
+      let subSum = 0;
+      for (let s = 1; s < operandDigits.length; s++) {
+        const d = operandDigits[s][col];
+        if (d !== "") subSum += d;
+      }
+      indicators[col] = borrow;
+      const diff = minuendDigit - subSum - borrow;
+      borrowOut[col] = diff < 0 ? 1 : 0;
+      if (borrow > 0) {
+        borrowDisplay[col] = minuendDigit - 1 + borrowOut[col] * 10;
+      }
+      borrow = borrowOut[col];
+    }
+  } else {
+    let carry = 0;
+    for (let col = totalCols - 1; col >= 0; col--) {
+      let colSum = carry;
+      for (const digits of operandDigits) {
+        const d = digits[col];
+        if (d !== "") colSum += d;
+      }
+      indicators[col] = carry;
+      carry = Math.floor(colSum / 10);
+    }
+  }
+
+  return { indicators, borrowOut, borrowDisplay };
+};
+
 export const buildParams = (seed: number, showAnswers: boolean, cfg: HissanConfig): URLSearchParams => {
   const params = new URLSearchParams();
   params.set("hq", seedToHex(seed));

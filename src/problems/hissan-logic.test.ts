@@ -12,6 +12,8 @@ import {
   digitsWithMinSum,
   digitsWithExactSum,
   randInt,
+  toDigitCells,
+  computeIndicators,
   type HissanConfig,
 } from "./hissan-logic";
 
@@ -471,5 +473,94 @@ describe("generateSubtractionProblem", () => {
       const problem = generateSubtractionProblem(rng, cfg);
       expect(problem[0] - problem[1]).toBeGreaterThanOrEqual(0);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// toDigitCells
+// ---------------------------------------------------------------------------
+describe("toDigitCells", () => {
+  it("pads with empty strings on the left", () => {
+    expect(toDigitCells(42, 4)).toEqual(["", "", 4, 2]);
+  });
+
+  it("fills exact width with no padding", () => {
+    expect(toDigitCells(123, 3)).toEqual([1, 2, 3]);
+  });
+
+  it("handles single digit", () => {
+    expect(toDigitCells(5, 3)).toEqual(["", "", 5]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// computeIndicators
+// ---------------------------------------------------------------------------
+describe("computeIndicators", () => {
+  describe("addition carries", () => {
+    it("no carry for small numbers", () => {
+      // 12 + 34 = 46, no carry
+      const { indicators } = computeIndicators([12, 34], 2, "add");
+      // totalCols = 3: [col0, col1, col2]
+      expect(indicators).toEqual([0, 0, 0]);
+    });
+
+    it("carry from ones to tens", () => {
+      // 18 + 15 = 33, carry from ones
+      const { indicators } = computeIndicators([18, 15], 2, "add");
+      // indicators show carry *into* each column
+      // col 0 (hundreds): carry from tens? 8+5=13 ones carry=1, 1+1+1=3 tens no carry → 0
+      // col 1 (tens): carry from ones = 1
+      // col 2 (ones): no carry in = 0
+      expect(indicators[2]).toBe(0); // ones: no carry in
+      expect(indicators[1]).toBe(1); // tens: carry from ones
+    });
+
+    it("carry chain across all columns", () => {
+      // 99 + 11 = 110, carries in every column
+      const { indicators } = computeIndicators([99, 11], 2, "add");
+      // col 2 (ones): no carry in → 0
+      // col 1 (tens): carry from ones (9+1=10) → 1
+      // col 0 (hundreds): carry from tens (9+1+1=11) → 1
+      expect(indicators).toEqual([1, 1, 0]);
+    });
+  });
+
+  describe("subtraction borrows", () => {
+    it("no borrow when minuend digits are larger", () => {
+      // 85 - 23 = 62, no borrow
+      const { indicators, borrowOut } = computeIndicators([85, 23], 2, "sub");
+      expect(indicators).toEqual([0, 0, 0]);
+      expect(borrowOut).toEqual([0, 0, 0]);
+    });
+
+    it("borrow from tens to ones", () => {
+      // 42 - 15 = 27, ones: 2-5 < 0 → borrow
+      const { indicators, borrowOut, borrowDisplay } = computeIndicators([42, 15], 2, "sub");
+      // col 2 (ones): no borrow in → indicators[2]=0, but 2-5<0 → borrowOut[2]=1
+      expect(indicators[2]).toBe(0);
+      expect(borrowOut[2]).toBe(1);
+      // col 1 (tens): borrow from ones → indicators[1]=1
+      expect(indicators[1]).toBe(1);
+      // borrowDisplay[1]: minuendDigit(4) - 1 + borrowOut[1]*10
+      // 4-1-1=2 >=0, so borrowOut[1]=0, display = 4-1+0 = 3
+      expect(borrowDisplay[1]).toBe(3);
+    });
+
+    it("consecutive borrows show large display value", () => {
+      // 100 - 1 = 99
+      // col 2 (ones): 0-1<0 → borrow
+      // col 1 (tens): 0-0-1<0 → borrow again
+      // borrowDisplay[1]: minuendDigit(0) - 1 + borrowOut[1]*10 = -1+10 = 9
+      const { indicators, borrowOut, borrowDisplay } = computeIndicators([100, 1], 3, "sub");
+      // totalCols = 4
+      expect(indicators[3]).toBe(0); // ones: no borrow in
+      expect(borrowOut[3]).toBe(1);  // ones borrows
+      expect(indicators[2]).toBe(1); // tens: borrow in
+      expect(borrowOut[2]).toBe(1);  // tens also borrows
+      expect(borrowDisplay[2]).toBe(9); // 0-1+10=9
+      expect(indicators[1]).toBe(1); // hundreds: borrow in
+      expect(borrowDisplay[1]).toBe(0); // 1-1+0=0
+    });
   });
 });

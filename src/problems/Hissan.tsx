@@ -9,18 +9,10 @@ import {
   generateProblems,
   parseConfig,
   buildParams,
+  toDigitCells,
+  computeIndicators,
 } from "./hissan-logic";
 import "../App.css";
-
-/** Convert a number to an array of digits, padded to `width` with empty strings on the left. */
-const toDigitCells = (n: number, width: number): (number | "")[] => {
-  const str = String(n);
-  const cells: (number | "")[] = Array(width).fill("");
-  for (let i = 0; i < str.length; i++) {
-    cells[width - str.length + i] = parseInt(str[i], 10);
-  }
-  return cells;
-};
 
 const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
   const url = new URL(window.location.href);
@@ -74,46 +66,7 @@ function HissanProblem({
   const last = problem.length - 1;
   const operatorSymbol = operator === "sub" ? "\u2212" : "+";
 
-  // Compute carries/borrows: iterate columns right-to-left
-  const operandDigits = problem.map((op) => toDigitCells(op, totalCols));
-  const indicators = new Array<number>(totalCols).fill(0);
-  // For subtraction: borrowOut[col]=1 means this column borrows from its left neighbor
-  const borrowOut = new Array<number>(totalCols).fill(0);
-  // For subtraction: display value above slashed digit
-  const borrowDisplay = new Array<number | "">(totalCols).fill("");
-
-  if (operator === "sub") {
-    // Compute borrows
-    let borrow = 0;
-    for (let col = totalCols - 1; col >= 0; col--) {
-      const minuendDigit = operandDigits[0][col] === "" ? 0 : operandDigits[0][col] as number;
-      let subSum = 0;
-      for (let s = 1; s < operandDigits.length; s++) {
-        const d = operandDigits[s][col];
-        if (d !== "") subSum += d;
-      }
-      indicators[col] = borrow;
-      const diff = minuendDigit - subSum - borrow;
-      borrowOut[col] = diff < 0 ? 1 : 0;
-      if (borrow > 0) {
-        // digit - 1, plus 10 if this column also borrows from left
-        borrowDisplay[col] = minuendDigit - 1 + borrowOut[col] * 10;
-      }
-      borrow = borrowOut[col];
-    }
-  } else {
-    // Compute carries
-    let carry = 0;
-    for (let col = totalCols - 1; col >= 0; col--) {
-      let colSum = carry;
-      for (const digits of operandDigits) {
-        const d = digits[col];
-        if (d !== "") colSum += d;
-      }
-      indicators[col] = carry;
-      carry = Math.floor(colSum / 10);
-    }
-  }
+  const { indicators, borrowOut, borrowDisplay } = computeIndicators(problem, maxDigits, operator);
 
   return (
     <div className="hissan-problem">
