@@ -5,6 +5,7 @@ import { mulberry32, randomSeed, seedToHex, hexToSeed } from "./random";
 import "../App.css";
 
 type Problem = number[];
+type HissanOperator = "add" | "sub";
 
 const generateNumber = (rng: () => number, minDigits: number, maxDigits: number): number => {
   const digits = minDigits + Math.floor(rng() * (maxDigits - minDigits + 1));
@@ -19,6 +20,7 @@ interface HissanConfig {
   numOperands: number;
   consecutiveCarries: boolean;
   showGrid: boolean;
+  operator: HissanOperator;
 }
 
 /** Pick a random integer in [lo, hi] inclusive. */
@@ -121,7 +123,126 @@ const generateCarryChainProblem = (rng: () => number, cfg: HissanConfig): Proble
   );
 };
 
+/** Generate a subtraction problem where minuend - subtrahend1 - subtrahend2 - ... >= 0. */
+const generateSubtractionProblem = (rng: () => number, cfg: HissanConfig): Problem => {
+  for (let attempt = 0; attempt < 100; attempt++) {
+    const minuend = generateNumber(rng, cfg.minDigits, cfg.maxDigits);
+    const subtrahends: number[] = [];
+    let budget = minuend - 1; // ensure result >= 0 (strictly: sum of subtrahends < minuend)
+    let ok = true;
+    for (let i = 1; i < cfg.numOperands; i++) {
+      const lo = cfg.minDigits === 1 ? 1 : Math.pow(10, cfg.minDigits - 1);
+      const hi = Math.min(Math.pow(10, cfg.maxDigits) - 1, budget - (cfg.numOperands - 1 - i));
+      if (hi < lo) { ok = false; break; }
+      const sub = randInt(rng, lo, hi);
+      subtrahends.push(sub);
+      budget -= sub;
+    }
+    if (ok) return [minuend, ...subtrahends];
+  }
+  // Fallback: simple guaranteed valid problem
+  const minuend = generateNumber(rng, cfg.minDigits, cfg.maxDigits);
+  return [minuend, ...Array.from({ length: cfg.numOperands - 1 }, () => 1)];
+};
+
+/**
+ * Constructively generate a subtraction problem with borrows in every column.
+ * Column-by-column (right-to-left): choose minuend digit and subtrahend digits
+ * such that minuendDigit - subDigitSum - borrowIn < 0, forcing a borrow.
+ */
+const generateBorrowChainProblem = (rng: () => number, cfg: HissanConfig): Problem => {
+  const numSubs = cfg.numOperands - 1;
+
+  for (let attempt = 0; attempt < 100; attempt++) {
+    // Choose digit count for minuend = maxDigits, subtrahends within [minDigits, maxDigits]
+    const minuendWidth = cfg.minDigits + Math.floor(rng() * (cfg.maxDigits - cfg.minDigits + 1));
+    const subWidths = Array.from({ length: numSubs }, () =>
+      cfg.minDigits + Math.floor(rng() * (cfg.maxDigits - cfg.minDigits + 1)),
+    );
+    const width = Math.max(minuendWidth, ...subWidths);
+    const minChain = Math.min(2, width);
+    const chainLen = minChain + Math.floor(rng() * (width - minChain + 1));
+
+    const minuendDigits: number[] = [];
+    const subDigits: number[][] = Array.from({ length: numSubs }, () => []);
+    let borrow = 0;
+
+    for (let col = 0; col < width; col++) {
+      const activeSubs: number[] = [];
+      for (let s = 0; s < numSubs; s++) {
+        if (col < subWidths[s]) activeSubs.push(s);
+      }
+      const minuendActive = col < minuendWidth;
+
+      if (col < chainLen && minuendActive) {
+        // Borrow chain: need minuendDigit < subDigitSum + borrow (forces borrow out)
+        // subDigitSum must be >= minuendDigit - borrow + 1 for a borrow to occur
+        // Pick minuend digit, then choose sub digits that exceed it
+        const mDigit = randInt(rng, 0, 8); // leave room for sub digits to exceed
+        const minSubSum = mDigit + 1 - borrow; // need subSum > mDigit - borrow, so subSum >= mDigit - borrow + 1
+        if (minSubSum > activeSubs.length * 9 || minSubSum < 0) {
+          // Can't force a borrow with these constraints at this column
+          // Use simpler approach: mDigit=0, subDigits sum to at least 1
+          minuendDigits.push(0);
+          const colSubs = activeSubs.length > 0
+            ? digitsWithMinSum(rng, activeSubs.length, Math.max(1 - borrow, 0))
+            : [];
+          let si = 0;
+          for (let s = 0; s < numSubs; s++) {
+            subDigits[s].push(col < subWidths[s] ? colSubs[si++] : 0);
+          }
+          const diff = 0 - colSubs.reduce((a, b) => a + b, 0) - borrow;
+          borrow = diff < 0 ? 1 : 0;
+        } else {
+          minuendDigits.push(mDigit);
+          const safeMinSubSum = Math.max(0, minSubSum);
+          const colSubs = activeSubs.length > 0
+            ? digitsWithMinSum(rng, activeSubs.length, safeMinSubSum)
+            : [];
+          let si = 0;
+          for (let s = 0; s < numSubs; s++) {
+            subDigits[s].push(col < subWidths[s] ? colSubs[si++] : 0);
+          }
+          const diff = mDigit - colSubs.reduce((a, b) => a + b, 0) - borrow;
+          borrow = diff < 0 ? 1 : 0;
+        }
+      } else {
+        // Beyond chain or minuend not active: free digits, no forced borrow
+        const mDigit = minuendActive ? randInt(rng, 0, 9) : 0;
+        minuendDigits.push(mDigit);
+        const colSubs = activeSubs.map(() => randInt(rng, 0, 9));
+        let si = 0;
+        for (let s = 0; s < numSubs; s++) {
+          subDigits[s].push(col < subWidths[s] ? colSubs[si++] : 0);
+        }
+        // Don't force borrow beyond chain
+        borrow = 0;
+      }
+    }
+
+    const minuend = minuendDigits.reduce((num, d, col) => num + d * Math.pow(10, col), 0);
+    const subs = subDigits.map((digits) =>
+      digits.reduce((num, d, col) => num + d * Math.pow(10, col), 0),
+    );
+    const result = minuend - subs.reduce((a, b) => a + b, 0);
+
+    // Verify: result >= 0, each number has intended digit count
+    const minuendOk = minuend >= (minuendWidth <= 1 ? 1 : Math.pow(10, minuendWidth - 1));
+    const subsOk = subs.every((s, i) => s >= (subWidths[i] <= 1 ? 1 : Math.pow(10, subWidths[i] - 1)));
+    if (result >= 0 && minuendOk && subsOk) {
+      return [minuend, ...subs];
+    }
+  }
+
+  // Fallback
+  return generateSubtractionProblem(rng, cfg);
+};
+
 const generateProblem = (rng: () => number, cfg: HissanConfig): Problem => {
+  if (cfg.operator === "sub") {
+    if (cfg.consecutiveCarries) return generateBorrowChainProblem(rng, cfg);
+    return generateSubtractionProblem(rng, cfg);
+  }
   if (cfg.consecutiveCarries) return generateCarryChainProblem(rng, cfg);
   return Array.from({ length: cfg.numOperands }, () =>
     generateNumber(rng, cfg.minDigits, cfg.maxDigits),
@@ -154,6 +275,11 @@ const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
   } else {
     url.searchParams.delete("hgrid");
   }
+  if (cfg.operator === "sub") {
+    url.searchParams.set("hop", "sub");
+  } else {
+    url.searchParams.delete("hop");
+  }
   window.history.replaceState(null, "", url.toString());
 };
 
@@ -168,7 +294,8 @@ const getInitialConfig = (): HissanConfig => {
   if (!(numOperands >= 2 && numOperands <= 3)) numOperands = 2;
   const consecutiveCarries = params.get("hcc") === "1";
   const showGrid = params.get("hgrid") !== "0";
-  return { minDigits, maxDigits, numOperands, consecutiveCarries, showGrid };
+  const operator: HissanOperator = params.get("hop") === "sub" ? "sub" : "add";
+  return { minDigits, maxDigits, numOperands, consecutiveCarries, showGrid, operator };
 };
 
 const getInitialSeed = (): number => {
@@ -198,31 +325,63 @@ function HissanProblem({
   problem,
   showAnswers,
   maxDigits,
+  operator,
 }: {
   index: number;
   problem: Problem;
   showAnswers: boolean;
   maxDigits: number;
+  operator: HissanOperator;
 }) {
-  const sum = problem.reduce((a, b) => a + b, 0);
+  const answer = operator === "sub"
+    ? problem[0] - problem.slice(1).reduce((a, b) => a + b, 0)
+    : problem.reduce((a, b) => a + b, 0);
 
   // totalCols = maxDigits + 1 (extra column for operator / potential carry)
   const totalCols = maxDigits + 1;
-  const sumDigits = toDigitCells(sum, totalCols);
+  const answerDigits = toDigitCells(answer, totalCols);
   const last = problem.length - 1;
+  const operatorSymbol = operator === "sub" ? "\u2212" : "+";
 
-  // Compute carries: iterate columns right-to-left
+  // Compute carries/borrows: iterate columns right-to-left
   const operandDigits = problem.map((op) => toDigitCells(op, totalCols));
-  const carries = new Array<number>(totalCols).fill(0);
-  let carry = 0;
-  for (let col = totalCols - 1; col >= 0; col--) {
-    let colSum = carry;
-    for (const digits of operandDigits) {
-      const d = digits[col];
-      if (d !== "") colSum += d;
+  const indicators = new Array<number>(totalCols).fill(0);
+  // For subtraction: borrowOut[col]=1 means this column borrows from its left neighbor
+  const borrowOut = new Array<number>(totalCols).fill(0);
+  // For subtraction: display value above slashed digit
+  const borrowDisplay = new Array<number | "">(totalCols).fill("");
+
+  if (operator === "sub") {
+    // Compute borrows
+    let borrow = 0;
+    for (let col = totalCols - 1; col >= 0; col--) {
+      const minuendDigit = operandDigits[0][col] === "" ? 0 : operandDigits[0][col] as number;
+      let subSum = 0;
+      for (let s = 1; s < operandDigits.length; s++) {
+        const d = operandDigits[s][col];
+        if (d !== "") subSum += d;
+      }
+      indicators[col] = borrow;
+      const diff = minuendDigit - subSum - borrow;
+      borrowOut[col] = diff < 0 ? 1 : 0;
+      if (borrow > 0) {
+        // digit - 1, plus 10 if this column also borrows from left
+        borrowDisplay[col] = minuendDigit - 1 + borrowOut[col] * 10;
+      }
+      borrow = borrowOut[col];
     }
-    carries[col] = carry;
-    carry = Math.floor(colSum / 10);
+  } else {
+    // Compute carries
+    let carry = 0;
+    for (let col = totalCols - 1; col >= 0; col--) {
+      let colSum = carry;
+      for (const digits of operandDigits) {
+        const d = digits[col];
+        if (d !== "") colSum += d;
+      }
+      indicators[col] = carry;
+      carry = Math.floor(colSum / 10);
+    }
   }
 
   return (
@@ -231,8 +390,12 @@ function HissanProblem({
       <table className="hissan-grid">
         <tbody>
           <tr className="hissan-carry-row">
-            {carries.map((c, i) => (
-              <td key={i}>{showAnswers && c > 0 ? c : ""}</td>
+            {indicators.map((c, i) => (
+              <td key={i}>
+                {showAnswers && c > 0
+                  ? (operator === "sub" ? borrowDisplay[i] : c)
+                  : ""}
+              </td>
             ))}
           </tr>
           {problem.map((operand, ri) => {
@@ -241,14 +404,16 @@ function HissanProblem({
               return (
                 <tr key={ri}>
                   {digits.map((d, i) => (
-                    <td key={i} className="hissan-cell">{d}</td>
+                    <td key={i} className={
+                      `hissan-cell${showAnswers && operator === "sub" && ri === 0 && indicators[i] > 0 ? " hissan-slashed" : ""}`
+                    }>{d}</td>
                   ))}
                 </tr>
               );
             }
             return (
               <tr key={ri} className="hissan-operator-row">
-                <td className="hissan-cell">+</td>
+                <td className="hissan-cell">{operatorSymbol}</td>
                 {digits.slice(1).map((d, i) => (
                   <td key={i} className="hissan-cell">{d}</td>
                 ))}
@@ -256,7 +421,7 @@ function HissanProblem({
             );
           })}
           <tr className="hissan-answer-row">
-            {sumDigits.map((d, i) => (
+            {answerDigits.map((d, i) => (
               <td key={i} className="hissan-cell">
                 {showAnswers ? d : ""}
               </td>
@@ -295,9 +460,10 @@ function Hissan() {
   const handleConfigChange = useCallback(
     (field: keyof HissanConfig) => (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
       setCfg((prev) => {
+        const raw = e.target.value;
         const value = e.target instanceof HTMLInputElement && e.target.type === "checkbox"
           ? e.target.checked
-          : parseInt(e.target.value, 10);
+          : isNaN(parseInt(raw, 10)) ? raw : parseInt(raw, 10);
         const next = { ...prev, [field]: value };
         if (field === "minDigits" && next.minDigits > next.maxDigits)
           next.maxDigits = next.minDigits;
@@ -330,12 +496,17 @@ function Hissan() {
     url.searchParams.set("hops", String(cfg.numOperands));
     if (cfg.consecutiveCarries) url.searchParams.set("hcc", "1");
     if (!cfg.showGrid) url.searchParams.set("hgrid", "0");
+    if (cfg.operator === "sub") url.searchParams.set("hop", "sub");
     return url.toString();
   }, [seed, cfg]);
 
   return (
     <>
       <div className="no-print controls">
+        <select className="operator-select" value={cfg.operator} onChange={handleConfigChange("operator")}>
+          <option value="add">たし算</option>
+          <option value="sub">ひき算</option>
+        </select>
         <button onClick={handleNewProblems}>新しい問題</button>
         <button onClick={handleToggleAnswers}>
           {showAnswers ? "答えを隠す" : "答え"}
@@ -366,7 +537,7 @@ function Hissan() {
           </label>
           <label>
             <input type="checkbox" checked={cfg.consecutiveCarries} onChange={handleConfigChange("consecutiveCarries")} />
-            連続繰り上がり
+            {cfg.operator === "sub" ? "連続繰り下がり" : "連続繰り上がり"}
           </label>
           <label>
             <input type="checkbox" checked={cfg.showGrid} onChange={handleToggleGrid} />
@@ -382,6 +553,7 @@ function Hissan() {
             problem={problem}
             showAnswers={showAnswers}
             maxDigits={cfg.maxDigits}
+            operator={cfg.operator}
           />
         ))}
       </div>

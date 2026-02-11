@@ -206,14 +206,36 @@
 }
 
 .hissan-carry-row td {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: bold;
-  height: 24px;
+  height: 28px;
   color: red;
   border: none;
   text-align: center;
   vertical-align: bottom;
   padding: 0;
+}
+
+.hissan-slashed {
+  position: relative;
+  color: #999;
+}
+
+.hissan-slashed::after {
+  content: "";
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  width: 70%;
+  height: 70%;
+  background: linear-gradient(
+    to bottom left,
+    transparent calc(50% - 1px),
+    red calc(50% - 1px),
+    red calc(50% + 1px),
+    transparent calc(50% + 1px)
+  );
+  pointer-events: none;
 }
 
 .hissan-no-grid .hissan-cell {
@@ -327,8 +349,8 @@
   }
 
   .hissan-carry-row td {
-    font-size: 10px;
-    height: 5mm;
+    font-size: 12px;
+    height: 6mm;
   }
 
   @page {

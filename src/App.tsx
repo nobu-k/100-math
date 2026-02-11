@@ -23,6 +23,7 @@ function App() {
     url.searchParams.delete("hq");
     url.searchParams.delete("answers");
     url.searchParams.delete("op");
+    url.searchParams.delete("hop");
     url.searchParams.set("type", id);
     window.history.replaceState(null, "", url.toString());
   }, []);
