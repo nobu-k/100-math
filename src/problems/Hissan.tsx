@@ -264,7 +264,11 @@ const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
   }
   url.searchParams.set("hmin", String(cfg.minDigits));
   url.searchParams.set("hmax", String(cfg.maxDigits));
-  url.searchParams.set("hops", String(cfg.numOperands));
+  if (cfg.operator === "add") {
+    url.searchParams.set("hops", String(cfg.numOperands));
+  } else {
+    url.searchParams.delete("hops");
+  }
   if (cfg.consecutiveCarries) {
     url.searchParams.set("hcc", "1");
   } else {
@@ -295,6 +299,7 @@ const getInitialConfig = (): HissanConfig => {
   const consecutiveCarries = params.get("hcc") === "1";
   const showGrid = params.get("hgrid") !== "0";
   const operator: HissanOperator = params.get("hop") === "sub" ? "sub" : "add";
+  if (operator === "sub") numOperands = 2;
   return { minDigits, maxDigits, numOperands, consecutiveCarries, showGrid, operator };
 };
 
@@ -465,6 +470,8 @@ function Hissan() {
           ? e.target.checked
           : isNaN(parseInt(raw, 10)) ? raw : parseInt(raw, 10);
         const next = { ...prev, [field]: value };
+        if (field === "operator" && next.operator === "sub")
+          next.numOperands = 2;
         if (field === "minDigits" && next.minDigits > next.maxDigits)
           next.maxDigits = next.minDigits;
         if (field === "maxDigits" && next.maxDigits < next.minDigits)
@@ -493,7 +500,7 @@ function Hissan() {
     url.searchParams.set("answers", "1");
     url.searchParams.set("hmin", String(cfg.minDigits));
     url.searchParams.set("hmax", String(cfg.maxDigits));
-    url.searchParams.set("hops", String(cfg.numOperands));
+    if (cfg.operator === "add") url.searchParams.set("hops", String(cfg.numOperands));
     if (cfg.consecutiveCarries) url.searchParams.set("hcc", "1");
     if (!cfg.showGrid) url.searchParams.set("hgrid", "0");
     if (cfg.operator === "sub") url.searchParams.set("hop", "sub");
@@ -529,12 +536,14 @@ function Hissan() {
               {[1, 2, 3, 4].map((d) => <option key={d} value={d}>{d} 桁</option>)}
             </select>
           </label>
-          <label>
-            項数{" "}
-            <select className="operator-select" value={cfg.numOperands} onChange={handleConfigChange("numOperands")}>
-              {[2, 3].map((n) => <option key={n} value={n}>{n}</option>)}
-            </select>
-          </label>
+          {cfg.operator !== "sub" && (
+            <label>
+              項数{" "}
+              <select className="operator-select" value={cfg.numOperands} onChange={handleConfigChange("numOperands")}>
+                {[2, 3].map((n) => <option key={n} value={n}>{n}</option>)}
+              </select>
+            </label>
+          )}
           <label>
             <input type="checkbox" checked={cfg.consecutiveCarries} onChange={handleConfigChange("consecutiveCarries")} />
             {cfg.operator === "sub" ? "連続繰り下がり" : "連続繰り上がり"}
