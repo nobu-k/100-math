@@ -410,7 +410,7 @@ function HissanProblem({
                 <tr key={ri}>
                   {digits.map((d, i) => (
                     <td key={i} className={
-                      `hissan-cell${showAnswers && operator === "sub" && ri === 0 && indicators[i] > 0 ? " hissan-slashed" : ""}`
+                      `hissan-cell${showAnswers && operator === "sub" && ri === 0 && indicators[i] > 0 ? " hissan-slashed" : ""}${showAnswers && operator === "sub" && ri === 0 && borrowOut[i] > 0 && indicators[i] === 0 ? " hissan-borrow-in" : ""}`
                     }>{d}</td>
                   ))}
                 </tr>
