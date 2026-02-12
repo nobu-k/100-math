@@ -1,7 +1,7 @@
-import { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import type { ProblemTypeDefinition } from "./types";
-import { randomSeed, seedToHex, hexToSeed } from "./random";
+import { randomSeed, hexToSeed } from "./random";
 import {
   type Problem,
   type HissanOperator,
@@ -11,6 +11,7 @@ import {
   buildParams,
   toDigitCells,
   computeIndicators,
+  computeMulDetails,
 } from "./hissan-logic";
 import "../App.css";
 
@@ -18,7 +19,7 @@ const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
   const url = new URL(window.location.href);
   const params = buildParams(seed, showAnswers, cfg);
   // Replace all hissan-related params on the existing URL
-  for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop"]) {
+  for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax"]) {
     url.searchParams.delete(key);
   }
   for (const [key, value] of params) {
@@ -117,6 +118,102 @@ function HissanProblem({
   );
 }
 
+function HissanMulProblem({
+  index,
+  problem,
+  showAnswers,
+  cfg,
+}: {
+  index: number;
+  problem: Problem;
+  showAnswers: boolean;
+  cfg: HissanConfig;
+}) {
+  const [multiplicand, multiplier] = problem;
+  const { partials, finalAnswer } = computeMulDetails(multiplicand, multiplier);
+  const totalCols = cfg.maxDigits + cfg.mulMaxDigits;
+  const mcandDigits = toDigitCells(multiplicand, totalCols);
+  const mplierDigits = toDigitCells(multiplier, totalCols);
+  const answerDigits = toDigitCells(finalAnswer, totalCols);
+  const singleDigitMultiplier = String(multiplier).length === 1;
+  const mcandLen = String(multiplicand).length;
+
+  /** Build a per-column carry map for a partial product.
+   *  carries[i] is the carry OUT of multiplicand digit i (left-to-right).
+   *  That carry is added INTO the column one position to the left. */
+  const carryMap = (carries: number[], shift: number): (number | null)[] => {
+    const map: (number | null)[] = Array(totalCols).fill(null);
+    const startCol = totalCols - mcandLen - shift;
+    for (let i = 0; i < carries.length; i++) {
+      const targetCol = startCol + i - 1;
+      if (targetCol >= 0 && carries[i] > 0) {
+        map[targetCol] = carries[i];
+      }
+    }
+    return map;
+  };
+
+  const renderPartialRow = (pp: typeof partials[0]) => {
+    const digits: (number | "")[] = [
+      ...toDigitCells(pp.value, totalCols - pp.shift),
+      ...Array(pp.shift).fill(""),
+    ];
+    const carries = carryMap(pp.carries, pp.shift);
+    const firstDigitCol = digits.findIndex((d) => d !== "");
+    return digits.map((d, i) => (
+      <td key={i} className="hissan-cell">
+        {showAnswers && i > firstDigitCol && carries[i] != null && <span className="hissan-cell-carry">{carries[i]}</span>}
+        {showAnswers ? d : ""}
+      </td>
+    ));
+  };
+
+  return (
+    <div className="hissan-problem">
+      <span className="hissan-number">({index + 1})</span>
+      <table className="hissan-grid">
+        <tbody>
+          {/* Multiplicand row */}
+          <tr>
+            {mcandDigits.map((d, i) => (
+              <td key={i} className="hissan-cell">{d}</td>
+            ))}
+          </tr>
+          {/* Multiplier row (with operator) */}
+          <tr className={singleDigitMultiplier ? "hissan-operator-row" : "hissan-mul-operator-row"}>
+            {mplierDigits.map((d, i) => (
+              <td key={i} className="hissan-cell">{i === 0 ? "\u00d7" : d}</td>
+            ))}
+          </tr>
+          {singleDigitMultiplier ? (
+            /* Single-digit multiplier: answer directly below with carries */
+            <tr className="hissan-answer-row">
+              {renderPartialRow(partials[0])}
+            </tr>
+          ) : (
+            <>
+              {/* Partial products with inline carries */}
+              {partials.map((pp, pi) => (
+                <tr key={pi} className={`hissan-answer-row${pi === partials.length - 1 ? " hissan-partial-last-row" : ""}`}>
+                  {renderPartialRow(pp)}
+                </tr>
+              ))}
+              {/* Final answer */}
+              <tr className="hissan-answer-row">
+                {answerDigits.map((d, i) => (
+                  <td key={i} className="hissan-cell">
+                    {showAnswers ? d : ""}
+                  </td>
+                ))}
+              </tr>
+            </>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function Hissan() {
   const [seed, setSeed] = useState(getInitialSeed);
   const [showAnswers, setShowAnswers] = useState(() => {
@@ -149,12 +246,20 @@ function Hissan() {
           ? e.target.checked
           : isNaN(parseInt(raw, 10)) ? raw : parseInt(raw, 10);
         const next = { ...prev, [field]: value };
-        if (field === "operator" && next.operator === "sub")
+        if (field === "operator" && (next.operator === "sub" || next.operator === "mul"))
           next.numOperands = 2;
+        if (field === "operator" && next.operator === "mul") {
+          if (next.maxDigits > 3) next.maxDigits = 3;
+          if (next.minDigits > next.maxDigits) next.minDigits = next.maxDigits;
+        }
         if (field === "minDigits" && next.minDigits > next.maxDigits)
           next.maxDigits = next.minDigits;
         if (field === "maxDigits" && next.maxDigits < next.minDigits)
           next.minDigits = next.maxDigits;
+        if (field === "mulMinDigits" && next.mulMinDigits > next.mulMaxDigits)
+          next.mulMaxDigits = next.mulMinDigits;
+        if (field === "mulMaxDigits" && next.mulMaxDigits < next.mulMinDigits)
+          next.mulMinDigits = next.mulMaxDigits;
         const newSeed = randomSeed();
         setSeed(newSeed);
         setShowAnswers(false);
@@ -175,14 +280,14 @@ function Hissan() {
 
   const qrUrl = useMemo(() => {
     const url = new URL(window.location.href);
-    url.searchParams.set("hq", seedToHex(seed));
-    url.searchParams.set("answers", "1");
-    url.searchParams.set("hmin", String(cfg.minDigits));
-    url.searchParams.set("hmax", String(cfg.maxDigits));
-    if (cfg.operator === "add") url.searchParams.set("hops", String(cfg.numOperands));
-    if (cfg.consecutiveCarries) url.searchParams.set("hcc", "1");
-    if (!cfg.showGrid) url.searchParams.set("hgrid", "0");
-    if (cfg.operator === "sub") url.searchParams.set("hop", "sub");
+    // Clear all hissan params before rebuilding
+    for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax"]) {
+      url.searchParams.delete(key);
+    }
+    const params = buildParams(seed, true, cfg);
+    for (const [key, value] of params) {
+      url.searchParams.set(key, value);
+    }
     return url.toString();
   }, [seed, cfg]);
 
@@ -192,6 +297,7 @@ function Hissan() {
         <select className="operator-select" value={cfg.operator} onChange={handleConfigChange("operator")}>
           <option value="add">たし算</option>
           <option value="sub">ひき算</option>
+          <option value="mul">かけ算</option>
         </select>
         <button onClick={handleNewProblems}>新しい問題</button>
         <button onClick={handleToggleAnswers}>
@@ -204,18 +310,34 @@ function Hissan() {
       {showSettings && (
         <div className="no-print settings-panel">
           <label>
-            桁数 最小{" "}
+            {cfg.operator === "mul" ? "かけられる数" : "桁数"} 最小{" "}
             <select className="operator-select" value={cfg.minDigits} onChange={handleConfigChange("minDigits")}>
-              {[1, 2, 3, 4].map((d) => <option key={d} value={d}>{d} 桁</option>)}
+              {(cfg.operator === "mul" ? [1, 2, 3] : [1, 2, 3, 4]).map((d) => <option key={d} value={d}>{d} 桁</option>)}
             </select>
           </label>
           <label>
             最大{" "}
             <select className="operator-select" value={cfg.maxDigits} onChange={handleConfigChange("maxDigits")}>
-              {[1, 2, 3, 4].map((d) => <option key={d} value={d}>{d} 桁</option>)}
+              {(cfg.operator === "mul" ? [1, 2, 3] : [1, 2, 3, 4]).map((d) => <option key={d} value={d}>{d} 桁</option>)}
             </select>
           </label>
-          {cfg.operator !== "sub" && (
+          {cfg.operator === "mul" && (
+            <>
+              <label>
+                かける数 最小{" "}
+                <select className="operator-select" value={cfg.mulMinDigits} onChange={handleConfigChange("mulMinDigits")}>
+                  {[1, 2, 3].map((d) => <option key={d} value={d}>{d} 桁</option>)}
+                </select>
+              </label>
+              <label>
+                最大{" "}
+                <select className="operator-select" value={cfg.mulMaxDigits} onChange={handleConfigChange("mulMaxDigits")}>
+                  {[1, 2, 3].map((d) => <option key={d} value={d}>{d} 桁</option>)}
+                </select>
+              </label>
+            </>
+          )}
+          {cfg.operator === "add" && (
             <label>
               項数{" "}
               <select className="operator-select" value={cfg.numOperands} onChange={handleConfigChange("numOperands")}>
@@ -223,27 +345,39 @@ function Hissan() {
               </select>
             </label>
           )}
-          <label>
-            <input type="checkbox" checked={cfg.consecutiveCarries} onChange={handleConfigChange("consecutiveCarries")} />
-            {cfg.operator === "sub" ? "連続繰り下がり" : "連続繰り上がり"}
-          </label>
+          {cfg.operator !== "mul" && (
+            <label>
+              <input type="checkbox" checked={cfg.consecutiveCarries} onChange={handleConfigChange("consecutiveCarries")} />
+              {cfg.operator === "sub" ? "連続繰り下がり" : "連続繰り上がり"}
+            </label>
+          )}
           <label>
             <input type="checkbox" checked={cfg.showGrid} onChange={handleToggleGrid} />
             補助グリッド
           </label>
         </div>
       )}
-      <div className={`hissan-page${cfg.showGrid ? "" : " hissan-no-grid"}`}>
-        {problems.map((problem, i) => (
-          <HissanProblem
-            key={i}
-            index={i}
-            problem={problem}
-            showAnswers={showAnswers}
-            maxDigits={cfg.maxDigits}
-            operator={cfg.operator}
-          />
-        ))}
+      <div className={`hissan-page${cfg.showGrid ? "" : " hissan-no-grid"}${cfg.operator === "mul" && cfg.mulMaxDigits >= 2 ? " hissan-mul-wide" : ""}`}>
+        {problems.map((problem, i) =>
+          cfg.operator === "mul" ? (
+            <HissanMulProblem
+              key={i}
+              index={i}
+              problem={problem}
+              showAnswers={showAnswers}
+              cfg={cfg}
+            />
+          ) : (
+            <HissanProblem
+              key={i}
+              index={i}
+              problem={problem}
+              showAnswers={showAnswers}
+              maxDigits={cfg.maxDigits}
+              operator={cfg.operator}
+            />
+          ),
+        )}
       </div>
       <div className="qr-section">
         <QRCodeSVG value={qrUrl} size={80} />

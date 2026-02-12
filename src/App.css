@@ -187,6 +187,7 @@
 }
 
 .hissan-cell {
+  position: relative;
   width: 48px;
   height: 48px;
   border: 2px dotted #ccc;
@@ -195,6 +196,16 @@
   font-size: 28px;
   font-weight: bold;
   padding: 0;
+}
+
+.hissan-cell-carry {
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  font-size: 14px;
+  font-weight: bold;
+  color: red;
+  line-height: 1;
 }
 
 .hissan-operator-row td {
@@ -216,10 +227,6 @@
   padding: 0;
 }
 
-.hissan-borrow-in {
-  position: relative;
-}
-
 .hissan-borrow-in::before {
   content: "1";
   position: absolute;
@@ -234,7 +241,6 @@
 }
 
 .hissan-slashed {
-  position: relative;
   color: #999;
 }
 
@@ -255,11 +261,31 @@
   pointer-events: none;
 }
 
+.hissan-mul-operator-row td {
+  border-bottom: 4px solid #000;
+}
+
+.hissan-partial-last-row td {
+  border-bottom: 4px solid #000;
+}
+
+.hissan-mul-wide {
+  grid-template-columns: repeat(2, auto);
+}
+
 .hissan-no-grid .hissan-cell {
   border-color: transparent;
 }
 
 .hissan-no-grid .hissan-operator-row td {
+  border-bottom-color: #000;
+}
+
+.hissan-no-grid .hissan-mul-operator-row td {
+  border-bottom-color: #000;
+}
+
+.hissan-no-grid .hissan-partial-last-row td {
   border-bottom-color: #000;
 }
 
@@ -368,6 +394,20 @@
   .hissan-carry-row td {
     font-size: 12px;
     height: 6mm;
+  }
+
+  .hissan-cell-carry {
+    font-size: 10px;
+  }
+
+  .hissan-mul-wide .hissan-cell {
+    width: 10mm;
+    height: 10mm;
+    font-size: 16px;
+  }
+
+  .hissan-mul-wide .hissan-cell-carry {
+    font-size: 8px;
   }
 
   @page {

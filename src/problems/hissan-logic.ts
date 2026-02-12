@@ -1,7 +1,7 @@
 import { mulberry32, seedToHex } from "./random";
 
 export type Problem = number[];
-export type HissanOperator = "add" | "sub";
+export type HissanOperator = "add" | "sub" | "mul";
 
 export interface HissanConfig {
   minDigits: number;
@@ -10,6 +10,8 @@ export interface HissanConfig {
   consecutiveCarries: boolean;
   showGrid: boolean;
   operator: HissanOperator;
+  mulMinDigits: number;
+  mulMaxDigits: number;
 }
 
 export const generateNumber = (rng: () => number, minDigits: number, maxDigits: number): number => {
@@ -234,7 +236,62 @@ export const generateBorrowChainProblem = (rng: () => number, cfg: HissanConfig)
   return generateSubtractionProblem(rng, cfg);
 };
 
+// ---------------------------------------------------------------------------
+// Multiplication
+// ---------------------------------------------------------------------------
+
+export interface MulPartialProduct {
+  value: number;
+  carries: number[];
+  shift: number;
+}
+
+export interface MulComputed {
+  partials: MulPartialProduct[];
+  finalAnswer: number;
+}
+
+/** Compute partial products and carries for multiplicand × multiplier. */
+export const computeMulDetails = (multiplicand: number, multiplier: number): MulComputed => {
+  const mDigits = String(multiplier);
+  const partials: MulPartialProduct[] = [];
+
+  for (let i = mDigits.length - 1; i >= 0; i--) {
+    const d = parseInt(mDigits[i], 10);
+    const shift = mDigits.length - 1 - i;
+    const partial = multiplicand * d;
+    // Compute carries for each digit of the multiplication
+    const carries: number[] = [];
+    let carry = 0;
+    const mcandStr = String(multiplicand);
+    for (let j = mcandStr.length - 1; j >= 0; j--) {
+      const mcandDigit = parseInt(mcandStr[j], 10);
+      const product = mcandDigit * d + carry;
+      carry = Math.floor(product / 10);
+      carries.unshift(carry);
+    }
+    partials.push({ value: partial, carries, shift });
+  }
+
+  const finalAnswer = multiplicand * multiplier;
+  return { partials, finalAnswer };
+};
+
+/** Generate a multiplication problem. */
+export const generateMultiplicationProblem = (rng: () => number, cfg: HissanConfig): Problem => {
+  const multiplicand = generateNumber(rng, cfg.minDigits, cfg.maxDigits);
+  const multiplier = generateNumber(rng, cfg.mulMinDigits, cfg.mulMaxDigits);
+  return [multiplicand, multiplier];
+};
+
+/** Return the number of problems per page for the given config. */
+export const getProblemCount = (cfg: HissanConfig): number => {
+  if (cfg.operator === "mul" && cfg.mulMaxDigits >= 2) return 6;
+  return 12;
+};
+
 export const generateProblem = (rng: () => number, cfg: HissanConfig): Problem => {
+  if (cfg.operator === "mul") return generateMultiplicationProblem(rng, cfg);
   if (cfg.operator === "sub") {
     if (cfg.consecutiveCarries) return generateBorrowChainProblem(rng, cfg);
     return generateSubtractionProblem(rng, cfg);
@@ -247,10 +304,14 @@ export const generateProblem = (rng: () => number, cfg: HissanConfig): Problem =
 
 export const generateProblems = (seed: number, cfg: HissanConfig): Problem[] => {
   const rng = mulberry32(seed);
-  return Array.from({ length: 12 }, () => generateProblem(rng, cfg));
+  const count = getProblemCount(cfg);
+  return Array.from({ length: count }, () => generateProblem(rng, cfg));
 };
 
 export const parseConfig = (params: URLSearchParams): HissanConfig => {
+  const hop = params.get("hop");
+  const operator: HissanOperator = hop === "sub" ? "sub" : hop === "mul" ? "mul" : "add";
+
   let minDigits = parseInt(params.get("hmin") || "", 10);
   let maxDigits = parseInt(params.get("hmax") || "", 10);
   let numOperands = parseInt(params.get("hops") || "", 10);
@@ -260,9 +321,21 @@ export const parseConfig = (params: URLSearchParams): HissanConfig => {
   if (!(numOperands >= 2 && numOperands <= 3)) numOperands = 2;
   const consecutiveCarries = params.get("hcc") === "1";
   const showGrid = params.get("hgrid") !== "0";
-  const operator: HissanOperator = params.get("hop") === "sub" ? "sub" : "add";
+
+  let mulMinDigits = parseInt(params.get("hmmin") || "", 10);
+  let mulMaxDigits = parseInt(params.get("hmmax") || "", 10);
+  if (!(mulMinDigits >= 1 && mulMinDigits <= 3)) mulMinDigits = 1;
+  if (!(mulMaxDigits >= 1 && mulMaxDigits <= 3)) mulMaxDigits = 1;
+  if (mulMinDigits > mulMaxDigits) mulMaxDigits = mulMinDigits;
+
   if (operator === "sub") numOperands = 2;
-  return { minDigits, maxDigits, numOperands, consecutiveCarries, showGrid, operator };
+  if (operator === "mul") {
+    numOperands = 2;
+    if (maxDigits > 3) maxDigits = 3;
+    if (minDigits > maxDigits) minDigits = maxDigits;
+  }
+
+  return { minDigits, maxDigits, numOperands, consecutiveCarries, showGrid, operator, mulMinDigits, mulMaxDigits };
 };
 
 /** Convert a number to an array of digits, padded to `width` with empty strings on the left. */
@@ -341,6 +414,11 @@ export const buildParams = (seed: number, showAnswers: boolean, cfg: HissanConfi
   }
   if (cfg.operator === "sub") {
     params.set("hop", "sub");
+  }
+  if (cfg.operator === "mul") {
+    params.set("hop", "mul");
+    params.set("hmmin", String(cfg.mulMinDigits));
+    params.set("hmmax", String(cfg.mulMaxDigits));
   }
   return params;
 };
