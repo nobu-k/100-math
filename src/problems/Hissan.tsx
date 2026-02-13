@@ -13,7 +13,7 @@ import {
   computeIndicators,
   computeMulDetails,
   computeDivDetails,
-} from "./hissan-logic";
+} from "./hissan";
 import "../App.css";
 
 const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
