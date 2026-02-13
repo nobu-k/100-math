@@ -298,20 +298,14 @@
   border-bottom: 3px solid #000;
 }
 
-.hissan-div-bracket-left {
-  border-left: none !important;
-}
-
-.hissan-div-bracket-left::before {
-  content: "";
+.hissan-div-bracket-curve {
   position: absolute;
-  left: -12px;
+  left: -1px;
   top: -2px;
-  bottom: 15%;
+  bottom: -2px;
   width: 10px;
-  border-right: 3px solid #000;
-  border-top-right-radius: 10px 40%;
-  border-bottom-right-radius: 10px 60%;
+  overflow: visible;
+  pointer-events: none;
 }
 
 .hissan-div-subtract-line {
@@ -479,12 +473,8 @@
     font-size: 18px;
   }
 
-  .hissan-div-bracket-left::before {
-    left: -3mm;
+  .hissan-div-bracket-curve {
     width: 2.5mm;
-    border-right-width: 0.8mm;
-    border-top-right-radius: 2.5mm 40%;
-    border-bottom-right-radius: 2.5mm 60%;
   }
 
   .hissan-div-remainder {

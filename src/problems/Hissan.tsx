@@ -294,7 +294,14 @@ function HissanDivProblem({
               <td key={`div${i}`} className="hissan-div-cell hissan-div-outside">{d}</td>
             ))}
             {dividendDigits.map((d, i) => (
-              <td key={i} className={`hissan-div-cell${i === 0 ? " hissan-div-bracket-left" : ""}`}>{d}</td>
+              <td key={i} className="hissan-div-cell">
+                {i === 0 && (
+                  <svg className="hissan-div-bracket-curve" viewBox="0 0 10 30" preserveAspectRatio="none">
+                    <path d="M0,0 C10,8 10,22 0,30" stroke="#000" strokeWidth="3" fill="none" />
+                  </svg>
+                )}
+                {d}
+              </td>
             ))}
           </tr>
           {/* Work rows */}
