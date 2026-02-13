@@ -306,6 +306,8 @@
   width: 8px;
   height: 3px;
   background: #000;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 .hissan-div-bracket-curve {
