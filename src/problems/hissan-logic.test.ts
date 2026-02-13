@@ -10,7 +10,9 @@ import {
   generateBorrowChainProblem,
   generateSubtractionProblem,
   generateMultiplicationProblem,
+  generateDivisionProblem,
   computeMulDetails,
+  computeDivDetails,
   getProblemCount,
   digitsWithMinSum,
   digitsWithExactSum,
@@ -19,6 +21,8 @@ import {
   computeIndicators,
   type HissanConfig,
 } from "./hissan-logic";
+
+const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false } as const;
 
 // ---------------------------------------------------------------------------
 // parseConfig
@@ -35,6 +39,7 @@ describe("parseConfig", () => {
       operator: "add",
       mulMinDigits: 1,
       mulMaxDigits: 1,
+      ...divDefaults,
     });
   });
 
@@ -50,6 +55,7 @@ describe("parseConfig", () => {
       operator: "add",
       mulMinDigits: 1,
       mulMaxDigits: 1,
+      ...divDefaults,
     });
   });
 
@@ -129,6 +135,30 @@ describe("parseConfig", () => {
     expect(cfg.mulMinDigits).toBe(3);
     expect(cfg.mulMaxDigits).toBe(3);
   });
+
+  it("parses hop=div with hdmin/hdmax/hdr", () => {
+    const params = new URLSearchParams("hop=div&hmin=3&hmax=4&hdmin=1&hdmax=2&hdr=1");
+    const cfg = parseConfig(params);
+    expect(cfg.operator).toBe("div");
+    expect(cfg.numOperands).toBe(2);
+    expect(cfg.minDigits).toBe(3);
+    expect(cfg.maxDigits).toBe(4);
+    expect(cfg.divMinDigits).toBe(1);
+    expect(cfg.divMaxDigits).toBe(2);
+    expect(cfg.divAllowRemainder).toBe(true);
+  });
+
+  it("forces minDigits >= 2 for div", () => {
+    const params = new URLSearchParams("hop=div&hmin=1&hmax=3");
+    const cfg = parseConfig(params);
+    expect(cfg.minDigits).toBe(2);
+  });
+
+  it("defaults divAllowRemainder to false", () => {
+    const params = new URLSearchParams("hop=div");
+    const cfg = parseConfig(params);
+    expect(cfg.divAllowRemainder).toBe(false);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -139,7 +169,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 3,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const params = buildParams(42, false, cfg);
     expect(params.get("hops")).toBe("3");
@@ -151,7 +181,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "sub",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const params = buildParams(42, false, cfg);
     expect(params.get("hop")).toBe("sub");
@@ -162,7 +192,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const params = buildParams(42, true, cfg);
     expect(params.get("answers")).toBe("1");
@@ -172,7 +202,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: true, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const params = buildParams(42, false, cfg);
     expect(params.get("hcc")).toBe("1");
@@ -182,7 +212,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const params = buildParams(42, false, cfg);
     expect(params.has("hcc")).toBe(false);
@@ -192,7 +222,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: false, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const params = buildParams(42, false, cfg);
     expect(params.get("hgrid")).toBe("0");
@@ -202,7 +232,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const params = buildParams(42, false, cfg);
     expect(params.has("hgrid")).toBe(false);
@@ -212,7 +242,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "mul",
-      mulMinDigits: 1, mulMaxDigits: 2,
+      mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults,
     };
     const params = buildParams(42, false, cfg);
     expect(params.get("hop")).toBe("mul");
@@ -221,13 +251,41 @@ describe("buildParams", () => {
     expect(params.has("hops")).toBe(false);
   });
 
+  it("includes hop=div and hdmin/hdmax/hdr for div", () => {
+    const cfg: HissanConfig = {
+      minDigits: 2, maxDigits: 3, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "div",
+      mulMinDigits: 1, mulMaxDigits: 1,
+      divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: true,
+    };
+    const params = buildParams(42, false, cfg);
+    expect(params.get("hop")).toBe("div");
+    expect(params.get("hdmin")).toBe("1");
+    expect(params.get("hdmax")).toBe("2");
+    expect(params.get("hdr")).toBe("1");
+    expect(params.has("hops")).toBe(false);
+  });
+
+  it("omits hdr when divAllowRemainder is false", () => {
+    const cfg: HissanConfig = {
+      minDigits: 2, maxDigits: 3, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "div",
+      mulMinDigits: 1, mulMaxDigits: 1,
+      divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
+    };
+    const params = buildParams(42, false, cfg);
+    expect(params.has("hdr")).toBe(false);
+  });
+
   it("round-trips: parseConfig(buildParams(...)) recovers config", () => {
     const configs: HissanConfig[] = [
-      { minDigits: 1, maxDigits: 2, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "add", mulMinDigits: 1, mulMaxDigits: 1 },
-      { minDigits: 2, maxDigits: 4, numOperands: 3, consecutiveCarries: true, showGrid: false, operator: "add", mulMinDigits: 1, mulMaxDigits: 1 },
-      { minDigits: 1, maxDigits: 3, numOperands: 2, consecutiveCarries: true, showGrid: true, operator: "sub", mulMinDigits: 1, mulMaxDigits: 1 },
-      { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "mul", mulMinDigits: 1, mulMaxDigits: 2 },
-      { minDigits: 1, maxDigits: 2, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "mul", mulMinDigits: 2, mulMaxDigits: 3 },
+      { minDigits: 1, maxDigits: 2, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "add", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults },
+      { minDigits: 2, maxDigits: 4, numOperands: 3, consecutiveCarries: true, showGrid: false, operator: "add", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults },
+      { minDigits: 1, maxDigits: 3, numOperands: 2, consecutiveCarries: true, showGrid: true, operator: "sub", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults },
+      { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "mul", mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults },
+      { minDigits: 1, maxDigits: 2, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "mul", mulMinDigits: 2, mulMaxDigits: 3, ...divDefaults },
+      { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false },
+      { minDigits: 3, maxDigits: 4, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: true },
     ];
     for (const cfg of configs) {
       const params = buildParams(123, false, cfg);
@@ -313,7 +371,7 @@ describe("generateProblem (addition)", () => {
   const cfg: HissanConfig = {
     minDigits: 1, maxDigits: 2, numOperands: 3,
     consecutiveCarries: false, showGrid: true, operator: "add",
-    mulMinDigits: 1, mulMaxDigits: 1,
+    mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
   };
 
   it("returns correct operand count", () => {
@@ -342,7 +400,7 @@ describe("generateProblem (subtraction)", () => {
   const cfg: HissanConfig = {
     minDigits: 1, maxDigits: 2, numOperands: 2,
     consecutiveCarries: false, showGrid: true, operator: "sub",
-    mulMinDigits: 1, mulMaxDigits: 1,
+    mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
   };
 
   it("returns 2 operands", () => {
@@ -381,7 +439,7 @@ describe("generateProblems", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const problems = generateProblems(42, cfg);
     expect(problems).toHaveLength(12);
@@ -391,7 +449,7 @@ describe("generateProblems", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const a = generateProblems(12345, cfg);
     const b = generateProblems(12345, cfg);
@@ -432,7 +490,7 @@ describe("generateCarryChainProblem", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 2, numOperands: 2,
       consecutiveCarries: true, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const seeds = [1, 2, 3, 4, 5, 10, 20, 50, 100, 200];
     for (const seed of seeds) {
@@ -447,7 +505,7 @@ describe("generateCarryChainProblem", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 3,
       consecutiveCarries: true, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const seeds = [1, 5, 10, 42, 99];
     for (const seed of seeds) {
@@ -497,7 +555,7 @@ describe("generateBorrowChainProblem", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: true, showGrid: true, operator: "sub",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     let successCount = 0;
     const total = 100;
@@ -517,7 +575,7 @@ describe("generateBorrowChainProblem", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 3, numOperands: 2,
       consecutiveCarries: true, showGrid: true, operator: "sub",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     for (let seed = 0; seed < 50; seed++) {
       const rng = mulberry32(seed);
@@ -535,7 +593,7 @@ describe("generateSubtractionProblem", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "sub",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     for (let seed = 0; seed < 50; seed++) {
       const rng = mulberry32(seed);
@@ -694,6 +752,61 @@ describe("computeMulDetails", () => {
 });
 
 // ---------------------------------------------------------------------------
+// computeDivDetails
+// ---------------------------------------------------------------------------
+describe("computeDivDetails", () => {
+  it("computes 72 ÷ 3 = 24 (exact, 1-digit divisor)", () => {
+    const { quotient, remainder, steps } = computeDivDetails(72, 3);
+    expect(quotient).toBe(24);
+    expect(remainder).toBe(0);
+    expect(steps).toHaveLength(2);
+    // Step 1: position 0, dividendSoFar=7, quotientDigit=2, product=6, remainder=1
+    expect(steps[0]).toEqual({ position: 0, dividendSoFar: 7, quotientDigit: 2, product: 6, remainder: 1 });
+    // Step 2: position 1, dividendSoFar=12, quotientDigit=4, product=12, remainder=0
+    expect(steps[1]).toEqual({ position: 1, dividendSoFar: 12, quotientDigit: 4, product: 12, remainder: 0 });
+  });
+
+  it("computes 75 ÷ 4 = 18 r3 (remainder, 1-digit divisor)", () => {
+    const { quotient, remainder, steps } = computeDivDetails(75, 4);
+    expect(quotient).toBe(18);
+    expect(remainder).toBe(3);
+    expect(steps).toHaveLength(2);
+    expect(steps[0]).toEqual({ position: 0, dividendSoFar: 7, quotientDigit: 1, product: 4, remainder: 3 });
+    expect(steps[1]).toEqual({ position: 1, dividendSoFar: 35, quotientDigit: 8, product: 32, remainder: 3 });
+  });
+
+  it("computes 1024 ÷ 16 = 64 (exact, 2-digit divisor)", () => {
+    const { quotient, remainder, steps } = computeDivDetails(1024, 16);
+    expect(quotient).toBe(64);
+    expect(remainder).toBe(0);
+    // Digits: 1, 0, 2, 4
+    // current=1 < 16, skip; current=10 < 16, skip; current=102, qd=6, prod=96, rem=6; current=64, qd=4, prod=64, rem=0
+    expect(steps).toHaveLength(2);
+    expect(steps[0]).toEqual({ position: 2, dividendSoFar: 102, quotientDigit: 6, product: 96, remainder: 6 });
+    expect(steps[1]).toEqual({ position: 3, dividendSoFar: 64, quotientDigit: 4, product: 64, remainder: 0 });
+  });
+
+  it("computes 100 ÷ 10 = 10 (quotient has interior zero)", () => {
+    const { quotient, remainder, steps } = computeDivDetails(100, 10);
+    expect(quotient).toBe(10);
+    expect(remainder).toBe(0);
+    // Digits: 1, 0, 0
+    // current=1 < 10, skip; current=10 >= 10, qd=1, prod=10, rem=0; current=0, qd=0, prod=0, rem=0
+    expect(steps).toHaveLength(2);
+    expect(steps[0]).toEqual({ position: 1, dividendSoFar: 10, quotientDigit: 1, product: 10, remainder: 0 });
+    expect(steps[1]).toEqual({ position: 2, dividendSoFar: 0, quotientDigit: 0, product: 0, remainder: 0 });
+  });
+
+  it("computes 8 ÷ 4 = 2 (single-step)", () => {
+    const { quotient, remainder, steps } = computeDivDetails(8, 4);
+    expect(quotient).toBe(2);
+    expect(remainder).toBe(0);
+    expect(steps).toHaveLength(1);
+    expect(steps[0]).toEqual({ position: 0, dividendSoFar: 8, quotientDigit: 2, product: 8, remainder: 0 });
+  });
+});
+
+// ---------------------------------------------------------------------------
 // generateMultiplicationProblem
 // ---------------------------------------------------------------------------
 describe("generateMultiplicationProblem", () => {
@@ -701,7 +814,7 @@ describe("generateMultiplicationProblem", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "mul",
-      mulMinDigits: 1, mulMaxDigits: 2,
+      mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults,
     };
     for (let seed = 0; seed < 50; seed++) {
       const rng = mulberry32(seed);
@@ -715,6 +828,65 @@ describe("generateMultiplicationProblem", () => {
 });
 
 // ---------------------------------------------------------------------------
+// generateDivisionProblem
+// ---------------------------------------------------------------------------
+describe("generateDivisionProblem", () => {
+  it("exact mode always produces divisible pair", () => {
+    const cfg: HissanConfig = {
+      minDigits: 2, maxDigits: 3, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "div",
+      mulMinDigits: 1, mulMaxDigits: 1,
+      divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
+    };
+    for (let seed = 0; seed < 50; seed++) {
+      const rng = mulberry32(seed);
+      const [dividend, divisor] = generateDivisionProblem(rng, cfg);
+      expect(dividend % divisor).toBe(0);
+      expect(dividend).toBeGreaterThanOrEqual(10);
+      expect(dividend).toBeLessThanOrEqual(999);
+      expect(divisor).toBeGreaterThanOrEqual(1);
+      expect(divisor).toBeLessThanOrEqual(9);
+    }
+  });
+
+  it("exact mode with 2-digit divisor", () => {
+    const cfg: HissanConfig = {
+      minDigits: 3, maxDigits: 4, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "div",
+      mulMinDigits: 1, mulMaxDigits: 1,
+      divMinDigits: 2, divMaxDigits: 2, divAllowRemainder: false,
+    };
+    for (let seed = 0; seed < 50; seed++) {
+      const rng = mulberry32(seed);
+      const [dividend, divisor] = generateDivisionProblem(rng, cfg);
+      expect(dividend % divisor).toBe(0);
+      expect(dividend).toBeGreaterThanOrEqual(100);
+      expect(dividend).toBeLessThanOrEqual(9999);
+      expect(divisor).toBeGreaterThanOrEqual(10);
+      expect(divisor).toBeLessThanOrEqual(99);
+    }
+  });
+
+  it("remainder mode produces valid dividend >= divisor", () => {
+    const cfg: HissanConfig = {
+      minDigits: 2, maxDigits: 3, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "div",
+      mulMinDigits: 1, mulMaxDigits: 1,
+      divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: true,
+    };
+    for (let seed = 0; seed < 50; seed++) {
+      const rng = mulberry32(seed);
+      const [dividend, divisor] = generateDivisionProblem(rng, cfg);
+      expect(dividend).toBeGreaterThanOrEqual(divisor);
+      expect(dividend).toBeGreaterThanOrEqual(10);
+      expect(dividend).toBeLessThanOrEqual(999);
+      expect(divisor).toBeGreaterThanOrEqual(1);
+      expect(divisor).toBeLessThanOrEqual(9);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
 // getProblemCount
 // ---------------------------------------------------------------------------
 describe("getProblemCount", () => {
@@ -722,7 +894,7 @@ describe("getProblemCount", () => {
     const addCfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     expect(getProblemCount(addCfg)).toBe(12);
 
@@ -736,7 +908,7 @@ describe("getProblemCount", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "mul",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     expect(getProblemCount(cfg)).toBe(12);
   });
@@ -745,7 +917,7 @@ describe("getProblemCount", () => {
     const cfg2: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "mul",
-      mulMinDigits: 1, mulMaxDigits: 2,
+      mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults,
     };
     expect(getProblemCount(cfg2)).toBe(6);
 
@@ -753,6 +925,16 @@ describe("getProblemCount", () => {
       ...cfg2, mulMinDigits: 2, mulMaxDigits: 3,
     };
     expect(getProblemCount(cfg3)).toBe(6);
+  });
+
+  it("returns 6 for div", () => {
+    const cfg: HissanConfig = {
+      minDigits: 2, maxDigits: 3, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "div",
+      mulMinDigits: 1, mulMaxDigits: 1,
+      divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
+    };
+    expect(getProblemCount(cfg)).toBe(6);
   });
 });
 
@@ -764,7 +946,7 @@ describe("generateProblems (mul)", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "mul",
-      mulMinDigits: 1, mulMaxDigits: 2,
+      mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults,
     };
     const problems = generateProblems(42, cfg);
     expect(problems).toHaveLength(6);
@@ -774,9 +956,25 @@ describe("generateProblems (mul)", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "mul",
-      mulMinDigits: 1, mulMaxDigits: 1,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const problems = generateProblems(42, cfg);
     expect(problems).toHaveLength(12);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// generateProblems — div count
+// ---------------------------------------------------------------------------
+describe("generateProblems (div)", () => {
+  it("returns 6 problems for division", () => {
+    const cfg: HissanConfig = {
+      minDigits: 2, maxDigits: 3, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "div",
+      mulMinDigits: 1, mulMaxDigits: 1,
+      divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
+    };
+    const problems = generateProblems(42, cfg);
+    expect(problems).toHaveLength(6);
   });
 });

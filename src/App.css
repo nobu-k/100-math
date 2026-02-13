@@ -273,7 +273,72 @@
   grid-template-columns: repeat(2, auto);
 }
 
-.hissan-no-grid .hissan-cell {
+/* Division styles */
+.hissan-div-page {
+  grid-template-columns: repeat(2, auto);
+}
+
+.hissan-div-grid {
+  border-collapse: collapse;
+}
+
+.hissan-div-cell {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 28px;
+  font-weight: bold;
+  padding: 0;
+  border: 2px dotted #ccc;
+}
+
+.hissan-div-bracket-top td:not(:first-child) {
+  border-bottom: 3px solid #000;
+}
+
+.hissan-div-bracket-left {
+  border-left: none !important;
+}
+
+.hissan-div-bracket-left::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: -2px;
+  bottom: 15%;
+  width: 10px;
+  border-right: 3px solid #000;
+  border-top-right-radius: 10px 40%;
+  border-bottom-right-radius: 10px 60%;
+}
+
+.hissan-div-divisor {
+  font-size: 24px;
+  white-space: nowrap;
+  padding-right: 2px;
+}
+
+.hissan-div-subtract-row td {
+  border-bottom: 2px solid #000;
+}
+
+.hissan-div-work-cell {
+  color: red;
+}
+
+.hissan-div-remainder {
+  font-size: 18px;
+  font-weight: bold;
+  color: red;
+  margin-left: 4px;
+  align-self: flex-end;
+  margin-bottom: 4px;
+}
+
+.hissan-no-grid .hissan-cell,
+.hissan-no-grid .hissan-div-cell {
   border-color: transparent;
 }
 
@@ -408,6 +473,28 @@
 
   .hissan-mul-wide .hissan-cell-carry {
     font-size: 8px;
+  }
+
+  .hissan-div-cell {
+    width: 9mm;
+    height: 9mm;
+    font-size: 18px;
+  }
+
+  .hissan-div-divisor {
+    font-size: 16px;
+  }
+
+  .hissan-div-bracket-left::before {
+    left: -3mm;
+    width: 2.5mm;
+    border-right-width: 0.8mm;
+    border-top-right-radius: 2.5mm 40%;
+    border-bottom-right-radius: 2.5mm 60%;
+  }
+
+  .hissan-div-remainder {
+    font-size: 14px;
   }
 
   @page {

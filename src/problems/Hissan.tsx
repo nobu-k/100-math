@@ -12,6 +12,7 @@ import {
   toDigitCells,
   computeIndicators,
   computeMulDetails,
+  computeDivDetails,
 } from "./hissan-logic";
 import "../App.css";
 
@@ -19,7 +20,7 @@ const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
   const url = new URL(window.location.href);
   const params = buildParams(seed, showAnswers, cfg);
   // Replace all hissan-related params on the existing URL
-  for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax"]) {
+  for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax", "hdmin", "hdmax", "hdr"]) {
     url.searchParams.delete(key);
   }
   for (const [key, value] of params) {
@@ -214,6 +215,102 @@ function HissanMulProblem({
   );
 }
 
+function HissanDivProblem({
+  index,
+  problem,
+  showAnswers,
+}: {
+  index: number;
+  problem: Problem;
+  showAnswers: boolean;
+}) {
+  const [dividend, divisor] = problem;
+  const { quotient, remainder, steps } = computeDivDetails(dividend, divisor);
+  const dividendStr = String(dividend);
+  const dividendDigits = dividendStr.split("").map(Number);
+  const quotientStr = String(quotient);
+  const totalCols = 1 + dividendDigits.length; // col 0 = divisor, cols 1+ = dividend
+
+  // Map quotient digits to their column positions (right-aligned to dividend)
+  const quotientCols: (number | "")[] = Array(totalCols).fill("");
+  for (let i = 0; i < quotientStr.length; i++) {
+    const col = totalCols - quotientStr.length + i;
+    quotientCols[col] = parseInt(quotientStr[i], 10);
+  }
+
+  // Build work rows from steps (always, so students have space to calculate)
+  const workRows: { cells: (number | "")[], hasBottomBorder: boolean }[] = [];
+  for (let si = 0; si < steps.length; si++) {
+    const step = steps[si];
+    const endCol = step.position + 1; // 1-based column in totalCols
+
+    // Subtract row: product right-aligned ending at endCol
+    const subtractCells: (number | "")[] = Array(totalCols).fill("");
+    if (showAnswers) {
+      const prodStr = String(step.product);
+      for (let i = 0; i < prodStr.length; i++) {
+        const col = endCol - prodStr.length + 1 + i;
+        if (col >= 0) subtractCells[col] = parseInt(prodStr[i], 10);
+      }
+    }
+    workRows.push({ cells: subtractCells, hasBottomBorder: true });
+
+    // Remainder row: remainder digits + next brought-down digit
+    const remainderCells: (number | "")[] = Array(totalCols).fill("");
+    if (showAnswers) {
+      const nextDigitIndex = step.position + 1;
+      let remStr: string;
+      if (si < steps.length - 1) {
+        remStr = String(step.remainder * 10 + dividendDigits[nextDigitIndex]);
+      } else {
+        remStr = String(step.remainder);
+      }
+      const remEndCol = si < steps.length - 1 ? nextDigitIndex + 1 : endCol;
+      for (let i = 0; i < remStr.length; i++) {
+        const col = remEndCol - remStr.length + 1 + i;
+        if (col >= 0) remainderCells[col] = parseInt(remStr[i], 10);
+      }
+    }
+    workRows.push({ cells: remainderCells, hasBottomBorder: false });
+  }
+
+  return (
+    <div className="hissan-problem">
+      <span className="hissan-number">({index + 1})</span>
+      <table className="hissan-grid hissan-div-grid">
+        <tbody>
+          {/* Quotient row */}
+          <tr className="hissan-div-bracket-top">
+            {quotientCols.map((d, i) => (
+              <td key={i} className={i === 0 ? "hissan-div-cell" : "hissan-div-cell"}>
+                {showAnswers ? d : ""}
+              </td>
+            ))}
+          </tr>
+          {/* Divisor + Dividend row */}
+          <tr>
+            <td className="hissan-div-cell hissan-div-divisor">{divisor}</td>
+            {dividendDigits.map((d, i) => (
+              <td key={i} className={`hissan-div-cell${i === 0 ? " hissan-div-bracket-left" : ""}`}>{d}</td>
+            ))}
+          </tr>
+          {/* Work rows */}
+          {workRows.map((row, ri) => (
+            <tr key={ri} className={row.hasBottomBorder ? "hissan-div-subtract-row" : ""}>
+              {row.cells.map((d, i) => (
+                <td key={i} className="hissan-div-cell hissan-div-work-cell">{d}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {showAnswers && remainder > 0 && (
+        <span className="hissan-div-remainder">あまり {remainder}</span>
+      )}
+    </div>
+  );
+}
+
 function Hissan() {
   const [seed, setSeed] = useState(getInitialSeed);
   const [showAnswers, setShowAnswers] = useState(() => {
@@ -246,11 +343,15 @@ function Hissan() {
           ? e.target.checked
           : isNaN(parseInt(raw, 10)) ? raw : parseInt(raw, 10);
         const next = { ...prev, [field]: value };
-        if (field === "operator" && (next.operator === "sub" || next.operator === "mul"))
+        if (field === "operator" && (next.operator === "sub" || next.operator === "mul" || next.operator === "div"))
           next.numOperands = 2;
         if (field === "operator" && next.operator === "mul") {
           if (next.maxDigits > 3) next.maxDigits = 3;
           if (next.minDigits > next.maxDigits) next.minDigits = next.maxDigits;
+        }
+        if (field === "operator" && next.operator === "div") {
+          if (next.minDigits < 2) next.minDigits = 2;
+          if (next.maxDigits < next.minDigits) next.maxDigits = next.minDigits;
         }
         if (field === "minDigits" && next.minDigits > next.maxDigits)
           next.maxDigits = next.minDigits;
@@ -260,6 +361,10 @@ function Hissan() {
           next.mulMaxDigits = next.mulMinDigits;
         if (field === "mulMaxDigits" && next.mulMaxDigits < next.mulMinDigits)
           next.mulMinDigits = next.mulMaxDigits;
+        if (field === "divMinDigits" && next.divMinDigits > next.divMaxDigits)
+          next.divMaxDigits = next.divMinDigits;
+        if (field === "divMaxDigits" && next.divMaxDigits < next.divMinDigits)
+          next.divMinDigits = next.divMaxDigits;
         const newSeed = randomSeed();
         setSeed(newSeed);
         setShowAnswers(false);
@@ -281,7 +386,7 @@ function Hissan() {
   const qrUrl = useMemo(() => {
     const url = new URL(window.location.href);
     // Clear all hissan params before rebuilding
-    for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax"]) {
+    for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax", "hdmin", "hdmax", "hdr"]) {
       url.searchParams.delete(key);
     }
     const params = buildParams(seed, true, cfg);
@@ -298,6 +403,7 @@ function Hissan() {
           <option value="add">たし算</option>
           <option value="sub">ひき算</option>
           <option value="mul">かけ算</option>
+          <option value="div">わり算</option>
         </select>
         <button onClick={handleNewProblems}>新しい問題</button>
         <button onClick={handleToggleAnswers}>
@@ -310,15 +416,15 @@ function Hissan() {
       {showSettings && (
         <div className="no-print settings-panel">
           <label>
-            {cfg.operator === "mul" ? "かけられる数" : "桁数"} 最小{" "}
+            {cfg.operator === "mul" ? "かけられる数" : cfg.operator === "div" ? "割られる数" : "桁数"} 最小{" "}
             <select className="operator-select" value={cfg.minDigits} onChange={handleConfigChange("minDigits")}>
-              {(cfg.operator === "mul" ? [1, 2, 3] : [1, 2, 3, 4]).map((d) => <option key={d} value={d}>{d} 桁</option>)}
+              {(cfg.operator === "mul" ? [1, 2, 3] : cfg.operator === "div" ? [2, 3, 4] : [1, 2, 3, 4]).map((d) => <option key={d} value={d}>{d} 桁</option>)}
             </select>
           </label>
           <label>
             最大{" "}
             <select className="operator-select" value={cfg.maxDigits} onChange={handleConfigChange("maxDigits")}>
-              {(cfg.operator === "mul" ? [1, 2, 3] : [1, 2, 3, 4]).map((d) => <option key={d} value={d}>{d} 桁</option>)}
+              {(cfg.operator === "mul" ? [1, 2, 3] : cfg.operator === "div" ? [2, 3, 4] : [1, 2, 3, 4]).map((d) => <option key={d} value={d}>{d} 桁</option>)}
             </select>
           </label>
           {cfg.operator === "mul" && (
@@ -337,6 +443,26 @@ function Hissan() {
               </label>
             </>
           )}
+          {cfg.operator === "div" && (
+            <>
+              <label>
+                わる数 最小{" "}
+                <select className="operator-select" value={cfg.divMinDigits} onChange={handleConfigChange("divMinDigits")}>
+                  {[1, 2].map((d) => <option key={d} value={d}>{d} 桁</option>)}
+                </select>
+              </label>
+              <label>
+                最大{" "}
+                <select className="operator-select" value={cfg.divMaxDigits} onChange={handleConfigChange("divMaxDigits")}>
+                  {[1, 2].map((d) => <option key={d} value={d}>{d} 桁</option>)}
+                </select>
+              </label>
+              <label>
+                <input type="checkbox" checked={cfg.divAllowRemainder} onChange={handleConfigChange("divAllowRemainder")} />
+                あまりあり
+              </label>
+            </>
+          )}
           {cfg.operator === "add" && (
             <label>
               項数{" "}
@@ -345,7 +471,7 @@ function Hissan() {
               </select>
             </label>
           )}
-          {cfg.operator !== "mul" && (
+          {cfg.operator !== "mul" && cfg.operator !== "div" && (
             <label>
               <input type="checkbox" checked={cfg.consecutiveCarries} onChange={handleConfigChange("consecutiveCarries")} />
               {cfg.operator === "sub" ? "連続繰り下がり" : "連続繰り上がり"}
@@ -357,9 +483,16 @@ function Hissan() {
           </label>
         </div>
       )}
-      <div className={`hissan-page${cfg.showGrid ? "" : " hissan-no-grid"}${cfg.operator === "mul" && cfg.mulMaxDigits >= 2 ? " hissan-mul-wide" : ""}`}>
+      <div className={`hissan-page${cfg.showGrid ? "" : " hissan-no-grid"}${cfg.operator === "mul" && cfg.mulMaxDigits >= 2 ? " hissan-mul-wide" : ""}${cfg.operator === "div" ? " hissan-div-page" : ""}`}>
         {problems.map((problem, i) =>
-          cfg.operator === "mul" ? (
+          cfg.operator === "div" ? (
+            <HissanDivProblem
+              key={i}
+              index={i}
+              problem={problem}
+              showAnswers={showAnswers}
+            />
+          ) : cfg.operator === "mul" ? (
             <HissanMulProblem
               key={i}
               index={i}

@@ -1,7 +1,7 @@
 import { mulberry32, seedToHex } from "./random";
 
 export type Problem = number[];
-export type HissanOperator = "add" | "sub" | "mul";
+export type HissanOperator = "add" | "sub" | "mul" | "div";
 
 export interface HissanConfig {
   minDigits: number;
@@ -12,6 +12,9 @@ export interface HissanConfig {
   operator: HissanOperator;
   mulMinDigits: number;
   mulMaxDigits: number;
+  divMinDigits: number;
+  divMaxDigits: number;
+  divAllowRemainder: boolean;
 }
 
 export const generateNumber = (rng: () => number, minDigits: number, maxDigits: number): number => {
@@ -277,6 +280,81 @@ export const computeMulDetails = (multiplicand: number, multiplier: number): Mul
   return { partials, finalAnswer };
 };
 
+// ---------------------------------------------------------------------------
+// Division
+// ---------------------------------------------------------------------------
+
+export interface DivStep {
+  position: number;      // column index in dividend (0-based from left)
+  dividendSoFar: number; // the current partial dividend being divided
+  quotientDigit: number; // digit of quotient at this position
+  product: number;       // divisor × quotientDigit
+  remainder: number;     // dividendSoFar - product
+}
+
+export interface DivComputed {
+  quotient: number;
+  remainder: number;
+  steps: DivStep[];
+}
+
+/** Compute long division steps for dividend ÷ divisor. */
+export const computeDivDetails = (dividend: number, divisor: number): DivComputed => {
+  const digits = String(dividend).split("").map(Number);
+  const steps: DivStep[] = [];
+  let current = 0;
+  let started = false;
+
+  for (let i = 0; i < digits.length; i++) {
+    current = current * 10 + digits[i];
+    if (!started && current < divisor) continue;
+    started = true;
+    const quotientDigit = Math.floor(current / divisor);
+    const product = divisor * quotientDigit;
+    const remainder = current - product;
+    steps.push({ position: i, dividendSoFar: current, quotientDigit, product, remainder });
+    current = remainder;
+  }
+
+  const quotient = Math.floor(dividend / divisor);
+  const remainder = dividend % divisor;
+  return { quotient, remainder, steps };
+};
+
+/** Generate a division problem. */
+export const generateDivisionProblem = (rng: () => number, cfg: HissanConfig): Problem => {
+  if (!cfg.divAllowRemainder) {
+    // Exact mode: generate divisor and quotient, compute dividend = divisor × quotient
+    for (let attempt = 0; attempt < 100; attempt++) {
+      const divisor = generateNumber(rng, cfg.divMinDigits, cfg.divMaxDigits);
+      // Generate a quotient such that dividend = divisor * quotient is in range
+      const minDividend = cfg.minDigits === 1 ? 1 : Math.pow(10, cfg.minDigits - 1);
+      const maxDividend = Math.pow(10, cfg.maxDigits) - 1;
+      const minQuotient = Math.max(1, Math.ceil(minDividend / divisor));
+      const maxQuotient = Math.floor(maxDividend / divisor);
+      if (minQuotient > maxQuotient) continue;
+      const quotient = randInt(rng, minQuotient, maxQuotient);
+      const dividend = divisor * quotient;
+      if (String(dividend).length >= cfg.minDigits && String(dividend).length <= cfg.maxDigits) {
+        return [dividend, divisor];
+      }
+    }
+    // Fallback
+    const divisor = generateNumber(rng, cfg.divMinDigits, cfg.divMaxDigits);
+    return [divisor * 2, divisor];
+  } else {
+    // Remainder mode: generate dividend and divisor, ensure dividend >= divisor
+    for (let attempt = 0; attempt < 100; attempt++) {
+      const dividend = generateNumber(rng, cfg.minDigits, cfg.maxDigits);
+      const divisor = generateNumber(rng, cfg.divMinDigits, cfg.divMaxDigits);
+      if (dividend >= divisor) return [dividend, divisor];
+    }
+    // Fallback
+    const dividend = generateNumber(rng, cfg.minDigits, cfg.maxDigits);
+    return [dividend, 1];
+  }
+};
+
 /** Generate a multiplication problem. */
 export const generateMultiplicationProblem = (rng: () => number, cfg: HissanConfig): Problem => {
   const multiplicand = generateNumber(rng, cfg.minDigits, cfg.maxDigits);
@@ -286,11 +364,13 @@ export const generateMultiplicationProblem = (rng: () => number, cfg: HissanConf
 
 /** Return the number of problems per page for the given config. */
 export const getProblemCount = (cfg: HissanConfig): number => {
+  if (cfg.operator === "div") return 6;
   if (cfg.operator === "mul" && cfg.mulMaxDigits >= 2) return 6;
   return 12;
 };
 
 export const generateProblem = (rng: () => number, cfg: HissanConfig): Problem => {
+  if (cfg.operator === "div") return generateDivisionProblem(rng, cfg);
   if (cfg.operator === "mul") return generateMultiplicationProblem(rng, cfg);
   if (cfg.operator === "sub") {
     if (cfg.consecutiveCarries) return generateBorrowChainProblem(rng, cfg);
@@ -310,12 +390,12 @@ export const generateProblems = (seed: number, cfg: HissanConfig): Problem[] => 
 
 export const parseConfig = (params: URLSearchParams): HissanConfig => {
   const hop = params.get("hop");
-  const operator: HissanOperator = hop === "sub" ? "sub" : hop === "mul" ? "mul" : "add";
+  const operator: HissanOperator = hop === "sub" ? "sub" : hop === "mul" ? "mul" : hop === "div" ? "div" : "add";
 
   let minDigits = parseInt(params.get("hmin") || "", 10);
   let maxDigits = parseInt(params.get("hmax") || "", 10);
   let numOperands = parseInt(params.get("hops") || "", 10);
-  if (!(minDigits >= 1 && minDigits <= 4)) minDigits = 1;
+  if (!(minDigits >= 1 && minDigits <= 4)) minDigits = operator === "div" ? 2 : 1;
   if (!(maxDigits >= 1 && maxDigits <= 4)) maxDigits = 2;
   if (minDigits > maxDigits) maxDigits = minDigits;
   if (!(numOperands >= 2 && numOperands <= 3)) numOperands = 2;
@@ -328,14 +408,26 @@ export const parseConfig = (params: URLSearchParams): HissanConfig => {
   if (!(mulMaxDigits >= 1 && mulMaxDigits <= 3)) mulMaxDigits = 1;
   if (mulMinDigits > mulMaxDigits) mulMaxDigits = mulMinDigits;
 
+  let divMinDigits = parseInt(params.get("hdmin") || "", 10);
+  let divMaxDigits = parseInt(params.get("hdmax") || "", 10);
+  if (!(divMinDigits >= 1 && divMinDigits <= 2)) divMinDigits = 1;
+  if (!(divMaxDigits >= 1 && divMaxDigits <= 2)) divMaxDigits = 1;
+  if (divMinDigits > divMaxDigits) divMaxDigits = divMinDigits;
+  const divAllowRemainder = params.get("hdr") === "1";
+
   if (operator === "sub") numOperands = 2;
   if (operator === "mul") {
     numOperands = 2;
     if (maxDigits > 3) maxDigits = 3;
     if (minDigits > maxDigits) minDigits = maxDigits;
   }
+  if (operator === "div") {
+    numOperands = 2;
+    if (minDigits < 2) minDigits = 2;
+    if (maxDigits < minDigits) maxDigits = minDigits;
+  }
 
-  return { minDigits, maxDigits, numOperands, consecutiveCarries, showGrid, operator, mulMinDigits, mulMaxDigits };
+  return { minDigits, maxDigits, numOperands, consecutiveCarries, showGrid, operator, mulMinDigits, mulMaxDigits, divMinDigits, divMaxDigits, divAllowRemainder };
 };
 
 /** Convert a number to an array of digits, padded to `width` with empty strings on the left. */
@@ -419,6 +511,14 @@ export const buildParams = (seed: number, showAnswers: boolean, cfg: HissanConfi
     params.set("hop", "mul");
     params.set("hmmin", String(cfg.mulMinDigits));
     params.set("hmmax", String(cfg.mulMaxDigits));
+  }
+  if (cfg.operator === "div") {
+    params.set("hop", "div");
+    params.set("hdmin", String(cfg.divMinDigits));
+    params.set("hdmax", String(cfg.divMaxDigits));
+    if (cfg.divAllowRemainder) {
+      params.set("hdr", "1");
+    }
   }
   return params;
 };
