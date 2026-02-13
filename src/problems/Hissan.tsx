@@ -226,12 +226,13 @@ function HissanDivProblem({
 }) {
   const [dividend, divisor] = problem;
   const { quotient, remainder, steps } = computeDivDetails(dividend, divisor);
-  const dividendStr = String(dividend);
-  const dividendDigits = dividendStr.split("").map(Number);
+  const dividendDigits = String(dividend).split("").map(Number);
+  const divisorDigits = String(divisor).split("").map(Number);
   const quotientStr = String(quotient);
-  const totalCols = 1 + dividendDigits.length; // col 0 = divisor, cols 1+ = dividend
+  const divCols = divisorDigits.length;  // number of divisor columns
+  const totalCols = divCols + dividendDigits.length;
 
-  // Map quotient digits to their column positions (right-aligned to dividend)
+  // Map quotient digits to their column positions (right-aligned to dividend area)
   const quotientCols: (number | "")[] = Array(totalCols).fill("");
   for (let i = 0; i < quotientStr.length; i++) {
     const col = totalCols - quotientStr.length + i;
@@ -242,7 +243,7 @@ function HissanDivProblem({
   const workRows: { cells: (number | "")[], hasBottomBorder: boolean }[] = [];
   for (let si = 0; si < steps.length; si++) {
     const step = steps[si];
-    const endCol = step.position + 1; // 1-based column in totalCols
+    const endCol = divCols + step.position; // column in totalCols grid
 
     // Subtract row: product right-aligned ending at endCol
     const subtractCells: (number | "")[] = Array(totalCols).fill("");
@@ -265,7 +266,7 @@ function HissanDivProblem({
       } else {
         remStr = String(step.remainder);
       }
-      const remEndCol = si < steps.length - 1 ? nextDigitIndex + 1 : endCol;
+      const remEndCol = si < steps.length - 1 ? divCols + nextDigitIndex : endCol;
       for (let i = 0; i < remStr.length; i++) {
         const col = remEndCol - remStr.length + 1 + i;
         if (col >= 0) remainderCells[col] = parseInt(remStr[i], 10);
@@ -280,16 +281,18 @@ function HissanDivProblem({
       <table className="hissan-grid hissan-div-grid">
         <tbody>
           {/* Quotient row */}
-          <tr className="hissan-div-bracket-top">
+          <tr>
             {quotientCols.map((d, i) => (
-              <td key={i} className={i === 0 ? "hissan-div-cell" : "hissan-div-cell"}>
+              <td key={i} className={`hissan-div-cell${i >= divCols ? " hissan-div-bracket-top-line" : ""}`}>
                 {showAnswers ? d : ""}
               </td>
             ))}
           </tr>
           {/* Divisor + Dividend row */}
           <tr>
-            <td className="hissan-div-cell hissan-div-divisor">{divisor}</td>
+            {divisorDigits.map((d, i) => (
+              <td key={`div${i}`} className="hissan-div-cell">{d}</td>
+            ))}
             {dividendDigits.map((d, i) => (
               <td key={i} className={`hissan-div-cell${i === 0 ? " hissan-div-bracket-left" : ""}`}>{d}</td>
             ))}

@@ -294,7 +294,7 @@
   border: 2px dotted #ccc;
 }
 
-.hissan-div-bracket-top td:not(:first-child) {
+.hissan-div-bracket-top-line {
   border-bottom: 3px solid #000;
 }
 
@@ -312,12 +312,6 @@
   border-right: 3px solid #000;
   border-top-right-radius: 10px 40%;
   border-bottom-right-radius: 10px 60%;
-}
-
-.hissan-div-divisor {
-  font-size: 24px;
-  white-space: nowrap;
-  padding-right: 2px;
 }
 
 .hissan-div-subtract-row td {
@@ -479,10 +473,6 @@
     width: 9mm;
     height: 9mm;
     font-size: 18px;
-  }
-
-  .hissan-div-divisor {
-    font-size: 16px;
   }
 
   .hissan-div-bracket-left::before {
