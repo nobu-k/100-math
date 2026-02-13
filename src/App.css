@@ -298,9 +298,19 @@
   border-bottom: 3px solid #000;
 }
 
+.hissan-div-bracket-top-start::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  bottom: -3px;
+  width: 8px;
+  height: 3px;
+  background: #000;
+}
+
 .hissan-div-bracket-curve {
   position: absolute;
-  left: -1px;
+  left: -9px;
   top: -2px;
   bottom: -2px;
   width: 10px;
@@ -314,6 +324,7 @@
 
 .hissan-div-outside {
   border: none !important;
+  padding-right: 8px;
 }
 
 .hissan-div-work-cell {

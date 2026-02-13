@@ -283,7 +283,7 @@ function HissanDivProblem({
           {/* Quotient row */}
           <tr>
             {quotientCols.map((d, i) => (
-              <td key={i} className={`hissan-div-cell${i < divCols ? " hissan-div-outside" : " hissan-div-bracket-top-line"}`}>
+              <td key={i} className={`hissan-div-cell${i < divCols ? " hissan-div-outside" : " hissan-div-bracket-top-line"}${i === divCols ? " hissan-div-bracket-top-start" : ""}`}>
                 {showAnswers ? d : ""}
               </td>
             ))}
