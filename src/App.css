@@ -275,7 +275,7 @@
 
 /* Division styles */
 .hissan-div-page {
-  grid-template-columns: repeat(2, auto);
+  grid-template-columns: repeat(3, auto);
 }
 
 .hissan-div-grid {
