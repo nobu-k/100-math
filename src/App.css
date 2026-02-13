@@ -334,12 +334,10 @@
 }
 
 .hissan-div-remainder {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
   color: red;
-  margin-left: 4px;
-  align-self: flex-end;
-  margin-bottom: 4px;
+  white-space: nowrap;
 }
 
 .hissan-no-grid .hissan-cell,

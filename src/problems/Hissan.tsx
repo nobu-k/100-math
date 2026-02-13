@@ -287,6 +287,9 @@ function HissanDivProblem({
                 {showAnswers ? d : ""}
               </td>
             ))}
+            {showAnswers && remainder > 0 && (
+              <td className="hissan-div-cell hissan-div-outside hissan-div-remainder">…{remainder}</td>
+            )}
           </tr>
           {/* Divisor + Dividend row */}
           <tr>
@@ -314,9 +317,6 @@ function HissanDivProblem({
           ))}
         </tbody>
       </table>
-      {showAnswers && remainder > 0 && (
-        <span className="hissan-div-remainder">あまり {remainder}</span>
-      )}
     </div>
   );
 }
