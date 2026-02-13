@@ -283,7 +283,7 @@ function HissanDivProblem({
           {/* Quotient row */}
           <tr>
             {quotientCols.map((d, i) => (
-              <td key={i} className={`hissan-div-cell${i >= divCols ? " hissan-div-bracket-top-line" : ""}`}>
+              <td key={i} className={`hissan-div-cell${i < divCols ? " hissan-div-outside" : " hissan-div-bracket-top-line"}`}>
                 {showAnswers ? d : ""}
               </td>
             ))}
@@ -291,7 +291,7 @@ function HissanDivProblem({
           {/* Divisor + Dividend row */}
           <tr>
             {divisorDigits.map((d, i) => (
-              <td key={`div${i}`} className="hissan-div-cell">{d}</td>
+              <td key={`div${i}`} className="hissan-div-cell hissan-div-outside">{d}</td>
             ))}
             {dividendDigits.map((d, i) => (
               <td key={i} className={`hissan-div-cell${i === 0 ? " hissan-div-bracket-left" : ""}`}>{d}</td>
@@ -299,9 +299,9 @@ function HissanDivProblem({
           </tr>
           {/* Work rows */}
           {workRows.map((row, ri) => (
-            <tr key={ri} className={row.hasBottomBorder ? "hissan-div-subtract-row" : ""}>
+            <tr key={ri}>
               {row.cells.map((d, i) => (
-                <td key={i} className="hissan-div-cell hissan-div-work-cell">{d}</td>
+                <td key={i} className={`hissan-div-cell hissan-div-work-cell${i < divCols ? " hissan-div-outside" : ""}${row.hasBottomBorder && i >= divCols ? " hissan-div-subtract-line" : ""}`}>{d}</td>
               ))}
             </tr>
           ))}

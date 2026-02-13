@@ -314,8 +314,12 @@
   border-bottom-right-radius: 10px 60%;
 }
 
-.hissan-div-subtract-row td {
+.hissan-div-subtract-line {
   border-bottom: 2px solid #000;
+}
+
+.hissan-div-outside {
+  border: none !important;
 }
 
 .hissan-div-work-cell {
