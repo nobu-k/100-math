@@ -10,6 +10,7 @@ import {
   parseConfig,
   buildParams,
   toDigitCells,
+  toDecimalDigitCells,
   computeIndicators,
   computeMulDetails,
   computeDivDetails,
@@ -20,7 +21,7 @@ const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
   const url = new URL(window.location.href);
   const params = buildParams(seed, showAnswers, cfg);
   // Replace all hissan-related params on the existing URL
-  for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax", "hdmin", "hdmax", "hdr"]) {
+  for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax", "hdmin", "hdmax", "hdr", "hdec"]) {
     url.searchParams.delete(key);
   }
   for (const [key, value] of params) {
@@ -51,13 +52,105 @@ function HissanProblem({
   showAnswers,
   maxDigits,
   operator,
+  dps,
 }: {
   index: number;
   problem: Problem;
   showAnswers: boolean;
   maxDigits: number;
   operator: HissanOperator;
+  dps: number[];
 }) {
+  const maxDP = Math.max(...dps);
+  const operatorSymbol = operator === "sub" ? "\u2212" : "+";
+  const last = problem.length - 1;
+
+  if (maxDP > 0) {
+    // Decimal rendering path
+    const maxIntDigits = Math.max(
+      ...problem.map((op, i) => {
+        const numDigits = String(op).length;
+        return dps[i] >= numDigits ? 1 : numDigits - dps[i];
+      }),
+    );
+    const effectiveMaxDigits = maxIntDigits + maxDP;
+    const totalIntCols = maxIntDigits + 1; // +1 for operator/carry overflow
+    const totalDecCols = maxDP;
+
+    const aligned = problem.map((op, i) => op * Math.pow(10, maxDP - dps[i]));
+    const answer = aligned.reduce((a, b) => a + b, 0);
+    const { indicators } = computeIndicators(aligned, effectiveMaxDigits, operator);
+    const answerCells = toDecimalDigitCells(answer, maxDP, totalIntCols, totalDecCols);
+
+    // Clear trailing zeros in the decimal portion of a cell array
+    const trimDecZeros = (cells: (number | "")[]) => {
+      const out = [...cells];
+      for (let i = out.length - 1; i >= totalIntCols; i--) {
+        if (out[i] === 0) out[i] = "";
+        else break;
+      }
+      return out;
+    };
+    const hasDecDigits = (cells: (number | "")[]) =>
+      cells.slice(totalIntCols).some((d) => d !== "");
+
+    const trimmedAnswer = trimDecZeros(answerCells);
+
+    return (
+      <div className="hissan-problem">
+        <span className="hissan-number">({index + 1})</span>
+        <table className="hissan-grid">
+          <tbody>
+            <tr className="hissan-carry-row">
+              {indicators.map((c, i) => (
+                <td key={i}>{showAnswers && c > 0 ? c : ""}</td>
+              ))}
+            </tr>
+            {problem.map((operand, ri) => {
+              const cells = trimDecZeros(toDecimalDigitCells(operand, dps[ri], totalIntCols, totalDecCols));
+              const intPart = cells.slice(0, totalIntCols);
+              const decPart = cells.slice(totalIntCols);
+              const showDot = hasDecDigits(cells);
+
+              if (ri < last) {
+                return (
+                  <tr key={ri}>
+                    {intPart.map((d, i) => (
+                      <td key={i} className={`hissan-cell${i === totalIntCols - 1 && showDot ? " hissan-dot-after" : ""}`}>{d}</td>
+                    ))}
+                    {decPart.map((d, i) => (
+                      <td key={`d${i}`} className="hissan-cell">{d}</td>
+                    ))}
+                  </tr>
+                );
+              }
+              return (
+                <tr key={ri} className="hissan-operator-row">
+                  <td className="hissan-cell">{operatorSymbol}</td>
+                  {intPart.slice(1).map((d, i) => (
+                    <td key={i} className={`hissan-cell${i === totalIntCols - 2 && showDot ? " hissan-dot-after" : ""}`}>{d}</td>
+                  ))}
+                  {decPart.map((d, i) => (
+                    <td key={`d${i}`} className="hissan-cell">{d}</td>
+                  ))}
+                </tr>
+              );
+            })}
+            <tr className="hissan-answer-row">
+              {trimmedAnswer.slice(0, totalIntCols).map((d, i) => (
+                <td key={i} className={`hissan-cell${i === totalIntCols - 1 && showAnswers && hasDecDigits(trimmedAnswer) ? " hissan-dot-after" : ""}`}>{showAnswers ? d : ""}</td>
+              ))}
+              {trimmedAnswer.slice(totalIntCols).map((d, i) => (
+                <td key={`d${i}`} className="hissan-cell">{showAnswers ? d : ""}</td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
+  // Integer rendering path (existing logic)
   const answer = operator === "sub"
     ? problem[0] - problem.slice(1).reduce((a, b) => a + b, 0)
     : problem.reduce((a, b) => a + b, 0);
@@ -65,8 +158,6 @@ function HissanProblem({
   // totalCols = maxDigits + 1 (extra column for operator / potential carry)
   const totalCols = maxDigits + 1;
   const answerDigits = toDigitCells(answer, totalCols);
-  const last = problem.length - 1;
-  const operatorSymbol = operator === "sub" ? "\u2212" : "+";
 
   const { indicators, borrowOut, borrowDisplay } = computeIndicators(problem, maxDigits, operator);
 
@@ -329,7 +420,7 @@ function Hissan() {
   const [cfg, setCfg] = useState(getInitialConfig);
   const [showSettings, setShowSettings] = useState(false);
 
-  const problems = useMemo(() => generateProblems(seed, cfg), [seed, cfg]);
+  const { problems, decimalPlaces } = useMemo(() => generateProblems(seed, cfg), [seed, cfg]);
 
   const handleNewProblems = useCallback(() => {
     const newSeed = randomSeed();
@@ -355,6 +446,10 @@ function Hissan() {
         const next = { ...prev, [field]: value };
         if (field === "operator" && (next.operator === "sub" || next.operator === "mul" || next.operator === "div"))
           next.numOperands = 2;
+        if (field === "operator" && next.operator !== "add")
+          next.useDecimals = false;
+        if (field === "useDecimals" && next.useDecimals)
+          next.consecutiveCarries = false;
         if (field === "operator" && next.operator === "mul") {
           if (next.maxDigits > 3) next.maxDigits = 3;
           if (next.minDigits > next.maxDigits) next.minDigits = next.maxDigits;
@@ -396,7 +491,7 @@ function Hissan() {
   const qrUrl = useMemo(() => {
     const url = new URL(window.location.href);
     // Clear all hissan params before rebuilding
-    for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax", "hdmin", "hdmax", "hdr"]) {
+    for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax", "hdmin", "hdmax", "hdr", "hdec"]) {
       url.searchParams.delete(key);
     }
     const params = buildParams(seed, true, cfg);
@@ -481,7 +576,13 @@ function Hissan() {
               </select>
             </label>
           )}
-          {cfg.operator !== "mul" && cfg.operator !== "div" && (
+          {cfg.operator === "add" && (
+            <label>
+              <input type="checkbox" checked={cfg.useDecimals} onChange={handleConfigChange("useDecimals")} />
+              小数
+            </label>
+          )}
+          {cfg.operator !== "mul" && cfg.operator !== "div" && !cfg.useDecimals && (
             <label>
               <input type="checkbox" checked={cfg.consecutiveCarries} onChange={handleConfigChange("consecutiveCarries")} />
               {cfg.operator === "sub" ? "連続繰り下がり" : "連続繰り上がり"}
@@ -493,7 +594,7 @@ function Hissan() {
           </label>
         </div>
       )}
-      <div className={`hissan-page${cfg.showGrid ? "" : " hissan-no-grid"}${cfg.operator === "mul" && cfg.mulMaxDigits >= 2 ? " hissan-mul-wide" : ""}${cfg.operator === "div" ? " hissan-div-page" : ""}`}>
+      <div className={`hissan-page${cfg.showGrid ? "" : " hissan-no-grid"}${cfg.operator === "mul" && cfg.mulMaxDigits >= 2 ? " hissan-mul-wide" : ""}${cfg.operator === "div" ? " hissan-div-page" : ""}${cfg.useDecimals ? " hissan-dec-wide" : ""}`}>
         {problems.map((problem, i) =>
           cfg.operator === "div" ? (
             <HissanDivProblem
@@ -518,6 +619,7 @@ function Hissan() {
               showAnswers={showAnswers}
               maxDigits={cfg.maxDigits}
               operator={cfg.operator}
+              dps={decimalPlaces[i]}
             />
           ),
         )}

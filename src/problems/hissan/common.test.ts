@@ -8,11 +8,12 @@ import {
   digitsWithMinSum,
   digitsWithExactSum,
   toDigitCells,
+  toDecimalDigitCells,
   computeIndicators,
   type HissanConfig,
 } from "./common";
 
-const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false } as const;
+const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, useDecimals: false } as const;
 
 // ---------------------------------------------------------------------------
 // parseConfig
@@ -47,6 +48,17 @@ describe("parseConfig", () => {
       mulMaxDigits: 1,
       ...divDefaults,
     });
+  });
+
+  it("parses hdec=1 as useDecimals true", () => {
+    const params = new URLSearchParams("hdec=1");
+    const cfg = parseConfig(params);
+    expect(cfg.useDecimals).toBe(true);
+  });
+
+  it("defaults useDecimals to false", () => {
+    const cfg = parseConfig(new URLSearchParams());
+    expect(cfg.useDecimals).toBe(false);
   });
 
   it("hop=sub forces numOperands=2 regardless of hops", () => {
@@ -155,6 +167,26 @@ describe("parseConfig", () => {
 // buildParams
 // ---------------------------------------------------------------------------
 describe("buildParams", () => {
+  it("includes hdec=1 when useDecimals is on", () => {
+    const cfg: HissanConfig = {
+      minDigits: 1, maxDigits: 2, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "add",
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true,
+    };
+    const params = buildParams(42, false, cfg);
+    expect(params.get("hdec")).toBe("1");
+  });
+
+  it("omits hdec when useDecimals is off", () => {
+    const cfg: HissanConfig = {
+      minDigits: 1, maxDigits: 2, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "add",
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+    };
+    const params = buildParams(42, false, cfg);
+    expect(params.has("hdec")).toBe(false);
+  });
+
   it("includes hops for addition mode, omits hop", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 3,
@@ -247,6 +279,7 @@ describe("buildParams", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: true,
+      useDecimals: false,
     };
     const params = buildParams(42, false, cfg);
     expect(params.get("hop")).toBe("div");
@@ -262,6 +295,7 @@ describe("buildParams", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
+      useDecimals: false,
     };
     const params = buildParams(42, false, cfg);
     expect(params.has("hdr")).toBe(false);
@@ -274,8 +308,9 @@ describe("buildParams", () => {
       { minDigits: 1, maxDigits: 3, numOperands: 2, consecutiveCarries: true, showGrid: true, operator: "sub", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults },
       { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "mul", mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults },
       { minDigits: 1, maxDigits: 2, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "mul", mulMinDigits: 2, mulMaxDigits: 3, ...divDefaults },
-      { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false },
-      { minDigits: 3, maxDigits: 4, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: true },
+      { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, useDecimals: false },
+      { minDigits: 3, maxDigits: 4, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: true, useDecimals: false },
+      { minDigits: 1, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "add", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true },
     ];
     for (const cfg of configs) {
       const params = buildParams(123, false, cfg);
@@ -368,6 +403,46 @@ describe("toDigitCells", () => {
 
   it("handles single digit", () => {
     expect(toDigitCells(5, 3)).toEqual(["", "", 5]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// toDecimalDigitCells
+// ---------------------------------------------------------------------------
+describe("toDecimalDigitCells", () => {
+  it("splits integer and decimal parts", () => {
+    // 123 with dp=2 → 1.23, totalIntCols=2, totalDecCols=2
+    expect(toDecimalDigitCells(123, 2, 2, 2)).toEqual(["", 1, 2, 3]);
+  });
+
+  it("handles dp=0 (no decimal part)", () => {
+    // 42 with dp=0, totalIntCols=3, totalDecCols=2
+    expect(toDecimalDigitCells(42, 0, 3, 2)).toEqual(["", 4, 2, "", ""]);
+  });
+
+  it("handles dp=numDigits (integer part is 0)", () => {
+    // 5 with dp=1 → 0.5, totalIntCols=2, totalDecCols=1
+    expect(toDecimalDigitCells(5, 1, 2, 1)).toEqual(["", 0, 5]);
+  });
+
+  it("handles dp=numDigits with multi-digit operand", () => {
+    // 123 with dp=3 → 0.123, totalIntCols=2, totalDecCols=3
+    expect(toDecimalDigitCells(123, 3, 2, 3)).toEqual(["", 0, 1, 2, 3]);
+  });
+
+  it("pads decimal part with leading zeros when dp > numDigits", () => {
+    // 5 with dp=2 → 0.05, totalIntCols=2, totalDecCols=2
+    expect(toDecimalDigitCells(5, 2, 2, 2)).toEqual(["", 0, 0, 5]);
+  });
+
+  it("leaves trailing decimal cells empty for operands", () => {
+    // 12 with dp=1 → 1.2, totalIntCols=2, totalDecCols=3
+    expect(toDecimalDigitCells(12, 1, 2, 3)).toEqual(["", 1, 2, "", ""]);
+  });
+
+  it("shows trailing zeros for answer", () => {
+    // 460 with dp=2 → 4.60, totalIntCols=2, totalDecCols=2
+    expect(toDecimalDigitCells(460, 2, 2, 2)).toEqual(["", 4, 6, 0]);
   });
 });
 

@@ -62,6 +62,7 @@ describe("generateDivisionProblem", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
+      useDecimals: false,
     };
     for (let seed = 0; seed < 50; seed++) {
       const rng = mulberry32(seed);
@@ -80,6 +81,7 @@ describe("generateDivisionProblem", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 2, divMaxDigits: 2, divAllowRemainder: false,
+      useDecimals: false,
     };
     for (let seed = 0; seed < 50; seed++) {
       const rng = mulberry32(seed);
@@ -98,6 +100,7 @@ describe("generateDivisionProblem", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: true,
+      useDecimals: false,
     };
     for (let seed = 0; seed < 50; seed++) {
       const rng = mulberry32(seed);

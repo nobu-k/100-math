@@ -15,6 +15,7 @@ export interface HissanConfig {
   divMinDigits: number;
   divMaxDigits: number;
   divAllowRemainder: boolean;
+  useDecimals: boolean;
 }
 
 export const generateNumber = (rng: () => number, minDigits: number, maxDigits: number): number => {
@@ -65,6 +66,48 @@ export const toDigitCells = (n: number, width: number): (number | "")[] => {
     cells[width - str.length + i] = parseInt(str[i], 10);
   }
   return cells;
+};
+
+/**
+ * Convert an integer operand with `dp` decimal places into digit cells
+ * for display, split into integer-part columns and decimal-part columns.
+ * Integer digits are right-aligned in `totalIntCols`; decimal digits are
+ * left-aligned in `totalDecCols`. When dp >= numDigits the integer part
+ * shows "0". Trailing decimal positions beyond dp are left empty (operands)
+ * or filled with zeros (answer — caller passes dp = maxDP in that case).
+ */
+export const toDecimalDigitCells = (
+  operand: number,
+  dp: number,
+  totalIntCols: number,
+  totalDecCols: number,
+): (number | "")[] => {
+  const str = String(operand);
+  const numDigits = str.length;
+
+  // Integer part: right-aligned in totalIntCols
+  const intCells: (number | "")[] = Array(totalIntCols).fill("");
+  if (dp >= numDigits) {
+    // All digits are after the decimal; integer part is 0
+    intCells[totalIntCols - 1] = 0;
+  } else {
+    const intStr = str.slice(0, numDigits - dp);
+    for (let i = 0; i < intStr.length; i++) {
+      intCells[totalIntCols - intStr.length + i] = parseInt(intStr[i], 10);
+    }
+  }
+
+  // Decimal part: left-aligned in totalDecCols
+  const decCells: (number | "")[] = Array(totalDecCols).fill("");
+  if (dp > 0) {
+    const rawDecStr = dp >= numDigits ? str : str.slice(numDigits - dp);
+    const decStr = rawDecStr.padStart(dp, "0");
+    for (let i = 0; i < dp; i++) {
+      decCells[i] = parseInt(decStr[i], 10);
+    }
+  }
+
+  return [...intCells, ...decCells];
 };
 
 export interface Indicators {
@@ -140,6 +183,7 @@ export const parseConfig = (params: URLSearchParams): HissanConfig => {
   if (!(divMaxDigits >= 1 && divMaxDigits <= 2)) divMaxDigits = 1;
   if (divMinDigits > divMaxDigits) divMaxDigits = divMinDigits;
   const divAllowRemainder = params.get("hdr") === "1";
+  const useDecimals = params.get("hdec") === "1";
 
   if (operator === "sub") numOperands = 2;
   if (operator === "mul") {
@@ -153,7 +197,7 @@ export const parseConfig = (params: URLSearchParams): HissanConfig => {
     if (maxDigits < minDigits) maxDigits = minDigits;
   }
 
-  return { minDigits, maxDigits, numOperands, consecutiveCarries, showGrid, operator, mulMinDigits, mulMaxDigits, divMinDigits, divMaxDigits, divAllowRemainder };
+  return { minDigits, maxDigits, numOperands, consecutiveCarries, showGrid, operator, mulMinDigits, mulMaxDigits, divMinDigits, divMaxDigits, divAllowRemainder, useDecimals };
 };
 
 export const buildParams = (seed: number, showAnswers: boolean, cfg: HissanConfig): URLSearchParams => {
@@ -188,6 +232,9 @@ export const buildParams = (seed: number, showAnswers: boolean, cfg: HissanConfi
     if (cfg.divAllowRemainder) {
       params.set("hdr", "1");
     }
+  }
+  if (cfg.useDecimals) {
+    params.set("hdec", "1");
   }
   return params;
 };

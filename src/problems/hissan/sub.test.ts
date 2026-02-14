@@ -3,7 +3,7 @@ import { mulberry32 } from "../random";
 import { generateSubtractionProblem, generateBorrowChainProblem } from "./sub";
 import type { HissanConfig } from "./common";
 
-const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false } as const;
+const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, useDecimals: false } as const;
 
 describe("generateBorrowChainProblem", () => {
   /** Check that at least 2 consecutive columns (from ones) require a borrow. */

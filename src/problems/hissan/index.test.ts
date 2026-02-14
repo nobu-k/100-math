@@ -7,7 +7,7 @@ import {
   type HissanConfig,
 } from "./index";
 
-const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false } as const;
+const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, useDecimals: false } as const;
 
 // ---------------------------------------------------------------------------
 // getProblemCount
@@ -56,8 +56,18 @@ describe("getProblemCount", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
+      useDecimals: false,
     };
     expect(getProblemCount(cfg)).toBe(6);
+  });
+
+  it("returns 8 for add with useDecimals", () => {
+    const cfg: HissanConfig = {
+      minDigits: 1, maxDigits: 2, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "add",
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true,
+    };
+    expect(getProblemCount(cfg)).toBe(8);
   });
 });
 
@@ -138,7 +148,7 @@ describe("generateProblems", () => {
       consecutiveCarries: false, showGrid: true, operator: "add",
       mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
-    const problems = generateProblems(42, cfg);
+    const { problems } = generateProblems(42, cfg);
     expect(problems).toHaveLength(12);
   });
 
@@ -164,7 +174,7 @@ describe("generateProblems (mul)", () => {
       consecutiveCarries: false, showGrid: true, operator: "mul",
       mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults,
     };
-    const problems = generateProblems(42, cfg);
+    const { problems } = generateProblems(42, cfg);
     expect(problems).toHaveLength(6);
   });
 
@@ -174,7 +184,7 @@ describe("generateProblems (mul)", () => {
       consecutiveCarries: false, showGrid: true, operator: "mul",
       mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
-    const problems = generateProblems(42, cfg);
+    const { problems } = generateProblems(42, cfg);
     expect(problems).toHaveLength(12);
   });
 });
@@ -189,8 +199,48 @@ describe("generateProblems (div)", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
+      useDecimals: false,
     };
-    const problems = generateProblems(42, cfg);
+    const { problems } = generateProblems(42, cfg);
     expect(problems).toHaveLength(6);
+  });
+});
+
+describe("generateProblems (decimal)", () => {
+  it("returns 8 problems with decimalPlaces for decimal add", () => {
+    const cfg: HissanConfig = {
+      minDigits: 1, maxDigits: 3, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "add",
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true,
+    };
+    const { problems, decimalPlaces } = generateProblems(42, cfg);
+    expect(problems).toHaveLength(8);
+    expect(decimalPlaces).toHaveLength(8);
+    for (let i = 0; i < 8; i++) {
+      expect(decimalPlaces[i]).toHaveLength(problems[i].length);
+      // All operands in a problem share the same dp
+      const dp = decimalPlaces[i][0];
+      expect(dp).toBeGreaterThanOrEqual(1);
+      for (let j = 0; j < problems[i].length; j++) {
+        expect(decimalPlaces[i][j]).toBe(dp);
+        // Integer part must be at most 2 digits (value < 100)
+        const numDigits = String(problems[i][j]).length;
+        expect(numDigits - dp).toBeLessThanOrEqual(2);
+      }
+    }
+  });
+
+  it("returns all-zero decimalPlaces for non-decimal mode", () => {
+    const cfg: HissanConfig = {
+      minDigits: 1, maxDigits: 2, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "add",
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+    };
+    const { decimalPlaces } = generateProblems(42, cfg);
+    for (const dps of decimalPlaces) {
+      for (const dp of dps) {
+        expect(dp).toBe(0);
+      }
+    }
   });
 });
