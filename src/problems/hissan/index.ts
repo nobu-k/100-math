@@ -43,7 +43,7 @@ export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResul
   const problems = Array.from({ length: count }, () => generateProblem(rng, cfg));
 
   let decimalPlaces: number[][];
-  if (cfg.useDecimals && cfg.operator === "add") {
+  if (cfg.useDecimals && (cfg.operator === "add" || cfg.operator === "sub")) {
     decimalPlaces = problems.map((problem) => {
       // Use the same dp for all operands so decimal columns overlap
       const digitCounts = problem.map((op) => String(op).length);

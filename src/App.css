@@ -273,6 +273,10 @@
   grid-template-columns: repeat(2, auto);
 }
 
+.hissan-dec-borrow {
+  color: red;
+}
+
 /* Decimal styles */
 .hissan-dec-wide {
   grid-template-columns: repeat(2, auto);

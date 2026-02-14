@@ -78,8 +78,10 @@ function HissanProblem({
     const totalDecCols = maxDP;
 
     const aligned = problem.map((op, i) => op * Math.pow(10, maxDP - dps[i]));
-    const answer = aligned.reduce((a, b) => a + b, 0);
-    const { indicators } = computeIndicators(aligned, effectiveMaxDigits, operator);
+    const answer = operator === "sub"
+      ? aligned[0] - aligned.slice(1).reduce((a, b) => a + b, 0)
+      : aligned.reduce((a, b) => a + b, 0);
+    const { indicators, borrowOut, borrowDisplay } = computeIndicators(aligned, effectiveMaxDigits, operator);
     const answerCells = toDecimalDigitCells(answer, maxDP, totalIntCols, totalDecCols);
 
     // Clear trailing zeros in the decimal portion of a cell array
@@ -95,6 +97,7 @@ function HissanProblem({
       cells.slice(totalIntCols).some((d) => d !== "");
 
     const trimmedAnswer = trimDecZeros(answerCells);
+    const isSub = operator === "sub";
 
     return (
       <div className="hissan-problem">
@@ -103,24 +106,53 @@ function HissanProblem({
           <tbody>
             <tr className="hissan-carry-row">
               {indicators.map((c, i) => (
-                <td key={i}>{showAnswers && c > 0 ? c : ""}</td>
+                <td key={i}>
+                  {showAnswers && c > 0
+                    ? (isSub ? borrowDisplay[i] : c)
+                    : ""}
+                </td>
               ))}
             </tr>
             {problem.map((operand, ri) => {
-              const cells = trimDecZeros(toDecimalDigitCells(operand, dps[ri], totalIntCols, totalDecCols));
+              const rawCells = toDecimalDigitCells(operand, dps[ri], totalIntCols, totalDecCols);
+              const trimmedCells = trimDecZeros(rawCells);
+              // Keep trailing zeros on minuend when showing subtraction answers
+              // so borrow marks render on the padded zero positions.
+              const cells = (showAnswers && isSub && ri === 0) ? rawCells : trimmedCells;
               const intPart = cells.slice(0, totalIntCols);
               const decPart = cells.slice(totalIntCols);
               const showDot = hasDecDigits(cells);
+              const isSub0 = showAnswers && isSub && ri === 0;
 
               if (ri < last) {
                 return (
                   <tr key={ri}>
-                    {intPart.map((d, i) => (
-                      <td key={i} className={`hissan-cell${i === totalIntCols - 1 && showDot ? " hissan-dot-after" : ""}`}>{d}</td>
-                    ))}
-                    {decPart.map((d, i) => (
-                      <td key={`d${i}`} className="hissan-cell">{d}</td>
-                    ))}
+                    {intPart.map((d, i) => {
+                      const slashed = isSub0 && indicators[i] > 0;
+                      const borrowIn = isSub0 && borrowOut[i] > 0 && indicators[i] === 0;
+                      return (
+                        <td key={i} className={`hissan-cell${i === totalIntCols - 1 && showDot ? " hissan-dot-after" : ""}${slashed ? " hissan-slashed" : ""}`}>
+                          {borrowIn ? <><span className="hissan-dec-borrow">1</span>{d === "" ? 0 : d}</> : d}
+                        </td>
+                      );
+                    })}
+                    {decPart.map((d, i) => {
+                      const ci = totalIntCols + i;
+                      const slashed = isSub0 && indicators[ci] > 0;
+                      const borrowIn = isSub0 && borrowOut[ci] > 0 && indicators[ci] === 0;
+                      // Padded trailing zero: was "" after trimming but 0 in raw cells.
+                      // When borrowed, show fully red "10" since the zero wasn't in the original number.
+                      const paddedZero = isSub0 && trimmedCells[ci] === "" && rawCells[ci] === 0;
+                      return (
+                        <td key={`d${i}`} className={`hissan-cell${slashed ? " hissan-slashed" : ""}`}>
+                          {borrowIn
+                            ? (paddedZero
+                              ? <span className="hissan-dec-borrow">10</span>
+                              : <><span className="hissan-dec-borrow">1</span>{d}</>)
+                            : d}
+                        </td>
+                      );
+                    })}
                   </tr>
                 );
               }
@@ -446,7 +478,7 @@ function Hissan() {
         const next = { ...prev, [field]: value };
         if (field === "operator" && (next.operator === "sub" || next.operator === "mul" || next.operator === "div"))
           next.numOperands = 2;
-        if (field === "operator" && next.operator !== "add")
+        if (field === "operator" && next.operator !== "add" && next.operator !== "sub")
           next.useDecimals = false;
         if (field === "useDecimals" && next.useDecimals)
           next.consecutiveCarries = false;
@@ -576,7 +608,7 @@ function Hissan() {
               </select>
             </label>
           )}
-          {cfg.operator === "add" && (
+          {(cfg.operator === "add" || cfg.operator === "sub") && (
             <label>
               <input type="checkbox" checked={cfg.useDecimals} onChange={handleConfigChange("useDecimals")} />
               小数

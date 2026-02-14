@@ -230,6 +230,45 @@ describe("generateProblems (decimal)", () => {
     }
   });
 
+  it("returns 8 problems with decimalPlaces for decimal sub", () => {
+    const cfg: HissanConfig = {
+      minDigits: 1, maxDigits: 3, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "sub",
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true,
+    };
+    const { problems, decimalPlaces } = generateProblems(42, cfg);
+    expect(problems).toHaveLength(8);
+    expect(decimalPlaces).toHaveLength(8);
+    for (let i = 0; i < 8; i++) {
+      expect(decimalPlaces[i]).toHaveLength(problems[i].length);
+      const dp = decimalPlaces[i][0];
+      expect(dp).toBeGreaterThanOrEqual(1);
+      for (let j = 0; j < problems[i].length; j++) {
+        expect(decimalPlaces[i][j]).toBe(dp);
+        const numDigits = String(problems[i][j]).length;
+        expect(numDigits - dp).toBeLessThanOrEqual(2);
+      }
+      // Answer must be non-negative
+      expect(problems[i][0] - problems[i][1]).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it("decimal sub answer is non-negative across many seeds", () => {
+    const cfg: HissanConfig = {
+      minDigits: 1, maxDigits: 3, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "sub",
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true,
+    };
+    for (let seed = 0; seed < 50; seed++) {
+      const { problems, decimalPlaces } = generateProblems(seed, cfg);
+      for (let i = 0; i < problems.length; i++) {
+        const maxDP = Math.max(...decimalPlaces[i]);
+        const aligned = problems[i].map((op, j) => op * Math.pow(10, maxDP - decimalPlaces[i][j]));
+        expect(aligned[0] - aligned[1]).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+
   it("returns all-zero decimalPlaces for non-decimal mode", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
