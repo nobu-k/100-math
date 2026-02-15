@@ -601,7 +601,7 @@ function HissanDivProblem({
           {/* Quotient row */}
           <tr className={showAnswers ? "hissan-div-answer" : ""}>
             {quotientCols.map((d, i) => (
-              <td key={i} className={`hissan-div-cell${i < divCols ? " hissan-div-outside" : " hissan-div-bracket-top-line"}${i === divCols ? " hissan-div-bracket-top-start" : ""}${showAnswers && i === dotCol ? " hissan-div-dot-after" : ""}${cycleDotCols.has(i) ? " hissan-div-cycle-dot" : ""}`}>
+              <td key={i} className={`hissan-div-cell${i < divCols ? " hissan-div-outside" : " hissan-div-bracket-top-line"}${i >= divCols + origDividendDisplayWidth ? " hissan-div-bracket-top-ext" : ""}${i === divCols ? " hissan-div-bracket-top-start" : ""}${showAnswers && i === dotCol ? " hissan-div-dot-after" : ""}${cycleDotCols.has(i) ? " hissan-div-cycle-dot" : ""}`}>
                 {showAnswers ? d : ""}
               </td>
             ))}
@@ -828,7 +828,7 @@ function Hissan() {
           </label>
         </div>
       )}
-      <div className={`hissan-page${cfg.showGrid ? "" : " hissan-no-grid"}${cfg.operator === "mul" && (cfg.mulMaxDigits >= 2 || cfg.useDecimals) ? " hissan-mul-wide" : ""}${cfg.operator === "div" && !cfg.useDecimals ? " hissan-div-page" : ""}${cfg.useDecimals ? " hissan-dec-wide" : ""}`}>
+      <div className={`hissan-page${cfg.showGrid ? "" : " hissan-no-grid"}${showAnswers ? " hissan-show-answers" : ""}${cfg.operator === "mul" && (cfg.mulMaxDigits >= 2 || cfg.useDecimals) ? " hissan-mul-wide" : ""}${cfg.operator === "div" && !cfg.useDecimals ? " hissan-div-page" : ""}${cfg.useDecimals ? " hissan-dec-wide" : ""}`}>
         {problems.map((problem, i) =>
           cfg.operator === "div" ? (
             <HissanDivProblem

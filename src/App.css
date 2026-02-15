@@ -503,6 +503,26 @@
   border-bottom-color: #000;
 }
 
+.hissan-no-grid .hissan-div-subtract-line {
+  border-bottom-color: transparent;
+}
+
+.hissan-no-grid .hissan-div-bracket-top-line {
+  border-bottom-color: #000;
+}
+
+.hissan-no-grid .hissan-div-bracket-top-ext {
+  border-bottom-color: transparent;
+}
+
+.hissan-no-grid.hissan-show-answers .hissan-div-subtract-line {
+  border-bottom-color: #000;
+}
+
+.hissan-no-grid.hissan-show-answers .hissan-div-bracket-top-ext {
+  border-bottom-color: #000;
+}
+
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;
