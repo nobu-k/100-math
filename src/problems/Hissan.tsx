@@ -247,20 +247,59 @@ function HissanMulProblem({
   problem,
   showAnswers,
   cfg,
+  dps,
 }: {
   index: number;
   problem: Problem;
   showAnswers: boolean;
   cfg: HissanConfig;
+  dps: number[];
 }) {
   const [multiplicand, multiplier] = problem;
+  const [dp1, dp2] = dps;
+  const dpTotal = dp1 + dp2;
+  const maxDP = Math.max(dp1, dp2);
   const { partials, finalAnswer } = computeMulDetails(multiplicand, multiplier);
-  const totalCols = cfg.maxDigits + cfg.mulMaxDigits;
-  const mcandDigits = toDigitCells(multiplicand, totalCols);
-  const mplierDigits = toDigitCells(multiplier, totalCols);
-  const answerDigits = toDigitCells(finalAnswer, totalCols);
-  const singleDigitMultiplier = String(multiplier).length === 1;
+
   const mcandLen = String(multiplicand).length;
+  const mplierLen = String(multiplier).length;
+  const singleDigitMultiplier = mplierLen === 1;
+
+  // Compute totalCols: for decimal mode, account for leading zeros on numbers < 1
+  let totalCols: number;
+  if (maxDP > 0) {
+    const mcandDisplayWidth = dp1 > 0 ? Math.max(mcandLen, dp1 + 1) : mcandLen;
+    const mplierDisplayWidth = dp2 > 0 ? Math.max(mplierLen, dp2 + 1) : mplierLen;
+    const answerLen = String(finalAnswer).length;
+    const answerDisplayWidth = dpTotal > 0 ? Math.max(answerLen, dpTotal + 1) : answerLen;
+    const maxPartialWidth = Math.max(...partials.map(pp => String(pp.value).length + pp.shift));
+    totalCols = Math.max(mcandDisplayWidth + 1, mplierDisplayWidth + 1, maxPartialWidth, answerDisplayWidth);
+  } else {
+    totalCols = cfg.maxDigits + cfg.mulMaxDigits;
+  }
+
+  /** Build digit cells for a number with dp decimal places.
+   *  Pads with leading zeros when dp >= numDigits (e.g. 25 with dp=3 → "0.025"). */
+  const toDecimalMulCells = (n: number, dp: number): (number | "")[] => {
+    if (dp === 0) return toDigitCells(n, totalCols);
+    const numDig = String(n).length;
+    const displayWidth = Math.max(numDig, dp + 1);
+    const padded = String(n).padStart(displayWidth, "0");
+    const cells: (number | "")[] = Array(totalCols).fill("");
+    for (let i = 0; i < padded.length; i++) {
+      cells[totalCols - padded.length + i] = parseInt(padded[i], 10);
+    }
+    return cells;
+  };
+
+  const mcandCells = toDecimalMulCells(multiplicand, dp1);
+  const mplierCells = toDecimalMulCells(multiplier, dp2);
+  const answerCells = toDecimalMulCells(finalAnswer, dpTotal);
+
+  // Dot column positions (-1 = no dot)
+  const mcandDotCol = dp1 > 0 ? totalCols - 1 - dp1 : -1;
+  const mplierDotCol = dp2 > 0 ? totalCols - 1 - dp2 : -1;
+  const answerDotCol = dpTotal > 0 ? totalCols - 1 - dpTotal : -1;
 
   /** Build a per-column carry map for a partial product.
    *  carries[i] is the carry OUT of multiplicand digit i (left-to-right).
@@ -277,15 +316,21 @@ function HissanMulProblem({
     return map;
   };
 
-  const renderPartialRow = (pp: typeof partials[0]) => {
-    const digits: (number | "")[] = [
-      ...toDigitCells(pp.value, totalCols - pp.shift),
-      ...Array(pp.shift).fill(""),
-    ];
+  const renderPartialRow = (pp: typeof partials[0], dotCol?: number, dp?: number) => {
+    let digits: (number | "")[];
+    if (dp !== undefined && dp > 0) {
+      // Decimal answer: pad with leading zeros for numbers < 1
+      digits = toDecimalMulCells(pp.value, dp);
+    } else {
+      digits = [
+        ...toDigitCells(pp.value, totalCols - pp.shift),
+        ...Array(pp.shift).fill(""),
+      ];
+    }
     const carries = carryMap(pp.carries, pp.shift);
     const firstDigitCol = digits.findIndex((d) => d !== "");
     return digits.map((d, i) => (
-      <td key={i} className="hissan-cell">
+      <td key={i} className={`hissan-cell${dotCol !== undefined && i === dotCol ? " hissan-dot-after" : ""}`}>
         {showAnswers && i > firstDigitCol && carries[i] != null && <span className="hissan-cell-carry">{carries[i]}</span>}
         {showAnswers ? d : ""}
       </td>
@@ -299,24 +344,28 @@ function HissanMulProblem({
         <tbody>
           {/* Multiplicand row */}
           <tr>
-            {mcandDigits.map((d, i) => (
-              <td key={i} className="hissan-cell">{d}</td>
+            {mcandCells.map((d, i) => (
+              <td key={i} className={`hissan-cell${i === mcandDotCol ? " hissan-dot-after" : ""}`}>{d}</td>
             ))}
           </tr>
           {/* Multiplier row (with operator) */}
           <tr className={singleDigitMultiplier ? "hissan-operator-row" : "hissan-mul-operator-row"}>
-            {mplierDigits.map((d, i) => (
-              <td key={i} className="hissan-cell">{i === 0 ? "\u00d7" : d}</td>
+            {mplierCells.map((d, i) => (
+              <td key={i} className={`hissan-cell${i === mplierDotCol ? " hissan-dot-after" : ""}`}>{i === 0 ? "\u00d7" : d}</td>
             ))}
           </tr>
           {singleDigitMultiplier ? (
             /* Single-digit multiplier: answer directly below with carries */
             <tr className="hissan-answer-row">
-              {renderPartialRow(partials[0])}
+              {renderPartialRow(
+                partials[0],
+                showAnswers && answerDotCol >= 0 ? answerDotCol : undefined,
+                dpTotal > 0 ? dpTotal : undefined,
+              )}
             </tr>
           ) : (
             <>
-              {/* Partial products with inline carries */}
+              {/* Partial products with inline carries (no dot) */}
               {partials.map((pp, pi) => (
                 <tr key={pi} className={`hissan-answer-row${pi === partials.length - 1 ? " hissan-partial-last-row" : ""}`}>
                   {renderPartialRow(pp)}
@@ -324,8 +373,8 @@ function HissanMulProblem({
               ))}
               {/* Final answer */}
               <tr className="hissan-answer-row">
-                {answerDigits.map((d, i) => (
-                  <td key={i} className="hissan-cell">
+                {answerCells.map((d, i) => (
+                  <td key={i} className={`hissan-cell${showAnswers && i === answerDotCol ? " hissan-dot-after" : ""}`}>
                     {showAnswers ? d : ""}
                   </td>
                 ))}
@@ -478,7 +527,7 @@ function Hissan() {
         const next = { ...prev, [field]: value };
         if (field === "operator" && (next.operator === "sub" || next.operator === "mul" || next.operator === "div"))
           next.numOperands = 2;
-        if (field === "operator" && next.operator !== "add" && next.operator !== "sub")
+        if (field === "operator" && next.operator === "div")
           next.useDecimals = false;
         if (field === "useDecimals" && next.useDecimals)
           next.consecutiveCarries = false;
@@ -608,7 +657,7 @@ function Hissan() {
               </select>
             </label>
           )}
-          {(cfg.operator === "add" || cfg.operator === "sub") && (
+          {(cfg.operator === "add" || cfg.operator === "sub" || cfg.operator === "mul") && (
             <label>
               <input type="checkbox" checked={cfg.useDecimals} onChange={handleConfigChange("useDecimals")} />
               小数
@@ -626,7 +675,7 @@ function Hissan() {
           </label>
         </div>
       )}
-      <div className={`hissan-page${cfg.showGrid ? "" : " hissan-no-grid"}${cfg.operator === "mul" && cfg.mulMaxDigits >= 2 ? " hissan-mul-wide" : ""}${cfg.operator === "div" ? " hissan-div-page" : ""}${cfg.useDecimals ? " hissan-dec-wide" : ""}`}>
+      <div className={`hissan-page${cfg.showGrid ? "" : " hissan-no-grid"}${cfg.operator === "mul" && (cfg.mulMaxDigits >= 2 || cfg.useDecimals) ? " hissan-mul-wide" : ""}${cfg.operator === "div" ? " hissan-div-page" : ""}${cfg.useDecimals ? " hissan-dec-wide" : ""}`}>
         {problems.map((problem, i) =>
           cfg.operator === "div" ? (
             <HissanDivProblem
@@ -642,6 +691,7 @@ function Hissan() {
               problem={problem}
               showAnswers={showAnswers}
               cfg={cfg}
+              dps={decimalPlaces[i]}
             />
           ) : (
             <HissanProblem
