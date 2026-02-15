@@ -298,6 +298,23 @@
   color: inherit;
 }
 
+/* Division decimal dot (36×36px cells on screen, 9×9mm in print) */
+.hissan-div-dot-after {
+  position: relative;
+}
+
+.hissan-div-dot-after::after {
+  content: ".";
+  position: absolute;
+  right: -5px;
+  bottom: 2px;
+  font-size: 28px;
+  font-weight: bold;
+  line-height: 1;
+  z-index: 1;
+  color: inherit;
+}
+
 /* Division styles */
 .hissan-div-page {
   grid-template-columns: repeat(3, auto);
@@ -524,6 +541,12 @@
     width: 9mm;
     height: 9mm;
     font-size: 18px;
+  }
+
+  .hissan-div-dot-after::after {
+    font-size: 18px;
+    right: -1mm;
+    bottom: 0.5mm;
   }
 
   .hissan-div-bracket-curve {

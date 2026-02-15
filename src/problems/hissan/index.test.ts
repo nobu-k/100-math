@@ -268,6 +268,28 @@ describe("generateProblems (decimal)", () => {
     }
   });
 
+  it("returns 6 problems with decimalPlaces for decimal div", () => {
+    const cfg: HissanConfig = {
+      minDigits: 2, maxDigits: 3, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "div",
+      mulMinDigits: 1, mulMaxDigits: 1,
+      divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
+      useDecimals: true,
+    };
+    for (let seed = 0; seed < 20; seed++) {
+      const { problems, decimalPlaces } = generateProblems(seed, cfg);
+      expect(problems).toHaveLength(6);
+      expect(decimalPlaces).toHaveLength(6);
+      for (let i = 0; i < 6; i++) {
+        expect(decimalPlaces[i]).toHaveLength(2);
+        expect(decimalPlaces[i][0]).toBeGreaterThan(0); // dividend has dp
+        expect(decimalPlaces[i][1]).toBe(0); // divisor is integer
+        // Verify exact division (integer level)
+        expect(problems[i][0] % problems[i][1]).toBe(0);
+      }
+    }
+  });
+
   it("returns all-zero decimalPlaces for non-decimal mode", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,

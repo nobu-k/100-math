@@ -391,31 +391,48 @@ function HissanDivProblem({
   index,
   problem,
   showAnswers,
+  dps,
 }: {
   index: number;
   problem: Problem;
   showAnswers: boolean;
+  dps: number[];
 }) {
   const [dividend, divisor] = problem;
   const { quotient, remainder, steps } = computeDivDetails(dividend, divisor);
   const dividendDigits = String(dividend).split("").map(Number);
   const divisorDigits = String(divisor).split("").map(Number);
   const quotientStr = String(quotient);
-  const divCols = divisorDigits.length;  // number of divisor columns
-  const totalCols = divCols + dividendDigits.length;
+  const divCols = divisorDigits.length;
+
+  const dividendDP = dps[0] || 0;
+  const dividendDisplayWidth = dividendDP > 0
+    ? Math.max(dividendDigits.length, dividendDP + 1)
+    : dividendDigits.length;
+  const dividendOffset = dividendDisplayWidth - dividendDigits.length;
+  const totalCols = divCols + dividendDisplayWidth;
+  const dotCol = dividendDP > 0 ? totalCols - 1 - dividendDP : -1;
 
   // Map quotient digits to their column positions (right-aligned to dividend area)
   const quotientCols: (number | "")[] = Array(totalCols).fill("");
-  for (let i = 0; i < quotientStr.length; i++) {
-    const col = totalCols - quotientStr.length + i;
-    quotientCols[col] = parseInt(quotientStr[i], 10);
+  const quotientDisplayStr = dividendDP > 0
+    ? quotientStr.padStart(Math.max(quotientStr.length, dividendDP + 1), "0")
+    : quotientStr;
+  for (let i = 0; i < quotientDisplayStr.length; i++) {
+    const col = totalCols - quotientDisplayStr.length + i;
+    quotientCols[col] = parseInt(quotientDisplayStr[i], 10);
   }
+
+  // Build dividend display string (with leading zeros when dp >= numDigits)
+  const dividendDisplayStr = dividendDP > 0
+    ? String(dividend).padStart(dividendDisplayWidth, "0")
+    : String(dividend);
 
   // Build work rows from steps (always, so students have space to calculate)
   const workRows: { cells: (number | "")[], hasBottomBorder: boolean }[] = [];
   for (let si = 0; si < steps.length; si++) {
     const step = steps[si];
-    const endCol = divCols + step.position; // column in totalCols grid
+    const endCol = divCols + dividendOffset + step.position;
 
     // Subtract row: product right-aligned ending at endCol
     const subtractCells: (number | "")[] = Array(totalCols).fill("");
@@ -438,7 +455,7 @@ function HissanDivProblem({
       } else {
         remStr = String(step.remainder);
       }
-      const remEndCol = si < steps.length - 1 ? divCols + nextDigitIndex : endCol;
+      const remEndCol = si < steps.length - 1 ? divCols + dividendOffset + nextDigitIndex : endCol;
       for (let i = 0; i < remStr.length; i++) {
         const col = remEndCol - remStr.length + 1 + i;
         if (col >= 0) remainderCells[col] = parseInt(remStr[i], 10);
@@ -455,7 +472,7 @@ function HissanDivProblem({
           {/* Quotient row */}
           <tr>
             {quotientCols.map((d, i) => (
-              <td key={i} className={`hissan-div-cell${i < divCols ? " hissan-div-outside" : " hissan-div-bracket-top-line"}${i === divCols ? " hissan-div-bracket-top-start" : ""}`}>
+              <td key={i} className={`hissan-div-cell${i < divCols ? " hissan-div-outside" : " hissan-div-bracket-top-line"}${i === divCols ? " hissan-div-bracket-top-start" : ""}${showAnswers && i === dotCol ? " hissan-div-dot-after" : ""}`}>
                 {showAnswers ? d : ""}
               </td>
             ))}
@@ -468,14 +485,14 @@ function HissanDivProblem({
             {divisorDigits.map((d, i) => (
               <td key={`div${i}`} className="hissan-div-cell hissan-div-outside">{d}</td>
             ))}
-            {dividendDigits.map((d, i) => (
-              <td key={i} className="hissan-div-cell">
+            {dividendDisplayStr.split("").map((ch, i) => (
+              <td key={i} className={`hissan-div-cell${divCols + i === dotCol ? " hissan-div-dot-after" : ""}`}>
                 {i === 0 && (
                   <svg className="hissan-div-bracket-curve" viewBox="0 0 10 30" preserveAspectRatio="none">
                     <path d="M0,0 C10,8 10,22 0,30" stroke="#000" strokeWidth="3" fill="none" />
                   </svg>
                 )}
-                {d}
+                {parseInt(ch, 10)}
               </td>
             ))}
           </tr>
@@ -527,10 +544,10 @@ function Hissan() {
         const next = { ...prev, [field]: value };
         if (field === "operator" && (next.operator === "sub" || next.operator === "mul" || next.operator === "div"))
           next.numOperands = 2;
-        if (field === "operator" && next.operator === "div")
-          next.useDecimals = false;
         if (field === "useDecimals" && next.useDecimals)
           next.consecutiveCarries = false;
+        if (next.operator === "div" && next.useDecimals)
+          next.divAllowRemainder = false;
         if (field === "operator" && next.operator === "mul") {
           if (next.maxDigits > 3) next.maxDigits = 3;
           if (next.minDigits > next.maxDigits) next.minDigits = next.maxDigits;
@@ -643,10 +660,12 @@ function Hissan() {
                   {[1, 2].map((d) => <option key={d} value={d}>{d} 桁</option>)}
                 </select>
               </label>
-              <label>
-                <input type="checkbox" checked={cfg.divAllowRemainder} onChange={handleConfigChange("divAllowRemainder")} />
-                あまりあり
-              </label>
+              {!cfg.useDecimals && (
+                <label>
+                  <input type="checkbox" checked={cfg.divAllowRemainder} onChange={handleConfigChange("divAllowRemainder")} />
+                  あまりあり
+                </label>
+              )}
             </>
           )}
           {cfg.operator === "add" && (
@@ -657,7 +676,7 @@ function Hissan() {
               </select>
             </label>
           )}
-          {(cfg.operator === "add" || cfg.operator === "sub" || cfg.operator === "mul") && (
+          {(cfg.operator === "add" || cfg.operator === "sub" || cfg.operator === "mul" || cfg.operator === "div") && (
             <label>
               <input type="checkbox" checked={cfg.useDecimals} onChange={handleConfigChange("useDecimals")} />
               小数
@@ -683,6 +702,7 @@ function Hissan() {
               index={i}
               problem={problem}
               showAnswers={showAnswers}
+              dps={decimalPlaces[i]}
             />
           ) : cfg.operator === "mul" ? (
             <HissanMulProblem

@@ -66,6 +66,20 @@ export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResul
       }
       return dps;
     });
+  } else if (cfg.useDecimals && cfg.operator === "div") {
+    decimalPlaces = problems.map((problem) => {
+      const [dividend] = problem;
+      const numDigits = String(dividend).length;
+      let dp: number;
+      if (dividend % 10 === 0) {
+        dp = 1; // trailing zero: just use dp=1 (e.g. 20 → 2.0)
+      } else if (numDigits === 1) {
+        dp = 1;
+      } else {
+        dp = rng() < 0.2 ? numDigits : randInt(rng, 1, numDigits - 1);
+      }
+      return [dp, 0];
+    });
   } else if (cfg.useDecimals && cfg.operator === "mul") {
     // Pick decimal places for an operand.
     // For multi-digit numbers, bias toward >1 decimals (0 < dp < numDigits)
