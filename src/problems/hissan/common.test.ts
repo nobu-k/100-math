@@ -13,7 +13,7 @@ import {
   type HissanConfig,
 } from "./common";
 
-const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, useDecimals: false } as const;
+const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, divAllowRepeating: false, useDecimals: false } as const;
 
 // ---------------------------------------------------------------------------
 // parseConfig
@@ -161,6 +161,16 @@ describe("parseConfig", () => {
     const cfg = parseConfig(params);
     expect(cfg.divAllowRemainder).toBe(false);
   });
+
+  it("defaults divAllowRepeating to false", () => {
+    const cfg = parseConfig(new URLSearchParams("hop=div"));
+    expect(cfg.divAllowRepeating).toBe(false);
+  });
+
+  it("parses hdre=1 as divAllowRepeating true", () => {
+    const cfg = parseConfig(new URLSearchParams("hop=div&hdre=1"));
+    expect(cfg.divAllowRepeating).toBe(true);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -278,7 +288,7 @@ describe("buildParams", () => {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
-      divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: true,
+      divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: true, divAllowRepeating: false,
       useDecimals: false,
     };
     const params = buildParams(42, false, cfg);
@@ -294,7 +304,7 @@ describe("buildParams", () => {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
-      divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
+      divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, divAllowRepeating: false,
       useDecimals: false,
     };
     const params = buildParams(42, false, cfg);
@@ -308,8 +318,9 @@ describe("buildParams", () => {
       { minDigits: 1, maxDigits: 3, numOperands: 2, consecutiveCarries: true, showGrid: true, operator: "sub", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults },
       { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "mul", mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults },
       { minDigits: 1, maxDigits: 2, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "mul", mulMinDigits: 2, mulMaxDigits: 3, ...divDefaults },
-      { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, useDecimals: false },
-      { minDigits: 3, maxDigits: 4, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: true, useDecimals: false },
+      { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, divAllowRepeating: false, useDecimals: false },
+      { minDigits: 3, maxDigits: 4, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: true, divAllowRepeating: false, useDecimals: false },
+      { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: false, divAllowRepeating: true, useDecimals: true },
       { minDigits: 1, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "add", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true },
       { minDigits: 1, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "sub", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true },
     ];

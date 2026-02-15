@@ -21,7 +21,7 @@ const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
   const url = new URL(window.location.href);
   const params = buildParams(seed, showAnswers, cfg);
   // Replace all hissan-related params on the existing URL
-  for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax", "hdmin", "hdmax", "hdr", "hdec"]) {
+  for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax", "hdmin", "hdmax", "hdr", "hdre", "hdec"]) {
     url.searchParams.delete(key);
   }
   for (const [key, value] of params) {
@@ -578,6 +578,8 @@ function Hissan() {
           next.numOperands = 2;
         if (field === "useDecimals" && next.useDecimals)
           next.consecutiveCarries = false;
+        if (field === "useDecimals" && !next.useDecimals)
+          next.divAllowRepeating = false;
         if (next.operator === "div" && next.useDecimals)
           next.divAllowRemainder = false;
         if (field === "operator" && next.operator === "mul") {
@@ -621,7 +623,7 @@ function Hissan() {
   const qrUrl = useMemo(() => {
     const url = new URL(window.location.href);
     // Clear all hissan params before rebuilding
-    for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax", "hdmin", "hdmax", "hdr", "hdec"]) {
+    for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax", "hdmin", "hdmax", "hdr", "hdre", "hdec"]) {
       url.searchParams.delete(key);
     }
     const params = buildParams(seed, true, cfg);
@@ -696,6 +698,12 @@ function Hissan() {
                 <label>
                   <input type="checkbox" checked={cfg.divAllowRemainder} onChange={handleConfigChange("divAllowRemainder")} />
                   あまりあり
+                </label>
+              )}
+              {cfg.useDecimals && (
+                <label>
+                  <input type="checkbox" checked={cfg.divAllowRepeating} onChange={handleConfigChange("divAllowRepeating")} />
+                  循環小数
                 </label>
               )}
             </>

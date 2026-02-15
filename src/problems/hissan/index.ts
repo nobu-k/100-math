@@ -87,11 +87,13 @@ export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResul
     divExtra = [];
     for (let i = 0; i < count; i++) {
       const r = rng();
-      if (r < 0.33) {
+      const threshold2 = cfg.divAllowRepeating ? 0.33 : 0.5;
+      const threshold3 = cfg.divAllowRepeating ? 0.67 : 1;
+      if (r < threshold2) {
         // Pattern 1: exact
         problems.push(generateDivisionProblem(rng, { ...cfg, divAllowRemainder: false }));
         divExtra.push({ extraDigits: 0 });
-      } else if (r < 0.67) {
+      } else if (r < threshold3) {
         // Pattern 2: finite extension
         let found = false;
         for (let attempt = 0; attempt < 50; attempt++) {

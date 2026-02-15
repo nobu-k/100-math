@@ -15,6 +15,7 @@ export interface HissanConfig {
   divMinDigits: number;
   divMaxDigits: number;
   divAllowRemainder: boolean;
+  divAllowRepeating: boolean;
   useDecimals: boolean;
 }
 
@@ -183,6 +184,7 @@ export const parseConfig = (params: URLSearchParams): HissanConfig => {
   if (!(divMaxDigits >= 1 && divMaxDigits <= 2)) divMaxDigits = 1;
   if (divMinDigits > divMaxDigits) divMaxDigits = divMinDigits;
   const divAllowRemainder = params.get("hdr") === "1";
+  const divAllowRepeating = params.get("hdre") === "1";
   const useDecimals = params.get("hdec") === "1";
 
   if (operator === "sub") numOperands = 2;
@@ -197,7 +199,7 @@ export const parseConfig = (params: URLSearchParams): HissanConfig => {
     if (maxDigits < minDigits) maxDigits = minDigits;
   }
 
-  return { minDigits, maxDigits, numOperands, consecutiveCarries, showGrid, operator, mulMinDigits, mulMaxDigits, divMinDigits, divMaxDigits, divAllowRemainder, useDecimals };
+  return { minDigits, maxDigits, numOperands, consecutiveCarries, showGrid, operator, mulMinDigits, mulMaxDigits, divMinDigits, divMaxDigits, divAllowRemainder, divAllowRepeating, useDecimals };
 };
 
 export const buildParams = (seed: number, showAnswers: boolean, cfg: HissanConfig): URLSearchParams => {
@@ -231,6 +233,9 @@ export const buildParams = (seed: number, showAnswers: boolean, cfg: HissanConfi
     params.set("hdmax", String(cfg.divMaxDigits));
     if (cfg.divAllowRemainder) {
       params.set("hdr", "1");
+    }
+    if (cfg.divAllowRepeating) {
+      params.set("hdre", "1");
     }
   }
   if (cfg.useDecimals) {
