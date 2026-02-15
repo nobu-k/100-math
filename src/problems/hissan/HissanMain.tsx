@@ -1,9 +1,10 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import type { ProblemTypeDefinition } from "../types";
+import type { ProblemGroup } from "../types";
 import { randomSeed, hexToSeed } from "../random";
 import {
   type HissanConfig,
+  type HissanOperator,
   generateProblems,
   parseConfig,
   buildParams,
@@ -14,11 +15,19 @@ import { HissanDivProblem } from "./HissanDivProblem";
 import { cx } from "./render-utils";
 import "../../App.css";
 
+const operatorFromPath = (path: string): HissanOperator => {
+  if (path === "subtraction") return "sub";
+  if (path === "multiplication") return "mul";
+  if (path === "division") return "div";
+  return "add";
+};
+
+const PARAM_KEYS = ["q", "answers", "min", "max", "ops", "cc", "grid", "mmin", "mmax", "dmin", "dmax", "dr", "dre", "dec"];
+
 const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
   const url = new URL(window.location.href);
   const params = buildParams(seed, showAnswers, cfg);
-  // Replace all hissan-related params on the existing URL
-  for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax", "hdmin", "hdmax", "hdr", "hdre", "hdec"]) {
+  for (const key of PARAM_KEYS) {
     url.searchParams.delete(key);
   }
   for (const [key, value] of params) {
@@ -27,23 +36,25 @@ const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
   window.history.replaceState(null, "", url.toString());
 };
 
-const getInitialConfig = (): HissanConfig => {
-  return parseConfig(new URLSearchParams(window.location.search));
-};
+function Hissan({ operator: operatorPath }: { operator: string }) {
+  const hissanOperator = operatorFromPath(operatorPath);
 
-const getInitialSeed = (): number => {
-  const params = new URLSearchParams(window.location.search);
-  const hq = params.get("hq");
-  if (hq) {
-    const parsed = hexToSeed(hq);
-    if (parsed !== null) return parsed;
-  }
-  const seed = randomSeed();
-  updateUrl(seed, false, getInitialConfig());
-  return seed;
-};
+  const getInitialConfig = (): HissanConfig => {
+    return parseConfig(new URLSearchParams(window.location.search), hissanOperator);
+  };
 
-function Hissan() {
+  const getInitialSeed = (): number => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q");
+    if (q) {
+      const parsed = hexToSeed(q);
+      if (parsed !== null) return parsed;
+    }
+    const seed = randomSeed();
+    updateUrl(seed, false, getInitialConfig());
+    return seed;
+  };
+
   const [seed, setSeed] = useState(getInitialSeed);
   const [showAnswers, setShowAnswers] = useState(() => {
     return new URLSearchParams(window.location.search).get("answers") === "1";
@@ -75,19 +86,17 @@ function Hissan() {
           ? e.target.checked
           : isNaN(parseInt(raw, 10)) ? raw : parseInt(raw, 10);
         const next = { ...prev, [field]: value };
-        if (field === "operator" && (next.operator === "sub" || next.operator === "mul" || next.operator === "div"))
-          next.numOperands = 2;
         if (field === "useDecimals" && next.useDecimals)
           next.consecutiveCarries = false;
         if (field === "useDecimals" && !next.useDecimals)
           next.divAllowRepeating = false;
         if (next.operator === "div" && next.useDecimals)
           next.divAllowRemainder = false;
-        if (field === "operator" && next.operator === "mul") {
+        if (next.operator === "mul") {
           if (next.maxDigits > 3) next.maxDigits = 3;
           if (next.minDigits > next.maxDigits) next.minDigits = next.maxDigits;
         }
-        if (field === "operator" && next.operator === "div") {
+        if (next.operator === "div") {
           if (next.minDigits < 2) next.minDigits = 2;
           if (next.maxDigits < next.minDigits) next.maxDigits = next.minDigits;
         }
@@ -123,8 +132,7 @@ function Hissan() {
 
   const qrUrl = useMemo(() => {
     const url = new URL(window.location.href);
-    // Clear all hissan params before rebuilding
-    for (const key of ["hq", "answers", "hmin", "hmax", "hops", "hcc", "hgrid", "hop", "hmmin", "hmmax", "hdmin", "hdmax", "hdr", "hdre", "hdec"]) {
+    for (const key of PARAM_KEYS) {
       url.searchParams.delete(key);
     }
     const params = buildParams(seed, true, cfg);
@@ -137,12 +145,6 @@ function Hissan() {
   return (
     <>
       <div className="no-print controls">
-        <select className="operator-select" value={cfg.operator} onChange={handleConfigChange("operator")}>
-          <option value="add">たし算</option>
-          <option value="sub">ひき算</option>
-          <option value="mul">かけ算</option>
-          <option value="div">わり算</option>
-        </select>
         <button onClick={handleNewProblems}>新しい問題</button>
         <button onClick={handleToggleAnswers}>
           {showAnswers ? "答えを隠す" : "答え"}
@@ -283,8 +285,14 @@ function Hissan() {
   );
 }
 
-export const hissan: ProblemTypeDefinition = {
+export const hissan: ProblemGroup = {
   id: "hissan",
   label: "ひっ算",
+  operators: [
+    { operator: "addition", label: "たし算" },
+    { operator: "subtraction", label: "ひき算" },
+    { operator: "multiplication", label: "かけ算" },
+    { operator: "division", label: "わり算" },
+  ],
   Component: Hissan,
 };

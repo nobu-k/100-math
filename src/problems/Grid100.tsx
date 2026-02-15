@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import type { ProblemTypeDefinition } from "./types";
+import type { ProblemGroup } from "./types";
 import { mulberry32, randomSeed, seedToHex, hexToSeed } from "./random";
 import "../App.css";
 
@@ -10,6 +10,12 @@ interface Problem {
   rowHeaders: number[];
   colHeaders: number[];
 }
+
+const operatorFromPath = (path: string): Operator => {
+  if (path === "subtraction") return "sub";
+  if (path === "multiplication") return "mul";
+  return "add";
+};
 
 const seededShuffle = (arr: number[], rng: () => number): number[] => {
   const shuffled = [...arr];
@@ -29,7 +35,7 @@ const generateProblem = (seed: number): Problem => {
   };
 };
 
-const updateUrl = (seed: number, showAnswers: boolean, operator: Operator) => {
+const updateUrl = (seed: number, showAnswers: boolean) => {
   const url = new URL(window.location.href);
   url.searchParams.set("q", seedToHex(seed));
   if (showAnswers) {
@@ -37,15 +43,7 @@ const updateUrl = (seed: number, showAnswers: boolean, operator: Operator) => {
   } else {
     url.searchParams.delete("answers");
   }
-  url.searchParams.set("op", operator);
   window.history.replaceState(null, "", url.toString());
-};
-
-const getInitialOperator = (): Operator => {
-  const params = new URLSearchParams(window.location.search);
-  const op = params.get("op");
-  if (op === "mul" || op === "sub") return op;
-  return "add";
 };
 
 const getInitialSeed = (): number => {
@@ -56,13 +54,13 @@ const getInitialSeed = (): number => {
     if (parsed !== null) return parsed;
   }
   const seed = randomSeed();
-  updateUrl(seed, false, getInitialOperator());
+  updateUrl(seed, false);
   return seed;
 };
 
-function Grid100() {
+function Grid100({ operator: operatorPath }: { operator: string }) {
+  const operator = operatorFromPath(operatorPath);
   const [seed, setSeed] = useState(getInitialSeed);
-  const [operator, setOperator] = useState<Operator>(getInitialOperator);
   const [showAnswers, setShowAnswers] = useState(() => {
     return new URLSearchParams(window.location.search).get("answers") === "1";
   });
@@ -71,25 +69,17 @@ function Grid100() {
 
   const handleNewProblem = useCallback(() => {
     const newSeed = randomSeed();
-    updateUrl(newSeed, false, operator);
+    updateUrl(newSeed, false);
     setSeed(newSeed);
     setShowAnswers(false);
-  }, [operator]);
+  }, []);
 
   const handleToggleAnswers = useCallback(() => {
     setShowAnswers((prev) => {
-      updateUrl(seed, !prev, operator);
+      updateUrl(seed, !prev);
       return !prev;
     });
-  }, [seed, operator]);
-
-  const handleSetOperator = useCallback(
-    (op: Operator) => {
-      setOperator(op);
-      updateUrl(seed, showAnswers, op);
-    },
-    [seed, showAnswers],
-  );
+  }, [seed]);
 
   const { rowHeaders, colHeaders } = problem;
 
@@ -97,22 +87,12 @@ function Grid100() {
     const url = new URL(window.location.href);
     url.searchParams.set("q", seedToHex(seed));
     url.searchParams.set("answers", "1");
-    url.searchParams.set("op", operator);
     return url.toString();
-  }, [seed, operator]);
+  }, [seed]);
 
   return (
     <>
       <div className="no-print controls">
-        <select
-          className="operator-select"
-          value={operator}
-          onChange={(e) => handleSetOperator(e.target.value as Operator)}
-        >
-          <option value="add">たし算</option>
-          <option value="sub">ひき算</option>
-          <option value="mul">かけ算</option>
-        </select>
         <button onClick={handleNewProblem}>新しい問題</button>
         <button onClick={handleToggleAnswers}>
           {showAnswers ? "答えを隠す" : "答え"}
@@ -158,8 +138,13 @@ function Grid100() {
   );
 }
 
-export const grid100: ProblemTypeDefinition = {
-  id: "100grid",
+export const grid100: ProblemGroup = {
+  id: "grid100",
   label: "百マス計算",
+  operators: [
+    { operator: "addition", label: "たし算" },
+    { operator: "subtraction", label: "ひき算" },
+    { operator: "multiplication", label: "かけ算" },
+  ],
   Component: Grid100,
 };

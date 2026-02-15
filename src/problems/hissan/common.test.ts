@@ -20,7 +20,7 @@ const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false
 // ---------------------------------------------------------------------------
 describe("parseConfig", () => {
   it("returns defaults for empty params", () => {
-    const cfg = parseConfig(new URLSearchParams());
+    const cfg = parseConfig(new URLSearchParams(), "add");
     expect(cfg).toEqual({
       minDigits: 1,
       maxDigits: 2,
@@ -35,8 +35,8 @@ describe("parseConfig", () => {
   });
 
   it("parses all params explicitly", () => {
-    const params = new URLSearchParams("hmin=2&hmax=3&hops=3&hcc=1&hgrid=0&hop=add");
-    const cfg = parseConfig(params);
+    const params = new URLSearchParams("min=2&max=3&ops=3&cc=1&grid=0");
+    const cfg = parseConfig(params, "add");
     expect(cfg).toEqual({
       minDigits: 2,
       maxDigits: 3,
@@ -50,66 +50,66 @@ describe("parseConfig", () => {
     });
   });
 
-  it("parses hdec=1 as useDecimals true", () => {
-    const params = new URLSearchParams("hdec=1");
-    const cfg = parseConfig(params);
+  it("parses dec=1 as useDecimals true", () => {
+    const params = new URLSearchParams("dec=1");
+    const cfg = parseConfig(params, "add");
     expect(cfg.useDecimals).toBe(true);
   });
 
   it("defaults useDecimals to false", () => {
-    const cfg = parseConfig(new URLSearchParams());
+    const cfg = parseConfig(new URLSearchParams(), "add");
     expect(cfg.useDecimals).toBe(false);
   });
 
-  it("hop=sub forces numOperands=2 regardless of hops", () => {
-    const params = new URLSearchParams("hop=sub&hops=3");
-    const cfg = parseConfig(params);
+  it("sub forces numOperands=2 regardless of ops", () => {
+    const params = new URLSearchParams("ops=3");
+    const cfg = parseConfig(params, "sub");
     expect(cfg.operator).toBe("sub");
     expect(cfg.numOperands).toBe(2);
   });
 
-  it("adjusts hmax upward when hmin > hmax", () => {
-    const params = new URLSearchParams("hmin=3&hmax=1");
-    const cfg = parseConfig(params);
+  it("adjusts max upward when min > max", () => {
+    const params = new URLSearchParams("min=3&max=1");
+    const cfg = parseConfig(params, "add");
     expect(cfg.minDigits).toBe(3);
     expect(cfg.maxDigits).toBe(3);
   });
 
   it("uses defaults for invalid values", () => {
-    const params = new URLSearchParams("hmin=abc&hmax=99&hops=0");
-    const cfg = parseConfig(params);
+    const params = new URLSearchParams("min=abc&max=99&ops=0");
+    const cfg = parseConfig(params, "add");
     expect(cfg.minDigits).toBe(1);
     expect(cfg.maxDigits).toBe(2);
     expect(cfg.numOperands).toBe(2);
   });
 
-  it("parses hcc=1 as consecutiveCarries true", () => {
-    const params = new URLSearchParams("hcc=1");
-    const cfg = parseConfig(params);
+  it("parses cc=1 as consecutiveCarries true", () => {
+    const params = new URLSearchParams("cc=1");
+    const cfg = parseConfig(params, "add");
     expect(cfg.consecutiveCarries).toBe(true);
   });
 
-  it("parses hcc absent as consecutiveCarries false", () => {
+  it("parses cc absent as consecutiveCarries false", () => {
     const params = new URLSearchParams();
-    const cfg = parseConfig(params);
+    const cfg = parseConfig(params, "add");
     expect(cfg.consecutiveCarries).toBe(false);
   });
 
-  it("parses hgrid=0 as showGrid false", () => {
-    const params = new URLSearchParams("hgrid=0");
-    const cfg = parseConfig(params);
+  it("parses grid=0 as showGrid false", () => {
+    const params = new URLSearchParams("grid=0");
+    const cfg = parseConfig(params, "add");
     expect(cfg.showGrid).toBe(false);
   });
 
-  it("parses hgrid absent as showGrid true", () => {
+  it("parses grid absent as showGrid true", () => {
     const params = new URLSearchParams();
-    const cfg = parseConfig(params);
+    const cfg = parseConfig(params, "add");
     expect(cfg.showGrid).toBe(true);
   });
 
-  it("parses hop=mul with hmmin/hmmax", () => {
-    const params = new URLSearchParams("hop=mul&hmin=2&hmax=3&hmmin=1&hmmax=2");
-    const cfg = parseConfig(params);
+  it("parses mul with mmin/mmax", () => {
+    const params = new URLSearchParams("min=2&max=3&mmin=1&mmax=2");
+    const cfg = parseConfig(params, "mul");
     expect(cfg.operator).toBe("mul");
     expect(cfg.numOperands).toBe(2);
     expect(cfg.minDigits).toBe(2);
@@ -119,28 +119,28 @@ describe("parseConfig", () => {
   });
 
   it("caps maxDigits at 3 for mul", () => {
-    const params = new URLSearchParams("hop=mul&hmin=2&hmax=4");
-    const cfg = parseConfig(params);
+    const params = new URLSearchParams("min=2&max=4");
+    const cfg = parseConfig(params, "mul");
     expect(cfg.maxDigits).toBe(3);
   });
 
   it("defaults invalid mulMaxDigits", () => {
-    const params = new URLSearchParams("hop=mul&hmmin=1&hmmax=9");
-    const cfg = parseConfig(params);
+    const params = new URLSearchParams("mmin=1&mmax=9");
+    const cfg = parseConfig(params, "mul");
     // 9 is out of valid range (1-3), so defaults to 1
     expect(cfg.mulMaxDigits).toBe(1);
   });
 
-  it("adjusts hmmax upward when hmmin > hmmax", () => {
-    const params = new URLSearchParams("hop=mul&hmmin=3&hmmax=1");
-    const cfg = parseConfig(params);
+  it("adjusts mmax upward when mmin > mmax", () => {
+    const params = new URLSearchParams("mmin=3&mmax=1");
+    const cfg = parseConfig(params, "mul");
     expect(cfg.mulMinDigits).toBe(3);
     expect(cfg.mulMaxDigits).toBe(3);
   });
 
-  it("parses hop=div with hdmin/hdmax/hdr", () => {
-    const params = new URLSearchParams("hop=div&hmin=3&hmax=4&hdmin=1&hdmax=2&hdr=1");
-    const cfg = parseConfig(params);
+  it("parses div with dmin/dmax/dr", () => {
+    const params = new URLSearchParams("min=3&max=4&dmin=1&dmax=2&dr=1");
+    const cfg = parseConfig(params, "div");
     expect(cfg.operator).toBe("div");
     expect(cfg.numOperands).toBe(2);
     expect(cfg.minDigits).toBe(3);
@@ -151,24 +151,24 @@ describe("parseConfig", () => {
   });
 
   it("forces minDigits >= 2 for div", () => {
-    const params = new URLSearchParams("hop=div&hmin=1&hmax=3");
-    const cfg = parseConfig(params);
+    const params = new URLSearchParams("min=1&max=3");
+    const cfg = parseConfig(params, "div");
     expect(cfg.minDigits).toBe(2);
   });
 
   it("defaults divAllowRemainder to false", () => {
-    const params = new URLSearchParams("hop=div");
-    const cfg = parseConfig(params);
+    const params = new URLSearchParams();
+    const cfg = parseConfig(params, "div");
     expect(cfg.divAllowRemainder).toBe(false);
   });
 
   it("defaults divAllowRepeating to false", () => {
-    const cfg = parseConfig(new URLSearchParams("hop=div"));
+    const cfg = parseConfig(new URLSearchParams(), "div");
     expect(cfg.divAllowRepeating).toBe(false);
   });
 
-  it("parses hdre=1 as divAllowRepeating true", () => {
-    const cfg = parseConfig(new URLSearchParams("hop=div&hdre=1"));
+  it("parses dre=1 as divAllowRepeating true", () => {
+    const cfg = parseConfig(new URLSearchParams("dre=1"), "div");
     expect(cfg.divAllowRepeating).toBe(true);
   });
 });
@@ -177,47 +177,45 @@ describe("parseConfig", () => {
 // buildParams
 // ---------------------------------------------------------------------------
 describe("buildParams", () => {
-  it("includes hdec=1 when useDecimals is on", () => {
+  it("includes dec=1 when useDecimals is on", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
       mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true,
     };
     const params = buildParams(42, false, cfg);
-    expect(params.get("hdec")).toBe("1");
+    expect(params.get("dec")).toBe("1");
   });
 
-  it("omits hdec when useDecimals is off", () => {
+  it("omits dec when useDecimals is off", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
       mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const params = buildParams(42, false, cfg);
-    expect(params.has("hdec")).toBe(false);
+    expect(params.has("dec")).toBe(false);
   });
 
-  it("includes hops for addition mode, omits hop", () => {
+  it("includes ops for addition mode", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 3,
       consecutiveCarries: false, showGrid: true, operator: "add",
       mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const params = buildParams(42, false, cfg);
-    expect(params.get("hops")).toBe("3");
-    expect(params.has("hop")).toBe(false);
+    expect(params.get("ops")).toBe("3");
     expect(params.has("answers")).toBe(false);
   });
 
-  it("includes hop=sub for subtraction mode, omits hops", () => {
+  it("omits ops for subtraction mode", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "sub",
       mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const params = buildParams(42, false, cfg);
-    expect(params.get("hop")).toBe("sub");
-    expect(params.has("hops")).toBe(false);
+    expect(params.has("ops")).toBe(false);
   });
 
   it("includes answers=1 when showAnswers is true", () => {
@@ -230,60 +228,59 @@ describe("buildParams", () => {
     expect(params.get("answers")).toBe("1");
   });
 
-  it("includes hcc=1 when consecutiveCarries is on", () => {
+  it("includes cc=1 when consecutiveCarries is on", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: true, showGrid: true, operator: "add",
       mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const params = buildParams(42, false, cfg);
-    expect(params.get("hcc")).toBe("1");
+    expect(params.get("cc")).toBe("1");
   });
 
-  it("omits hcc when consecutiveCarries is off", () => {
+  it("omits cc when consecutiveCarries is off", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
       mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const params = buildParams(42, false, cfg);
-    expect(params.has("hcc")).toBe(false);
+    expect(params.has("cc")).toBe(false);
   });
 
-  it("includes hgrid=0 when showGrid is false", () => {
+  it("includes grid=0 when showGrid is false", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: false, operator: "add",
       mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const params = buildParams(42, false, cfg);
-    expect(params.get("hgrid")).toBe("0");
+    expect(params.get("grid")).toBe("0");
   });
 
-  it("omits hgrid when showGrid is true", () => {
+  it("omits grid when showGrid is true", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
       mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
     };
     const params = buildParams(42, false, cfg);
-    expect(params.has("hgrid")).toBe(false);
+    expect(params.has("grid")).toBe(false);
   });
 
-  it("includes hop=mul and hmmin/hmmax for mul", () => {
+  it("includes mmin/mmax for mul", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "mul",
       mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults,
     };
     const params = buildParams(42, false, cfg);
-    expect(params.get("hop")).toBe("mul");
-    expect(params.get("hmmin")).toBe("1");
-    expect(params.get("hmmax")).toBe("2");
-    expect(params.has("hops")).toBe(false);
+    expect(params.get("mmin")).toBe("1");
+    expect(params.get("mmax")).toBe("2");
+    expect(params.has("ops")).toBe(false);
   });
 
-  it("includes hop=div and hdmin/hdmax/hdr for div", () => {
+  it("includes dmin/dmax/dr for div", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "div",
@@ -292,14 +289,13 @@ describe("buildParams", () => {
       useDecimals: false,
     };
     const params = buildParams(42, false, cfg);
-    expect(params.get("hop")).toBe("div");
-    expect(params.get("hdmin")).toBe("1");
-    expect(params.get("hdmax")).toBe("2");
-    expect(params.get("hdr")).toBe("1");
-    expect(params.has("hops")).toBe(false);
+    expect(params.get("dmin")).toBe("1");
+    expect(params.get("dmax")).toBe("2");
+    expect(params.get("dr")).toBe("1");
+    expect(params.has("ops")).toBe(false);
   });
 
-  it("omits hdr when divAllowRemainder is false", () => {
+  it("omits dr when divAllowRemainder is false", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "div",
@@ -308,10 +304,10 @@ describe("buildParams", () => {
       useDecimals: false,
     };
     const params = buildParams(42, false, cfg);
-    expect(params.has("hdr")).toBe(false);
+    expect(params.has("dr")).toBe(false);
   });
 
-  it("round-trips: parseConfig(buildParams(...)) recovers config", () => {
+  it("round-trips: parseConfig(buildParams(...), operator) recovers config", () => {
     const configs: HissanConfig[] = [
       { minDigits: 1, maxDigits: 2, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "add", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults },
       { minDigits: 2, maxDigits: 4, numOperands: 3, consecutiveCarries: true, showGrid: false, operator: "add", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults },
@@ -326,7 +322,7 @@ describe("buildParams", () => {
     ];
     for (const cfg of configs) {
       const params = buildParams(123, false, cfg);
-      const recovered = parseConfig(params);
+      const recovered = parseConfig(params, cfg.operator);
       expect(recovered).toEqual(cfg);
     }
   });
