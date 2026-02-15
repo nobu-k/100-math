@@ -1,4 +1,3 @@
-import React from "react";
 import type { Problem, HissanOperator } from "./common";
 import { toDigitCells, toDecimalDigitCells, computeIndicators } from "./common";
 import { cx } from "./render-utils";

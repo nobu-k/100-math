@@ -252,8 +252,6 @@ function Hissan() {
               showAnswers={showAnswers}
               dps={decimalPlaces[i]}
               extraDigits={divExtra?.[i]?.extraDigits}
-              cycleStart={divExtra?.[i]?.cycleStart}
-              cycleLength={divExtra?.[i]?.cycleLength}
             />
           ) : cfg.operator === "mul" ? (
             <HissanMulProblem

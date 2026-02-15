@@ -1,4 +1,3 @@
-import React from "react";
 import type { Problem, HissanConfig } from "./common";
 import { toDigitCells, decimalDisplayWidth } from "./common";
 import { computeMulDetails } from "./mul";

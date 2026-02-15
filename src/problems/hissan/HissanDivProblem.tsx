@@ -1,6 +1,5 @@
-import React from "react";
 import type { Problem } from "./common";
-import { numberToDigits, decimalDisplayWidth, toDigitCells } from "./common";
+import { numberToDigits, decimalDisplayWidth } from "./common";
 import { computeDivDetails } from "./div";
 import { cx } from "./render-utils";
 
@@ -10,16 +9,12 @@ export function HissanDivProblem({
   showAnswers,
   dps,
   extraDigits = 0,
-  cycleStart: propCycleStart,
-  cycleLength: propCycleLength,
 }: {
   index: number;
   problem: Problem;
   showAnswers: boolean;
   dps: number[];
   extraDigits?: number;
-  cycleStart?: number;
-  cycleLength?: number;
 }) {
   const [dividend, divisor] = problem;
   const divisorDigits = numberToDigits(divisor);
