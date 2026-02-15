@@ -6,6 +6,7 @@ import {
   getProblemCount,
   divisionTerminates,
   divisionCycleLength,
+  decimalDisplayWidth,
   type HissanConfig,
 } from "./index";
 
@@ -386,7 +387,7 @@ describe("divisionCycleLength", () => {
 // decimal div column width constraint
 // ---------------------------------------------------------------------------
 describe("decimal div column width constraint", () => {
-  it("total columns ≤ 9 across many seeds", () => {
+  it("total columns (using divisor display width) ≤ 9 across many seeds", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "div",
@@ -405,8 +406,41 @@ describe("decimal div column width constraint", () => {
           ? Math.max(String(dividend).length, dividendDP + 1)
           : String(dividend).length;
         const dividendAreaWidth = origDisplayWidth + extraZeros;
-        const totalCols = String(divisor).length + dividendAreaWidth + extraDigits;
+        const divCols = decimalDisplayWidth(String(divisor).length, divisorDP);
+        const totalCols = divCols + dividendAreaWidth + extraDigits;
         expect(totalCols).toBeLessThanOrEqual(9);
+      }
+    }
+  });
+
+  it("divisor display width accounts for leading zero when divisorDP >= digit count", () => {
+    // Regression: a single-digit divisor with divisorDP=1 (e.g. 2 → 0.2)
+    // must occupy 2 columns, not 1
+    expect(decimalDisplayWidth(1, 1)).toBe(2); // "0.2" needs 2 chars
+    expect(decimalDisplayWidth(1, 0)).toBe(1); // "2" needs 1 char
+    expect(decimalDisplayWidth(2, 1)).toBe(2); // "1.2" needs 2 chars
+    expect(decimalDisplayWidth(2, 2)).toBe(3); // "0.12" needs 3 chars
+
+    // Verify generated problems: when divisorDP > 0, divCols must use display width
+    const cfg: HissanConfig = {
+      minDigits: 2, maxDigits: 3, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "div",
+      mulMinDigits: 1, mulMaxDigits: 1,
+      divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
+      divAllowRepeating: false, useDecimals: true,
+    };
+    for (let seed = 0; seed < 100; seed++) {
+      const { problems, decimalPlaces } = generateProblems(seed, cfg);
+      for (let i = 0; i < problems.length; i++) {
+        const divisor = problems[i][1];
+        const divisorDP = decimalPlaces[i][1];
+        if (divisorDP > 0) {
+          const rawLen = String(divisor).length;
+          const displayWidth = decimalDisplayWidth(rawLen, divisorDP);
+          // Display width must be enough to show all digits + leading zero if needed
+          expect(displayWidth).toBeGreaterThanOrEqual(rawLen);
+          expect(displayWidth).toBeGreaterThanOrEqual(divisorDP + 1);
+        }
       }
     }
   });

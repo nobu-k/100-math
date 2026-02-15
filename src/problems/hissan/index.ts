@@ -203,7 +203,8 @@ export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResul
         const origDisplayWidth = dp > 0 ? Math.max(numDigits, dp + 1) : numDigits;
         const dividendAreaWidth = origDisplayWidth + extraZeros;
         const extraDig = divExtra ? divExtra[i].extraDigits : 0;
-        if (String(divisor).length + dividendAreaWidth + extraDig <= 9) {
+        const divisorDisplayWidth = candidateDP > 0 ? Math.max(divLen, candidateDP + 1) : divLen;
+        if (divisorDisplayWidth + dividendAreaWidth + extraDig <= 9) {
           divisorDP = candidateDP;
         }
       }

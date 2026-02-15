@@ -18,10 +18,16 @@ export function HissanDivProblem({
 }) {
   const [dividend, divisor] = problem;
   const divisorDigits = numberToDigits(divisor);
-  const divCols = divisorDigits.length;
 
   const dividendDP = dps[0] || 0;
   const divisorDP = dps[1] || 0;
+
+  // Divisor display: pad with leading zero when divisorDP >= digit count (e.g. 2 with dp=1 → "0.2")
+  const divCols = decimalDisplayWidth(divisorDigits.length, divisorDP);
+  const divisorDisplayStr = divisorDP > 0
+    ? String(divisor).padStart(divCols, "0")
+    : String(divisor);
+  const divisorDisplayDigits = divisorDisplayStr.split("").map(Number);
 
   // Normalization for decimal divisors: multiply both by 10^divisorDP
   const extraZeros = Math.max(0, divisorDP - dividendDP);
@@ -227,7 +233,7 @@ export function HissanDivProblem({
           </tr>
           {/* Divisor + Dividend row */}
           <tr>
-            {divisorDigits.map((d, i) => {
+            {divisorDisplayDigits.map((d, i) => {
               const isOrigDivisorDot = i === divisorDotCol;
               const dotClass = isOrigDivisorDot
                 ? (showAnswers ? " hissan-div-slashed-dot" : " hissan-div-dot-after")
