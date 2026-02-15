@@ -72,9 +72,12 @@ export function HissanAddSubProblem({
             {problem.map((operand, ri) => {
               const rawCells = toDecimalDigitCells(operand, dps[ri], totalIntCols, totalDecCols);
               const trimmedCells = trimDecZeros(rawCells);
-              // Keep trailing zeros on minuend when showing subtraction answers
-              // so borrow marks render on the padded zero positions.
-              const cells = (showAnswers && isSub && ri === 0) ? rawCells : trimmedCells;
+              // For subtraction minuend with answers, use the aligned value padded
+              // to maxDP so trailing zeros are explicit 0s (not "").  This lets
+              // borrow marks and paddedZero detection work on those positions.
+              const cells = (showAnswers && isSub && ri === 0)
+                ? toDecimalDigitCells(aligned[ri], maxDP, totalIntCols, totalDecCols)
+                : trimmedCells;
               const intPart = cells.slice(0, totalIntCols);
               const decPart = cells.slice(totalIntCols);
               const showDot = hasDecDigits(cells);
@@ -96,9 +99,9 @@ export function HissanAddSubProblem({
                       const ci = totalIntCols + i;
                       const slashed = isSub0 && indicators[ci] > 0;
                       const borrowIn = isSub0 && borrowOut[ci] > 0 && indicators[ci] === 0;
-                      // Padded trailing zero: was "" after trimming but 0 in raw cells.
+                      // Padded trailing zero: was "" after trimming but 0 in aligned cells.
                       // When borrowed, show fully red "10" since the zero wasn't in the original number.
-                      const paddedZero = isSub0 && trimmedCells[ci] === "" && rawCells[ci] === 0;
+                      const paddedZero = isSub0 && trimmedCells[ci] === "" && d === 0;
                       return (
                         <td key={`d${i}`} className={cx("hissan-cell", [slashed, "hissan-slashed"])}>
                           {borrowIn
