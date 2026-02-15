@@ -401,12 +401,11 @@ describe("decimal div column width constraint", () => {
         const [dividendDP, divisorDP] = decimalPlaces[i];
         const extraDigits = divExtra![i].extraDigits;
         const extraZeros = Math.max(0, divisorDP - dividendDP);
-        const normalizedDividendDigits = String(dividend).length + extraZeros;
-        const newDividendDP = Math.max(0, dividendDP - divisorDP);
-        const normalizedDividendDisplayWidth = newDividendDP > 0
-          ? Math.max(normalizedDividendDigits, newDividendDP + 1)
-          : normalizedDividendDigits;
-        const totalCols = String(divisor).length + normalizedDividendDisplayWidth + extraDigits;
+        const origDisplayWidth = dividendDP > 0
+          ? Math.max(String(dividend).length, dividendDP + 1)
+          : String(dividend).length;
+        const dividendAreaWidth = origDisplayWidth + extraZeros;
+        const totalCols = String(divisor).length + dividendAreaWidth + extraDigits;
         expect(totalCols).toBeLessThanOrEqual(9);
       }
     }

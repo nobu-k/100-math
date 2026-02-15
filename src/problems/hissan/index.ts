@@ -198,15 +198,12 @@ export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResul
           candidateDP = rng() < 0.2 ? divLen : randInt(rng, 1, divLen - 1);
         }
 
-        // Width check: normalization must fit within maxTotalCols
+        // Width check: grid dividend area = original display width + extra zeros
         const extraZeros = Math.max(0, candidateDP - dp);
-        const normalizedDividendDigits = numDigits + extraZeros;
-        const normalizedDividendDP = Math.max(0, dp - candidateDP);
-        const normalizedDividendDisplayWidth = normalizedDividendDP > 0
-          ? Math.max(normalizedDividendDigits, normalizedDividendDP + 1)
-          : normalizedDividendDigits;
+        const origDisplayWidth = dp > 0 ? Math.max(numDigits, dp + 1) : numDigits;
+        const dividendAreaWidth = origDisplayWidth + extraZeros;
         const extraDig = divExtra ? divExtra[i].extraDigits : 0;
-        if (String(divisor).length + normalizedDividendDisplayWidth + extraDig <= 9) {
+        if (String(divisor).length + dividendAreaWidth + extraDig <= 9) {
           divisorDP = candidateDP;
         }
       }

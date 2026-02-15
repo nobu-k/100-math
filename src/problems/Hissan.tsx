@@ -422,12 +422,6 @@ function HissanDivProblem({
   const normalizedDividendDigits = String(normalizedDividend).split("").map(Number);
   const quotientStr = String(quotient);
 
-  // Display dimensions based on normalized dividend
-  const normalizedDividendDisplayWidth = newDividendDP > 0
-    ? Math.max(normalizedDividendDigits.length, newDividendDP + 1)
-    : normalizedDividendDigits.length;
-  const normalizedDividendOffset = normalizedDividendDisplayWidth - normalizedDividendDigits.length;
-
   // Original dividend display (for the visible row)
   const origDividendDigits = String(dividend).split("").map(Number);
   const origDividendDisplayWidth = dividendDP > 0
@@ -437,21 +431,31 @@ function HissanDivProblem({
     ? String(dividend).padStart(origDividendDisplayWidth, "0")
     : String(dividend);
 
-  // Total columns: divisor cols + normalized dividend display + extra extension digits
-  const totalCols = divCols + normalizedDividendDisplayWidth + extraDigits;
+  // Grid dividend area = original display + extra zeros (always >= normalized width)
+  const dividendAreaWidth = origDividendDisplayWidth + extraZeros;
+  const normalizedDividendOffset = dividendAreaWidth - normalizedDividendDigits.length;
 
-  // Quotient dot column based on normalized dividend's decimal position
+  // Total columns: divisor cols + dividend area + extra extension digits
+  const totalCols = divCols + dividendAreaWidth + extraDigits;
+
+  // Quotient dot column (aligned with the normalized dividend's decimal position)
   const dotCol = newDividendDP > 0
-    ? divCols + normalizedDividendDisplayWidth - 1 - newDividendDP
-    : (extraDigits > 0 ? divCols + normalizedDividendDisplayWidth - 1 : -1);
+    ? divCols + dividendAreaWidth - 1 - newDividendDP
+    : (extraDigits > 0 ? divCols + dividendAreaWidth - 1 : -1);
 
   // Original dividend dot column (for display in the dividend row)
   const origDotCol = dividendDP > 0 ? divCols + origDividendDisplayWidth - 1 - dividendDP : -1;
 
   // New red dot position when divisorDP > 0 and newDividendDP > 0
   const newRedDotCol = divisorDP > 0 && newDividendDP > 0
-    ? divCols + normalizedDividendDisplayWidth - 1 - newDividendDP
+    ? divCols + dividendAreaWidth - 1 - newDividendDP
     : -1;
+
+  // Number of leading chars that disappear after normalization (e.g. "0" in "0.598" → "5.98")
+  const normalizedDividendDisplayWidth = newDividendDP > 0
+    ? Math.max(normalizedDividendDigits.length, newDividendDP + 1)
+    : normalizedDividendDigits.length;
+  const lostLeadingChars = dividendAreaWidth - normalizedDividendDisplayWidth;
 
   // Divisor dot column
   const divisorDotCol = divisorDP > 0 ? divCols - 1 - divisorDP : -1;
@@ -477,7 +481,7 @@ function HissanDivProblem({
   // Cycle dot columns (for repeating decimal notation) — use computed cycle info
   const cycleDotCols = new Set<number>();
   if (cycleStart !== undefined && cycleLength !== undefined && showAnswers) {
-    const firstCycleCol = divCols + normalizedDividendDisplayWidth + cycleStart;
+    const firstCycleCol = divCols + dividendAreaWidth + cycleStart;
     if (cycleLength === 1) {
       cycleDotCols.add(firstCycleCol);
     } else {
@@ -538,6 +542,9 @@ function HissanDivProblem({
         : "";
       // Check if this position gets the new red dot
       const redDotClass = showAnswers && colIdx === newRedDotCol ? " hissan-div-dot-red" : "";
+      // Leading zeros that disappear after normalization get slashed
+      const isLostLeading = showAnswers && i < lostLeadingChars;
+      const digit = parseInt(origChars[i], 10);
       dividendRowCells.push(
         <td key={i} className={`hissan-div-cell${dotClass}${redDotClass}`}>
           {i === 0 && (
@@ -545,7 +552,7 @@ function HissanDivProblem({
               <path d="M0,0 C10,8 10,22 0,30" stroke="#000" strokeWidth="3" fill="none" />
             </svg>
           )}
-          {parseInt(origChars[i], 10)}
+          {isLostLeading ? <span className="hissan-div-slashed-zero">{digit}</span> : digit}
         </td>
       );
     }
