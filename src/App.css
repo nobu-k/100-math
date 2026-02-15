@@ -404,7 +404,7 @@
 .hissan-div-cycle-dot::before {
   content: "";
   position: absolute;
-  top: 2px;
+  top: -2px;
   left: 50%;
   transform: translateX(-50%);
   width: 6px;
@@ -706,13 +706,13 @@
   .hissan-div-cycle-dot::before {
     width: 1.5mm;
     height: 1.5mm;
-    top: 0.5mm;
+    top: -0.5mm;
   }
 
   .hissan-dec-wide .hissan-div-cycle-dot::before {
     width: 1mm;
     height: 1mm;
-    top: 0.2mm;
+    top: -0.3mm;
   }
 
   .hissan-div-bracket-curve {
