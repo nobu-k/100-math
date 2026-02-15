@@ -558,16 +558,34 @@
     font-size: 18px;
   }
 
+  .hissan-dec-wide .hissan-div-cell {
+    width: 6mm;
+    height: 6mm;
+    font-size: 12px;
+  }
+
   .hissan-div-dot-after::after {
     font-size: 18px;
     right: -1mm;
     bottom: 0.5mm;
   }
 
+  .hissan-dec-wide .hissan-div-dot-after::after {
+    font-size: 12px;
+    right: -0.6mm;
+    bottom: 0.2mm;
+  }
+
   .hissan-div-cycle-dot::before {
     width: 1.5mm;
     height: 1.5mm;
     top: 0.5mm;
+  }
+
+  .hissan-dec-wide .hissan-div-cycle-dot::before {
+    width: 1mm;
+    height: 1mm;
+    top: 0.2mm;
   }
 
   .hissan-div-bracket-curve {

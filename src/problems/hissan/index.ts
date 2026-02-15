@@ -80,6 +80,9 @@ export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResul
 
   if (cfg.useDecimals && cfg.operator === "div") {
     // Mix exact (pattern 1), finite-extension (pattern 2), and repeating (pattern 3)
+    // Cap extra columns per-problem to fit A4 print layout
+    const maxTotalCols = 9; // ~80mm at 9mm/cell in 2-col A4 layout
+    const maxTotalSteps = 5; // keeps work rows ≤ 10 → fits A4 vertically
     problems = [];
     divExtra = [];
     for (let i = 0; i < count; i++) {
@@ -95,7 +98,11 @@ export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResul
           const problem = generateDivisionProblem(rng, { ...cfg, divAllowRemainder: true });
           const [dividend, divisor] = problem;
           if (dividend % divisor !== 0) {
-            const result = divisionTerminates(dividend, divisor, 3);
+            const maxExtraByWidth = maxTotalCols - String(divisor).length - (String(dividend).length + 1);
+            const intSteps = String(Math.floor(dividend / divisor)).length;
+            const maxExtraByHeight = maxTotalSteps - intSteps;
+            const maxExtra = Math.max(0, Math.min(3, maxExtraByWidth, maxExtraByHeight));
+            const result = divisionTerminates(dividend, divisor, maxExtra);
             if (result.terminates) {
               problems.push(problem);
               divExtra.push({ extraDigits: result.stepsNeeded });
@@ -115,8 +122,12 @@ export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResul
           const problem = generateDivisionProblem(rng, { ...cfg, divAllowRemainder: true });
           const [dividend, divisor] = problem;
           if (dividend % divisor === 0) continue;
-          const cycle = divisionCycleLength(dividend, divisor, 10);
-          if (cycle && cycle.cycleLength >= 1 && cycle.cycleLength <= 6) {
+          const maxExtraByWidth = maxTotalCols - String(divisor).length - (String(dividend).length + 1);
+          const intSteps = String(Math.floor(dividend / divisor)).length;
+          const maxExtraByHeight = maxTotalSteps - intSteps;
+          const maxExtra = Math.max(0, Math.min(maxExtraByWidth, maxExtraByHeight));
+          const cycle = divisionCycleLength(dividend, divisor, maxExtra);
+          if (cycle && cycle.cycleStart + cycle.cycleLength <= maxExtra) {
             problems.push(problem);
             divExtra.push({
               extraDigits: cycle.cycleStart + cycle.cycleLength,
