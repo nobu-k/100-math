@@ -286,7 +286,7 @@ describe("generateProblems (decimal)", () => {
       for (let i = 0; i < 6; i++) {
         expect(decimalPlaces[i]).toHaveLength(2);
         expect(decimalPlaces[i][0]).toBeGreaterThan(0); // dividend has dp
-        expect(decimalPlaces[i][1]).toBe(0); // divisor is integer
+        expect(decimalPlaces[i][1]).toBeGreaterThanOrEqual(0); // divisor may have dp
         const entry = divExtra![i];
         if (entry.cycleStart !== undefined) {
           // Pattern 3: repeating — has cycle info
@@ -379,5 +379,36 @@ describe("divisionCycleLength", () => {
   it("returns null when cycle exceeds maxSteps", () => {
     // 22/7 has cycle length 6, but maxSteps=3 is too small
     expect(divisionCycleLength(22, 7, 3)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// decimal div column width constraint
+// ---------------------------------------------------------------------------
+describe("decimal div column width constraint", () => {
+  it("total columns ≤ 9 across many seeds", () => {
+    const cfg: HissanConfig = {
+      minDigits: 2, maxDigits: 3, numOperands: 2,
+      consecutiveCarries: false, showGrid: true, operator: "div",
+      mulMinDigits: 1, mulMaxDigits: 1,
+      divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: false,
+      useDecimals: true,
+    };
+    for (let seed = 0; seed < 50; seed++) {
+      const { problems, decimalPlaces, divExtra } = generateProblems(seed, cfg);
+      for (let i = 0; i < problems.length; i++) {
+        const [dividend, divisor] = problems[i];
+        const [dividendDP, divisorDP] = decimalPlaces[i];
+        const extraDigits = divExtra![i].extraDigits;
+        const extraZeros = Math.max(0, divisorDP - dividendDP);
+        const normalizedDividendDigits = String(dividend).length + extraZeros;
+        const newDividendDP = Math.max(0, dividendDP - divisorDP);
+        const normalizedDividendDisplayWidth = newDividendDP > 0
+          ? Math.max(normalizedDividendDigits, newDividendDP + 1)
+          : normalizedDividendDigits;
+        const totalCols = String(divisor).length + normalizedDividendDisplayWidth + extraDigits;
+        expect(totalCols).toBeLessThanOrEqual(9);
+      }
+    }
   });
 });

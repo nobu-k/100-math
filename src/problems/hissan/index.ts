@@ -175,8 +175,8 @@ export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResul
       return dps;
     });
   } else if (cfg.useDecimals && cfg.operator === "div") {
-    decimalPlaces = problems.map((problem) => {
-      const [dividend] = problem;
+    decimalPlaces = problems.map((problem, i) => {
+      const [dividend, divisor] = problem;
       const numDigits = String(dividend).length;
       let dp: number;
       if (dividend % 10 === 0) {
@@ -186,7 +186,32 @@ export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResul
       } else {
         dp = rng() < 0.2 ? numDigits : randInt(rng, 1, numDigits - 1);
       }
-      return [dp, 0];
+
+      // With ~50% probability, assign a decimal place to the divisor too
+      let divisorDP = 0;
+      if (rng() < 0.5 && divisor % 10 !== 0) {
+        const divLen = String(divisor).length;
+        let candidateDP: number;
+        if (divLen === 1) {
+          candidateDP = 1;
+        } else {
+          candidateDP = rng() < 0.2 ? divLen : randInt(rng, 1, divLen - 1);
+        }
+
+        // Width check: normalization must fit within maxTotalCols
+        const extraZeros = Math.max(0, candidateDP - dp);
+        const normalizedDividendDigits = numDigits + extraZeros;
+        const normalizedDividendDP = Math.max(0, dp - candidateDP);
+        const normalizedDividendDisplayWidth = normalizedDividendDP > 0
+          ? Math.max(normalizedDividendDigits, normalizedDividendDP + 1)
+          : normalizedDividendDigits;
+        const extraDig = divExtra ? divExtra[i].extraDigits : 0;
+        if (String(divisor).length + normalizedDividendDisplayWidth + extraDig <= 9) {
+          divisorDP = candidateDP;
+        }
+      }
+
+      return [dp, divisorDP];
     });
   } else if (cfg.useDecimals && cfg.operator === "mul") {
     // Pick decimal places for an operand.

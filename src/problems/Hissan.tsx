@@ -393,8 +393,8 @@ function HissanDivProblem({
   showAnswers,
   dps,
   extraDigits = 0,
-  cycleStart,
-  cycleLength,
+  cycleStart: propCycleStart,
+  cycleLength: propCycleLength,
 }: {
   index: number;
   problem: Problem;
@@ -405,20 +405,56 @@ function HissanDivProblem({
   cycleLength?: number;
 }) {
   const [dividend, divisor] = problem;
-  const { quotient, remainder, steps, extraStepCount } = computeDivDetails(dividend, divisor, extraDigits);
-  const dividendDigits = String(dividend).split("").map(Number);
   const divisorDigits = String(divisor).split("").map(Number);
-  const quotientStr = String(quotient);
   const divCols = divisorDigits.length;
 
   const dividendDP = dps[0] || 0;
-  const dividendDisplayWidth = dividendDP > 0
-    ? Math.max(dividendDigits.length, dividendDP + 1)
-    : dividendDigits.length;
-  const dividendOffset = dividendDisplayWidth - dividendDigits.length;
-  const totalCols = divCols + dividendDisplayWidth + extraDigits;
-  // Dot column: always at the same position relative to the original dividend area
-  const dotCol = dividendDP > 0 ? divCols + dividendDisplayWidth - 1 - dividendDP : -1;
+  const divisorDP = dps[1] || 0;
+
+  // Normalization for decimal divisors: multiply both by 10^divisorDP
+  const extraZeros = Math.max(0, divisorDP - dividendDP);
+  const normalizedDividend = divisorDP > 0 ? dividend * Math.pow(10, extraZeros) : dividend;
+  const newDividendDP = Math.max(0, dividendDP - divisorDP);
+
+  // Use normalized dividend for computation
+  const { quotient, remainder, steps, extraStepCount, cycleStart, cycleLength } =
+    computeDivDetails(normalizedDividend, divisor, extraDigits);
+  const normalizedDividendDigits = String(normalizedDividend).split("").map(Number);
+  const quotientStr = String(quotient);
+
+  // Display dimensions based on normalized dividend
+  const normalizedDividendDisplayWidth = newDividendDP > 0
+    ? Math.max(normalizedDividendDigits.length, newDividendDP + 1)
+    : normalizedDividendDigits.length;
+  const normalizedDividendOffset = normalizedDividendDisplayWidth - normalizedDividendDigits.length;
+
+  // Original dividend display (for the visible row)
+  const origDividendDigits = String(dividend).split("").map(Number);
+  const origDividendDisplayWidth = dividendDP > 0
+    ? Math.max(origDividendDigits.length, dividendDP + 1)
+    : origDividendDigits.length;
+  const origDividendDisplayStr = dividendDP > 0
+    ? String(dividend).padStart(origDividendDisplayWidth, "0")
+    : String(dividend);
+
+  // Total columns: divisor cols + normalized dividend display + extra extension digits
+  const totalCols = divCols + normalizedDividendDisplayWidth + extraDigits;
+
+  // Quotient dot column based on normalized dividend's decimal position
+  const dotCol = newDividendDP > 0
+    ? divCols + normalizedDividendDisplayWidth - 1 - newDividendDP
+    : (extraDigits > 0 ? divCols + normalizedDividendDisplayWidth - 1 : -1);
+
+  // Original dividend dot column (for display in the dividend row)
+  const origDotCol = dividendDP > 0 ? divCols + origDividendDisplayWidth - 1 - dividendDP : -1;
+
+  // New red dot position when divisorDP > 0 and newDividendDP > 0
+  const newRedDotCol = divisorDP > 0 && newDividendDP > 0
+    ? divCols + normalizedDividendDisplayWidth - 1 - newDividendDP
+    : -1;
+
+  // Divisor dot column
+  const divisorDotCol = divisorDP > 0 ? divCols - 1 - divisorDP : -1;
 
   // Build extended quotient string including extra step digits
   let extQuotientStr = quotientStr;
@@ -428,7 +464,7 @@ function HissanDivProblem({
   }
 
   // Map quotient digits to their column positions (right-aligned to full grid)
-  const quotientDP = dividendDP + extraDigits;
+  const quotientDP = newDividendDP + extraDigits;
   const quotientCols: (number | "")[] = Array(totalCols).fill("");
   const quotientDisplayStr = quotientDP > 0
     ? extQuotientStr.padStart(Math.max(extQuotientStr.length, quotientDP + 1), "0")
@@ -438,15 +474,10 @@ function HissanDivProblem({
     quotientCols[col] = parseInt(quotientDisplayStr[i], 10);
   }
 
-  // Build dividend display string (with leading zeros when dp >= numDigits)
-  const dividendDisplayStr = dividendDP > 0
-    ? String(dividend).padStart(dividendDisplayWidth, "0")
-    : String(dividend);
-
-  // Cycle dot columns (for repeating decimal notation)
+  // Cycle dot columns (for repeating decimal notation) — use computed cycle info
   const cycleDotCols = new Set<number>();
   if (cycleStart !== undefined && cycleLength !== undefined && showAnswers) {
-    const firstCycleCol = divCols + dividendDisplayWidth + cycleStart;
+    const firstCycleCol = divCols + normalizedDividendDisplayWidth + cycleStart;
     if (cycleLength === 1) {
       cycleDotCols.add(firstCycleCol);
     } else {
@@ -455,11 +486,11 @@ function HissanDivProblem({
     }
   }
 
-  // Build work rows from steps (always, so students have space to calculate)
+  // Build work rows from steps using normalized dividend
   const workRows: { cells: (number | "")[], hasBottomBorder: boolean }[] = [];
   for (let si = 0; si < steps.length; si++) {
     const step = steps[si];
-    const endCol = divCols + dividendOffset + step.position;
+    const endCol = divCols + normalizedDividendOffset + step.position;
 
     // Subtract row: product right-aligned ending at endCol
     const subtractCells: (number | "")[] = Array(totalCols).fill("");
@@ -478,19 +509,81 @@ function HissanDivProblem({
       const nextDigitIndex = step.position + 1;
       let remStr: string;
       if (si < steps.length - 1) {
-        // Bring down next digit: from dividend array, or 0 for extra extension steps
-        const nextDigit = nextDigitIndex < dividendDigits.length ? dividendDigits[nextDigitIndex] : 0;
+        const nextDigit = nextDigitIndex < normalizedDividendDigits.length ? normalizedDividendDigits[nextDigitIndex] : 0;
         remStr = String(step.remainder * 10 + nextDigit);
       } else {
         remStr = String(step.remainder);
       }
-      const remEndCol = si < steps.length - 1 ? divCols + dividendOffset + nextDigitIndex : endCol;
+      const remEndCol = si < steps.length - 1 ? divCols + normalizedDividendOffset + nextDigitIndex : endCol;
       for (let i = 0; i < remStr.length; i++) {
         const col = remEndCol - remStr.length + 1 + i;
         if (col >= 0) remainderCells[col] = parseInt(remStr[i], 10);
       }
     }
     workRows.push({ cells: remainderCells, hasBottomBorder: false });
+  }
+
+  // Build dividend row cells
+  const dividendRowCells: React.ReactNode[] = [];
+  if (divisorDP > 0) {
+    // Show original digits, then answer-only annotations (slashed dot, red zeros, new red dot)
+    const origChars = origDividendDisplayStr.split("");
+    // Columns occupied by original dividend display
+    for (let i = 0; i < origChars.length; i++) {
+      const colIdx = divCols + i;
+      const isOrigDot = colIdx === origDotCol;
+      // When showing answers, slash the original dot; otherwise show it normally
+      const dotClass = isOrigDot
+        ? (showAnswers ? " hissan-div-slashed-dot" : " hissan-div-dot-after")
+        : "";
+      // Check if this position gets the new red dot
+      const redDotClass = showAnswers && colIdx === newRedDotCol ? " hissan-div-dot-red" : "";
+      dividendRowCells.push(
+        <td key={i} className={`hissan-div-cell${dotClass}${redDotClass}`}>
+          {i === 0 && (
+            <svg className="hissan-div-bracket-curve" viewBox="0 0 10 30" preserveAspectRatio="none">
+              <path d="M0,0 C10,8 10,22 0,30" stroke="#000" strokeWidth="3" fill="none" />
+            </svg>
+          )}
+          {parseInt(origChars[i], 10)}
+        </td>
+      );
+    }
+    // Extra zero columns appended after original dividend
+    for (let i = 0; i < extraZeros; i++) {
+      const colIdx = divCols + origChars.length + i;
+      const redDotClass = showAnswers && colIdx === newRedDotCol ? " hissan-div-dot-red" : "";
+      dividendRowCells.push(
+        <td key={`z${i}`} className={`hissan-div-cell${redDotClass}`}>
+          {showAnswers ? <span className="hissan-div-extra-zero">0</span> : ""}
+        </td>
+      );
+    }
+    // Extra extension digit columns (for decimal extension beyond normalization)
+    for (let i = 0; i < extraDigits; i++) {
+      dividendRowCells.push(<td key={`ext${i}`} className="hissan-div-cell" />);
+    }
+  } else {
+    // No divisorDP — original rendering
+    const displayStr = dividendDP > 0
+      ? String(dividend).padStart(origDividendDisplayWidth, "0")
+      : String(dividend);
+    for (let i = 0; i < displayStr.length; i++) {
+      const colIdx = divCols + i;
+      dividendRowCells.push(
+        <td key={i} className={`hissan-div-cell${colIdx === origDotCol ? " hissan-div-dot-after" : ""}`}>
+          {i === 0 && (
+            <svg className="hissan-div-bracket-curve" viewBox="0 0 10 30" preserveAspectRatio="none">
+              <path d="M0,0 C10,8 10,22 0,30" stroke="#000" strokeWidth="3" fill="none" />
+            </svg>
+          )}
+          {parseInt(displayStr[i], 10)}
+        </td>
+      );
+    }
+    for (let i = 0; i < extraDigits; i++) {
+      dividendRowCells.push(<td key={`ext${i}`} className="hissan-div-cell" />);
+    }
   }
 
   return (
@@ -511,22 +604,16 @@ function HissanDivProblem({
           </tr>
           {/* Divisor + Dividend row */}
           <tr>
-            {divisorDigits.map((d, i) => (
-              <td key={`div${i}`} className="hissan-div-cell hissan-div-outside">{d}</td>
-            ))}
-            {dividendDisplayStr.split("").map((ch, i) => (
-              <td key={i} className={`hissan-div-cell${divCols + i === dotCol ? " hissan-div-dot-after" : ""}`}>
-                {i === 0 && (
-                  <svg className="hissan-div-bracket-curve" viewBox="0 0 10 30" preserveAspectRatio="none">
-                    <path d="M0,0 C10,8 10,22 0,30" stroke="#000" strokeWidth="3" fill="none" />
-                  </svg>
-                )}
-                {parseInt(ch, 10)}
-              </td>
-            ))}
-            {Array.from({ length: extraDigits }, (_, i) => (
-              <td key={`ext${i}`} className="hissan-div-cell" />
-            ))}
+            {divisorDigits.map((d, i) => {
+              const isOrigDivisorDot = i === divisorDotCol;
+              const dotClass = isOrigDivisorDot
+                ? (showAnswers ? " hissan-div-slashed-dot" : " hissan-div-dot-after")
+                : "";
+              return (
+                <td key={`div${i}`} className={`hissan-div-cell hissan-div-outside${dotClass}`}>{d}</td>
+              );
+            })}
+            {dividendRowCells}
           </tr>
           {/* Work rows */}
           {workRows.map((row, ri) => (
