@@ -306,7 +306,7 @@
 .hissan-div-dot-after::after {
   content: ".";
   position: absolute;
-  right: -5px;
+  right: -3px;
   bottom: 2px;
   font-size: 28px;
   font-weight: bold;
@@ -323,7 +323,7 @@
 .hissan-div-slashed-dot::after {
   content: ".";
   position: absolute;
-  right: -5px;
+  right: -3px;
   bottom: 2px;
   font-size: 28px;
   font-weight: bold;
@@ -335,7 +335,7 @@
 .hissan-div-slashed-dot::before {
   content: "";
   position: absolute;
-  right: -9px;
+  right: -7px;
   bottom: 2px;
   width: 12px;
   height: 12px;
@@ -358,7 +358,7 @@
 .hissan-div-dot-red::after {
   content: ".";
   position: absolute;
-  right: -5px;
+  right: -3px;
   bottom: 2px;
   font-size: 28px;
   font-weight: bold;
@@ -469,6 +469,16 @@
 .hissan-div-outside {
   border: none !important;
   padding-right: 8px;
+}
+
+/* Shift dots left to compensate for padding-right on outside cells */
+.hissan-div-outside.hissan-div-dot-after::after,
+.hissan-div-outside.hissan-div-slashed-dot::after {
+  right: 1px;
+}
+
+.hissan-div-outside.hissan-div-slashed-dot::before {
+  right: -3px;
 }
 
 .hissan-div-answer td {
@@ -675,24 +685,24 @@
 
   .hissan-div-dot-after::after {
     font-size: 18px;
-    right: -1mm;
+    right: -0.5mm;
     bottom: 0.5mm;
   }
 
   .hissan-dec-wide .hissan-div-dot-after::after {
     font-size: 12px;
-    right: -0.6mm;
+    right: -0.3mm;
     bottom: 0.2mm;
   }
 
   .hissan-div-slashed-dot::after {
     font-size: 18px;
-    right: -1mm;
+    right: -0.5mm;
     bottom: 0.5mm;
   }
 
   .hissan-div-slashed-dot::before {
-    right: -1.5mm;
+    right: -1mm;
     bottom: 0.5mm;
     width: 2.5mm;
     height: 2.5mm;
@@ -700,12 +710,12 @@
 
   .hissan-dec-wide .hissan-div-slashed-dot::after {
     font-size: 12px;
-    right: -0.6mm;
+    right: -0.3mm;
     bottom: 0.2mm;
   }
 
   .hissan-dec-wide .hissan-div-slashed-dot::before {
-    right: -1mm;
+    right: -0.6mm;
     bottom: 0.2mm;
     width: 1.8mm;
     height: 1.8mm;
@@ -713,13 +723,13 @@
 
   .hissan-div-dot-red::after {
     font-size: 18px;
-    right: -1mm;
+    right: -0.5mm;
     bottom: 0.5mm;
   }
 
   .hissan-dec-wide .hissan-div-dot-red::after {
     font-size: 12px;
-    right: -0.6mm;
+    right: -0.3mm;
     bottom: 0.2mm;
   }
 
