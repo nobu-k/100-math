@@ -1,4 +1,4 @@
-import { type HissanConfig, type Problem, generateNumber, randInt } from "./common";
+import { type HissanConfig, type Problem, generateNumber, randInt, numberToDigits } from "./common";
 
 export interface DivStep {
   position: number;      // column index in dividend (0-based from left)
@@ -21,7 +21,7 @@ export interface DivComputed {
  *  When extraDigits > 0, continue bringing down zeros after all dividend
  *  digits are consumed (for decimal extension). */
 export const computeDivDetails = (dividend: number, divisor: number, extraDigits: number = 0): DivComputed => {
-  const digits = String(dividend).split("").map(Number);
+  const digits = numberToDigits(dividend);
   const steps: DivStep[] = [];
   let current = 0;
   let started = false;

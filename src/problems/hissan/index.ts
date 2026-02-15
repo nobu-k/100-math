@@ -1,4 +1,4 @@
-export { type Problem, type HissanOperator, type HissanConfig, type Indicators, generateNumber, randInt, digitsWithMinSum, digitsWithExactSum, toDigitCells, toDecimalDigitCells, computeIndicators, parseConfig, buildParams } from "./common";
+export { type Problem, type HissanOperator, type HissanConfig, type Indicators, generateNumber, randInt, digitsWithMinSum, digitsWithExactSum, toDigitCells, toDecimalDigitCells, computeIndicators, parseConfig, buildParams, numberToDigits, decimalDisplayWidth } from "./common";
 export { generateCarryChainProblem } from "./add";
 export { generateSubtractionProblem, generateBorrowChainProblem } from "./sub";
 export { type MulPartialProduct, type MulComputed, computeMulDetails, generateMultiplicationProblem } from "./mul";

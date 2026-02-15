@@ -158,6 +158,15 @@ export const computeIndicators = (problem: Problem, maxDigits: number, operator:
   return { indicators, borrowOut, borrowDisplay };
 };
 
+/** Convert a non-negative integer to an array of its decimal digits. */
+export const numberToDigits = (n: number): number[] =>
+  String(n).split("").map(Number);
+
+/** Compute display width for a number with dp decimal places.
+ *  When dp >= numDigits, a leading zero is needed (e.g. 25 with dp=3 → "0.025"). */
+export const decimalDisplayWidth = (numDigits: number, dp: number): number =>
+  dp > 0 ? Math.max(numDigits, dp + 1) : numDigits;
+
 export const parseConfig = (params: URLSearchParams): HissanConfig => {
   const hop = params.get("hop");
   const operator: HissanOperator = hop === "sub" ? "sub" : hop === "mul" ? "mul" : hop === "div" ? "div" : "add";
