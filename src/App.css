@@ -386,6 +386,10 @@
   padding-right: 8px;
 }
 
+.hissan-div-answer td {
+  color: red;
+}
+
 .hissan-div-work-cell {
   color: red;
 }

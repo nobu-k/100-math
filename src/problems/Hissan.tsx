@@ -499,7 +499,7 @@ function HissanDivProblem({
       <table className="hissan-grid hissan-div-grid">
         <tbody>
           {/* Quotient row */}
-          <tr>
+          <tr className={showAnswers ? "hissan-div-answer" : ""}>
             {quotientCols.map((d, i) => (
               <td key={i} className={`hissan-div-cell${i < divCols ? " hissan-div-outside" : " hissan-div-bracket-top-line"}${i === divCols ? " hissan-div-bracket-top-start" : ""}${showAnswers && i === dotCol ? " hissan-div-dot-after" : ""}${cycleDotCols.has(i) ? " hissan-div-cycle-dot" : ""}`}>
                 {showAnswers ? d : ""}
