@@ -9,7 +9,7 @@ import {
   type HissanConfig,
 } from "./index";
 
-const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, useDecimals: false } as const;
+const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, divAllowRepeating: false, useDecimals: false } as const;
 
 // ---------------------------------------------------------------------------
 // getProblemCount
@@ -58,7 +58,7 @@ describe("getProblemCount", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
-      useDecimals: false,
+      divAllowRepeating: false, useDecimals: false,
     };
     expect(getProblemCount(cfg)).toBe(6);
   });
@@ -201,7 +201,7 @@ describe("generateProblems (div)", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
-      useDecimals: false,
+      divAllowRepeating: false, useDecimals: false,
     };
     const { problems } = generateProblems(42, cfg);
     expect(problems).toHaveLength(6);
@@ -276,7 +276,7 @@ describe("generateProblems (decimal)", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
-      useDecimals: true,
+      divAllowRepeating: false, useDecimals: true,
     };
     for (let seed = 0; seed < 20; seed++) {
       const { problems, decimalPlaces, divExtra } = generateProblems(seed, cfg);
@@ -392,7 +392,7 @@ describe("decimal div column width constraint", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: false,
-      useDecimals: true,
+      divAllowRepeating: false, useDecimals: true,
     };
     for (let seed = 0; seed < 50; seed++) {
       const { problems, decimalPlaces, divExtra } = generateProblems(seed, cfg);

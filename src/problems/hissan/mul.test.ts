@@ -3,7 +3,7 @@ import { mulberry32 } from "../random";
 import { computeMulDetails, generateMultiplicationProblem } from "./mul";
 import type { HissanConfig } from "./common";
 
-const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, useDecimals: false } as const;
+const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, divAllowRepeating: false, useDecimals: false } as const;
 
 describe("computeMulDetails", () => {
   it("computes 123 × 5 (single-digit multiplier)", () => {
