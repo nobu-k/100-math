@@ -393,12 +393,16 @@ function HissanDivProblem({
   showAnswers,
   dps,
   extraDigits = 0,
+  cycleStart,
+  cycleLength,
 }: {
   index: number;
   problem: Problem;
   showAnswers: boolean;
   dps: number[];
   extraDigits?: number;
+  cycleStart?: number;
+  cycleLength?: number;
 }) {
   const [dividend, divisor] = problem;
   const { quotient, remainder, steps, extraStepCount } = computeDivDetails(dividend, divisor, extraDigits);
@@ -438,6 +442,18 @@ function HissanDivProblem({
   const dividendDisplayStr = dividendDP > 0
     ? String(dividend).padStart(dividendDisplayWidth, "0")
     : String(dividend);
+
+  // Cycle dot columns (for repeating decimal notation)
+  const cycleDotCols = new Set<number>();
+  if (cycleStart !== undefined && cycleLength !== undefined && showAnswers) {
+    const firstCycleCol = divCols + dividendDisplayWidth + cycleStart;
+    if (cycleLength === 1) {
+      cycleDotCols.add(firstCycleCol);
+    } else {
+      cycleDotCols.add(firstCycleCol);
+      cycleDotCols.add(firstCycleCol + cycleLength - 1);
+    }
+  }
 
   // Build work rows from steps (always, so students have space to calculate)
   const workRows: { cells: (number | "")[], hasBottomBorder: boolean }[] = [];
@@ -485,11 +501,11 @@ function HissanDivProblem({
           {/* Quotient row */}
           <tr>
             {quotientCols.map((d, i) => (
-              <td key={i} className={`hissan-div-cell${i < divCols ? " hissan-div-outside" : " hissan-div-bracket-top-line"}${i === divCols ? " hissan-div-bracket-top-start" : ""}${showAnswers && i === dotCol ? " hissan-div-dot-after" : ""}`}>
+              <td key={i} className={`hissan-div-cell${i < divCols ? " hissan-div-outside" : " hissan-div-bracket-top-line"}${i === divCols ? " hissan-div-bracket-top-start" : ""}${showAnswers && i === dotCol ? " hissan-div-dot-after" : ""}${cycleDotCols.has(i) ? " hissan-div-cycle-dot" : ""}`}>
                 {showAnswers ? d : ""}
               </td>
             ))}
-            {showAnswers && remainder > 0 && (
+            {showAnswers && remainder > 0 && cycleStart === undefined && (
               <td className="hissan-div-cell hissan-div-outside hissan-div-remainder">…{remainder}</td>
             )}
           </tr>
@@ -710,7 +726,7 @@ function Hissan() {
           </label>
         </div>
       )}
-      <div className={`hissan-page${cfg.showGrid ? "" : " hissan-no-grid"}${cfg.operator === "mul" && (cfg.mulMaxDigits >= 2 || cfg.useDecimals) ? " hissan-mul-wide" : ""}${cfg.operator === "div" ? " hissan-div-page" : ""}${cfg.useDecimals ? " hissan-dec-wide" : ""}`}>
+      <div className={`hissan-page${cfg.showGrid ? "" : " hissan-no-grid"}${cfg.operator === "mul" && (cfg.mulMaxDigits >= 2 || cfg.useDecimals) ? " hissan-mul-wide" : ""}${cfg.operator === "div" && !cfg.useDecimals ? " hissan-div-page" : ""}${cfg.useDecimals ? " hissan-dec-wide" : ""}`}>
         {problems.map((problem, i) =>
           cfg.operator === "div" ? (
             <HissanDivProblem
@@ -720,6 +736,8 @@ function Hissan() {
               showAnswers={showAnswers}
               dps={decimalPlaces[i]}
               extraDigits={divExtra?.[i]?.extraDigits}
+              cycleStart={divExtra?.[i]?.cycleStart}
+              cycleLength={divExtra?.[i]?.cycleLength}
             />
           ) : cfg.operator === "mul" ? (
             <HissanMulProblem

@@ -5,6 +5,7 @@ import {
   generateProblems,
   getProblemCount,
   divisionTerminates,
+  divisionCycleLength,
   type HissanConfig,
 } from "./index";
 
@@ -286,15 +287,20 @@ describe("generateProblems (decimal)", () => {
         expect(decimalPlaces[i]).toHaveLength(2);
         expect(decimalPlaces[i][0]).toBeGreaterThan(0); // dividend has dp
         expect(decimalPlaces[i][1]).toBe(0); // divisor is integer
-        const extra = divExtra![i].extraDigits;
-        if (extra === 0) {
-          // Pattern 1: exact integer division
-          expect(problems[i][0] % problems[i][1]).toBe(0);
-        } else {
-          // Pattern 2: finite extension — terminates within extraDigits steps
-          const result = divisionTerminates(problems[i][0], problems[i][1], extra);
+        const entry = divExtra![i];
+        if (entry.cycleStart !== undefined) {
+          // Pattern 3: repeating — has cycle info
+          expect(entry.cycleLength).toBeGreaterThanOrEqual(1);
+          expect(entry.cycleLength).toBeLessThanOrEqual(6);
+          expect(entry.extraDigits).toBe(entry.cycleStart! + entry.cycleLength!);
+        } else if (entry.extraDigits > 0) {
+          // Pattern 2: finite extension
+          const result = divisionTerminates(problems[i][0], problems[i][1], entry.extraDigits);
           expect(result.terminates).toBe(true);
-          expect(result.stepsNeeded).toBe(extra);
+          expect(result.stepsNeeded).toBe(entry.extraDigits);
+        } else {
+          // Pattern 1: exact
+          expect(problems[i][0] % problems[i][1]).toBe(0);
         }
       }
     }
@@ -341,5 +347,37 @@ describe("divisionTerminates", () => {
   it("respects maxExtraSteps limit", () => {
     // 75 / 4 needs 2 steps, but only allow 1
     expect(divisionTerminates(75, 4, 1)).toEqual({ terminates: false, stepsNeeded: 0 });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// divisionCycleLength
+// ---------------------------------------------------------------------------
+describe("divisionCycleLength", () => {
+  it("returns null for exact division", () => {
+    expect(divisionCycleLength(12, 4, 10)).toBeNull();
+  });
+
+  it("returns null for terminating division", () => {
+    // 14 / 4 terminates at step 1
+    expect(divisionCycleLength(14, 4, 10)).toBeNull();
+  });
+
+  it("detects cycle of length 1 for 10 / 3", () => {
+    expect(divisionCycleLength(10, 3, 10)).toEqual({ cycleStart: 0, cycleLength: 1 });
+  });
+
+  it("detects cycle of length 6 for 22 / 7", () => {
+    expect(divisionCycleLength(22, 7, 10)).toEqual({ cycleStart: 0, cycleLength: 6 });
+  });
+
+  it("detects cycle with preamble for 14 / 12", () => {
+    // 14/12: remainder 2 → 20/12=1r8, 80/12=6r8 → cycle "6" starts at step 1
+    expect(divisionCycleLength(14, 12, 10)).toEqual({ cycleStart: 1, cycleLength: 1 });
+  });
+
+  it("returns null when cycle exceeds maxSteps", () => {
+    // 22/7 has cycle length 6, but maxSteps=3 is too small
+    expect(divisionCycleLength(22, 7, 3)).toBeNull();
   });
 });

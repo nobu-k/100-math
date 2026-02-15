@@ -88,6 +88,36 @@ describe("computeDivDetails", () => {
     const { extraStepCount } = computeDivDetails(12, 4, 3);
     expect(extraStepCount).toBe(0);
   });
+
+  it("detects repeating cycle for 10 ÷ 3 (period 1)", () => {
+    const { cycleStart, cycleLength, extraStepCount } = computeDivDetails(10, 3, 1);
+    expect(extraStepCount).toBe(1);
+    expect(cycleStart).toBe(0);
+    expect(cycleLength).toBe(1);
+  });
+
+  it("detects repeating cycle for 22 ÷ 7 (period 6)", () => {
+    const { cycleStart, cycleLength, extraStepCount, steps } = computeDivDetails(22, 7, 6);
+    expect(extraStepCount).toBe(6);
+    expect(cycleStart).toBe(0);
+    expect(cycleLength).toBe(6);
+    // Extra digits should be 142857
+    const extraDigits = steps.slice(-6).map(s => s.quotientDigit);
+    expect(extraDigits).toEqual([1, 4, 2, 8, 5, 7]);
+  });
+
+  it("detects cycle with preamble for 14 ÷ 12 (1 non-repeating + period 1)", () => {
+    const { cycleStart, cycleLength, extraStepCount } = computeDivDetails(14, 12, 2);
+    expect(extraStepCount).toBe(2);
+    expect(cycleStart).toBe(1);
+    expect(cycleLength).toBe(1);
+  });
+
+  it("no cycle when division terminates", () => {
+    const { cycleStart, cycleLength } = computeDivDetails(14, 4, 1);
+    expect(cycleStart).toBeUndefined();
+    expect(cycleLength).toBeUndefined();
+  });
 });
 
 describe("generateDivisionProblem", () => {

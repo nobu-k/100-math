@@ -315,6 +315,21 @@
   color: inherit;
 }
 
+/* Division repeating decimal cycle dot (循環小数) */
+.hissan-div-cycle-dot::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background: red;
+  border-radius: 50%;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
 /* Division styles */
 .hissan-div-page {
   grid-template-columns: repeat(3, auto);
@@ -547,6 +562,12 @@
     font-size: 18px;
     right: -1mm;
     bottom: 0.5mm;
+  }
+
+  .hissan-div-cycle-dot::before {
+    width: 1.5mm;
+    height: 1.5mm;
+    top: 0.5mm;
   }
 
   .hissan-div-bracket-curve {

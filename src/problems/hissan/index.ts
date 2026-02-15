@@ -44,10 +44,31 @@ export const divisionTerminates = (dividend: number, divisor: number, maxExtraSt
   return { terminates: false, stepsNeeded: 0 };
 };
 
+/** Detect the cycle in the decimal expansion of dividend ÷ divisor.
+ *  Returns cycleStart (number of non-repeating extension digits) and
+ *  cycleLength, or null if the division terminates or no cycle is found
+ *  within maxSteps. */
+export const divisionCycleLength = (dividend: number, divisor: number, maxSteps: number): { cycleStart: number; cycleLength: number } | null => {
+  let remainder = dividend % divisor;
+  if (remainder === 0) return null;
+  const seen = new Map<number, number>();
+  seen.set(remainder, 0);
+  for (let i = 1; i <= maxSteps; i++) {
+    remainder = (remainder * 10) % divisor;
+    if (remainder === 0) return null;
+    if (seen.has(remainder)) {
+      const cycleStart = seen.get(remainder)!;
+      return { cycleStart, cycleLength: i - cycleStart };
+    }
+    seen.set(remainder, i);
+  }
+  return null;
+};
+
 export interface GenerateResult {
   problems: Problem[];
   decimalPlaces: number[][];
-  divExtra?: { extraDigits: number }[];
+  divExtra?: { extraDigits: number; cycleStart?: number; cycleLength?: number }[];
 }
 
 export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResult => {
@@ -55,15 +76,20 @@ export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResul
   const count = getProblemCount(cfg);
 
   let problems: Problem[];
-  let divExtra: { extraDigits: number }[] | undefined;
+  let divExtra: { extraDigits: number; cycleStart?: number; cycleLength?: number }[] | undefined;
 
   if (cfg.useDecimals && cfg.operator === "div") {
-    // Mix exact (pattern 1) and finite-extension (pattern 2) problems
+    // Mix exact (pattern 1), finite-extension (pattern 2), and repeating (pattern 3)
     problems = [];
     divExtra = [];
     for (let i = 0; i < count; i++) {
-      if (rng() < 0.5) {
-        // Try finite extension (pattern 2)
+      const r = rng();
+      if (r < 0.33) {
+        // Pattern 1: exact
+        problems.push(generateDivisionProblem(rng, { ...cfg, divAllowRemainder: false }));
+        divExtra.push({ extraDigits: 0 });
+      } else if (r < 0.67) {
+        // Pattern 2: finite extension
         let found = false;
         for (let attempt = 0; attempt < 50; attempt++) {
           const problem = generateDivisionProblem(rng, { ...cfg, divAllowRemainder: true });
@@ -83,9 +109,28 @@ export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResul
           divExtra.push({ extraDigits: 0 });
         }
       } else {
-        // Exact (pattern 1)
-        problems.push(generateDivisionProblem(rng, { ...cfg, divAllowRemainder: false }));
-        divExtra.push({ extraDigits: 0 });
+        // Pattern 3: repeating decimal
+        let found = false;
+        for (let attempt = 0; attempt < 50; attempt++) {
+          const problem = generateDivisionProblem(rng, { ...cfg, divAllowRemainder: true });
+          const [dividend, divisor] = problem;
+          if (dividend % divisor === 0) continue;
+          const cycle = divisionCycleLength(dividend, divisor, 10);
+          if (cycle && cycle.cycleLength >= 1 && cycle.cycleLength <= 6) {
+            problems.push(problem);
+            divExtra.push({
+              extraDigits: cycle.cycleStart + cycle.cycleLength,
+              cycleStart: cycle.cycleStart,
+              cycleLength: cycle.cycleLength,
+            });
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          problems.push(generateDivisionProblem(rng, { ...cfg, divAllowRemainder: false }));
+          divExtra.push({ extraDigits: 0 });
+        }
       }
     }
   } else {

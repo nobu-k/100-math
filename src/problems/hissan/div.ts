@@ -13,6 +13,8 @@ export interface DivComputed {
   remainder: number;
   steps: DivStep[];
   extraStepCount: number;
+  cycleStart?: number;  // index into extra steps where repeating cycle begins (0-based)
+  cycleLength?: number; // number of digits in the repeating cycle
 }
 
 /** Compute long division steps for dividend ÷ divisor.
@@ -37,7 +39,13 @@ export const computeDivDetails = (dividend: number, divisor: number, extraDigits
 
   // Extra steps: bring down zeros for decimal extension
   let extraStepCount = 0;
-  for (let e = 0; e < extraDigits && current > 0; e++) {
+  let cycleStart: number | undefined;
+  let cycleLength: number | undefined;
+  const remainderToExtraStep = new Map<number, number>();
+  remainderToExtraStep.set(current, 0);
+
+  for (let e = 0; e < extraDigits; e++) {
+    if (current === 0) break;
     current = current * 10;
     const quotientDigit = Math.floor(current / divisor);
     const product = divisor * quotientDigit;
@@ -45,13 +53,20 @@ export const computeDivDetails = (dividend: number, divisor: number, extraDigits
     steps.push({ position: digits.length + e, dividendSoFar: current, quotientDigit, product, remainder });
     current = remainder;
     extraStepCount++;
+
+    if (remainderToExtraStep.has(current)) {
+      cycleStart = remainderToExtraStep.get(current)!;
+      cycleLength = (e + 1) - cycleStart;
+      break;
+    }
+    remainderToExtraStep.set(current, e + 1);
   }
 
   const quotient = Math.floor(dividend / divisor);
   const finalRemainder = extraStepCount > 0 && steps.length > 0
     ? steps[steps.length - 1].remainder
     : dividend % divisor;
-  return { quotient, remainder: finalRemainder, steps, extraStepCount };
+  return { quotient, remainder: finalRemainder, steps, extraStepCount, cycleStart, cycleLength };
 };
 
 /** Generate a division problem. */
