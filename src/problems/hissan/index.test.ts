@@ -218,11 +218,9 @@ describe("generateProblems (decimal)", () => {
     expect(decimalPlaces).toHaveLength(8);
     for (let i = 0; i < 8; i++) {
       expect(decimalPlaces[i]).toHaveLength(problems[i].length);
-      // All operands in a problem share the same dp
-      const dp = decimalPlaces[i][0];
-      expect(dp).toBeGreaterThanOrEqual(1);
       for (let j = 0; j < problems[i].length; j++) {
-        expect(decimalPlaces[i][j]).toBe(dp);
+        const dp = decimalPlaces[i][j];
+        expect(dp).toBeGreaterThanOrEqual(1);
         // Integer part must be at most 2 digits (value < 100)
         const numDigits = String(problems[i][j]).length;
         expect(numDigits - dp).toBeLessThanOrEqual(2);
@@ -241,15 +239,16 @@ describe("generateProblems (decimal)", () => {
     expect(decimalPlaces).toHaveLength(8);
     for (let i = 0; i < 8; i++) {
       expect(decimalPlaces[i]).toHaveLength(problems[i].length);
-      const dp = decimalPlaces[i][0];
-      expect(dp).toBeGreaterThanOrEqual(1);
       for (let j = 0; j < problems[i].length; j++) {
-        expect(decimalPlaces[i][j]).toBe(dp);
+        const dp = decimalPlaces[i][j];
+        expect(dp).toBeGreaterThanOrEqual(1);
         const numDigits = String(problems[i][j]).length;
         expect(numDigits - dp).toBeLessThanOrEqual(2);
       }
-      // Answer must be non-negative
-      expect(problems[i][0] - problems[i][1]).toBeGreaterThanOrEqual(0);
+      // Decimal answer must be non-negative (minuend dp ≤ subtrahend dp)
+      const maxDP = Math.max(...decimalPlaces[i]);
+      const aligned = problems[i].map((op, j) => op * Math.pow(10, maxDP - decimalPlaces[i][j]));
+      expect(aligned[0] - aligned[1]).toBeGreaterThanOrEqual(0);
     }
   });
 

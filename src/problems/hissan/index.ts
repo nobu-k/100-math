@@ -45,12 +45,26 @@ export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResul
   let decimalPlaces: number[][];
   if (cfg.useDecimals && (cfg.operator === "add" || cfg.operator === "sub")) {
     decimalPlaces = problems.map((problem) => {
-      // Use the same dp for all operands so decimal columns overlap
-      const digitCounts = problem.map((op) => String(op).length);
-      const minDP = Math.max(1, ...digitCounts.map((n) => n - 2));
-      const maxDP = Math.max(...digitCounts);
-      const dp = randInt(rng, minDP, maxDP);
-      return problem.map(() => dp);
+      // Each operand gets its own dp (decimal points may differ).
+      // The rendering aligns on the decimal point and trims trailing zeros.
+      const dps = problem.map((op) => {
+        const numDigits = String(op).length;
+        const opMinDP = Math.max(1, numDigits - 2); // keep integer part ≤ 2 digits
+        const opMaxDP = numDigits;
+        if (opMinDP === opMaxDP) return opMinDP;
+        // Bias toward smaller dp (produces >1 numbers);
+        // dp = numDigits makes the operand <1.
+        const r = rng();
+        if (r < 0.2) return opMaxDP;
+        return randInt(rng, opMinDP, opMaxDP - 1);
+      });
+      // For subtraction, ensure minuend dp ≤ subtrahend dp so the
+      // decimal answer stays non-negative (minuend ≥ subtrahend as integers,
+      // and a smaller dp keeps the minuend's decimal value larger).
+      if (cfg.operator === "sub" && dps[0] > dps[1]) {
+        [dps[0], dps[1]] = [dps[1], dps[0]];
+      }
+      return dps;
     });
   } else if (cfg.useDecimals && cfg.operator === "mul") {
     // Pick decimal places for an operand.
