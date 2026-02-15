@@ -4,6 +4,7 @@ import {
   generateProblem,
   generateProblems,
   getProblemCount,
+  divisionTerminates,
   type HissanConfig,
 } from "./index";
 
@@ -268,7 +269,7 @@ describe("generateProblems (decimal)", () => {
     }
   });
 
-  it("returns 6 problems with decimalPlaces for decimal div", () => {
+  it("returns 6 problems with decimalPlaces and divExtra for decimal div", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "div",
@@ -277,15 +278,24 @@ describe("generateProblems (decimal)", () => {
       useDecimals: true,
     };
     for (let seed = 0; seed < 20; seed++) {
-      const { problems, decimalPlaces } = generateProblems(seed, cfg);
+      const { problems, decimalPlaces, divExtra } = generateProblems(seed, cfg);
       expect(problems).toHaveLength(6);
       expect(decimalPlaces).toHaveLength(6);
+      expect(divExtra).toHaveLength(6);
       for (let i = 0; i < 6; i++) {
         expect(decimalPlaces[i]).toHaveLength(2);
         expect(decimalPlaces[i][0]).toBeGreaterThan(0); // dividend has dp
         expect(decimalPlaces[i][1]).toBe(0); // divisor is integer
-        // Verify exact division (integer level)
-        expect(problems[i][0] % problems[i][1]).toBe(0);
+        const extra = divExtra![i].extraDigits;
+        if (extra === 0) {
+          // Pattern 1: exact integer division
+          expect(problems[i][0] % problems[i][1]).toBe(0);
+        } else {
+          // Pattern 2: finite extension — terminates within extraDigits steps
+          const result = divisionTerminates(problems[i][0], problems[i][1], extra);
+          expect(result.terminates).toBe(true);
+          expect(result.stepsNeeded).toBe(extra);
+        }
       }
     }
   });
@@ -302,5 +312,34 @@ describe("generateProblems (decimal)", () => {
         expect(dp).toBe(0);
       }
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// divisionTerminates
+// ---------------------------------------------------------------------------
+describe("divisionTerminates", () => {
+  it("returns 0 steps for exact division", () => {
+    expect(divisionTerminates(12, 4, 3)).toEqual({ terminates: true, stepsNeeded: 0 });
+  });
+
+  it("detects termination in 1 step", () => {
+    // 14 / 4 = 3 r2 → 20/4 = 5 r0
+    expect(divisionTerminates(14, 4, 3)).toEqual({ terminates: true, stepsNeeded: 1 });
+  });
+
+  it("detects termination in 2 steps", () => {
+    // 75 / 4 = 18 r3 → 30/4=7r2, 20/4=5r0
+    expect(divisionTerminates(75, 4, 3)).toEqual({ terminates: true, stepsNeeded: 2 });
+  });
+
+  it("detects non-termination within limit", () => {
+    // 10 / 3 = 3 r1 → repeats forever
+    expect(divisionTerminates(10, 3, 3)).toEqual({ terminates: false, stepsNeeded: 0 });
+  });
+
+  it("respects maxExtraSteps limit", () => {
+    // 75 / 4 needs 2 steps, but only allow 1
+    expect(divisionTerminates(75, 4, 1)).toEqual({ terminates: false, stepsNeeded: 0 });
   });
 });

@@ -12,10 +12,13 @@ export interface DivComputed {
   quotient: number;
   remainder: number;
   steps: DivStep[];
+  extraStepCount: number;
 }
 
-/** Compute long division steps for dividend ÷ divisor. */
-export const computeDivDetails = (dividend: number, divisor: number): DivComputed => {
+/** Compute long division steps for dividend ÷ divisor.
+ *  When extraDigits > 0, continue bringing down zeros after all dividend
+ *  digits are consumed (for decimal extension). */
+export const computeDivDetails = (dividend: number, divisor: number, extraDigits: number = 0): DivComputed => {
   const digits = String(dividend).split("").map(Number);
   const steps: DivStep[] = [];
   let current = 0;
@@ -32,9 +35,23 @@ export const computeDivDetails = (dividend: number, divisor: number): DivCompute
     current = remainder;
   }
 
+  // Extra steps: bring down zeros for decimal extension
+  let extraStepCount = 0;
+  for (let e = 0; e < extraDigits && current > 0; e++) {
+    current = current * 10;
+    const quotientDigit = Math.floor(current / divisor);
+    const product = divisor * quotientDigit;
+    const remainder = current - product;
+    steps.push({ position: digits.length + e, dividendSoFar: current, quotientDigit, product, remainder });
+    current = remainder;
+    extraStepCount++;
+  }
+
   const quotient = Math.floor(dividend / divisor);
-  const remainder = dividend % divisor;
-  return { quotient, remainder, steps };
+  const finalRemainder = extraStepCount > 0 && steps.length > 0
+    ? steps[steps.length - 1].remainder
+    : dividend % divisor;
+  return { quotient, remainder: finalRemainder, steps, extraStepCount };
 };
 
 /** Generate a division problem. */

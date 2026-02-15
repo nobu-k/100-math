@@ -32,15 +32,65 @@ export const generateProblem = (rng: () => number, cfg: HissanConfig): Problem =
   );
 };
 
+/** Check whether dividend ÷ divisor terminates within maxExtraSteps
+ *  additional decimal extension steps (bringing down zeros). */
+export const divisionTerminates = (dividend: number, divisor: number, maxExtraSteps: number): { terminates: boolean; stepsNeeded: number } => {
+  let remainder = dividend % divisor;
+  if (remainder === 0) return { terminates: true, stepsNeeded: 0 };
+  for (let i = 1; i <= maxExtraSteps; i++) {
+    remainder = (remainder * 10) % divisor;
+    if (remainder === 0) return { terminates: true, stepsNeeded: i };
+  }
+  return { terminates: false, stepsNeeded: 0 };
+};
+
 export interface GenerateResult {
   problems: Problem[];
   decimalPlaces: number[][];
+  divExtra?: { extraDigits: number }[];
 }
 
 export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResult => {
   const rng = mulberry32(seed);
   const count = getProblemCount(cfg);
-  const problems = Array.from({ length: count }, () => generateProblem(rng, cfg));
+
+  let problems: Problem[];
+  let divExtra: { extraDigits: number }[] | undefined;
+
+  if (cfg.useDecimals && cfg.operator === "div") {
+    // Mix exact (pattern 1) and finite-extension (pattern 2) problems
+    problems = [];
+    divExtra = [];
+    for (let i = 0; i < count; i++) {
+      if (rng() < 0.5) {
+        // Try finite extension (pattern 2)
+        let found = false;
+        for (let attempt = 0; attempt < 50; attempt++) {
+          const problem = generateDivisionProblem(rng, { ...cfg, divAllowRemainder: true });
+          const [dividend, divisor] = problem;
+          if (dividend % divisor !== 0) {
+            const result = divisionTerminates(dividend, divisor, 3);
+            if (result.terminates) {
+              problems.push(problem);
+              divExtra.push({ extraDigits: result.stepsNeeded });
+              found = true;
+              break;
+            }
+          }
+        }
+        if (!found) {
+          problems.push(generateDivisionProblem(rng, { ...cfg, divAllowRemainder: false }));
+          divExtra.push({ extraDigits: 0 });
+        }
+      } else {
+        // Exact (pattern 1)
+        problems.push(generateDivisionProblem(rng, { ...cfg, divAllowRemainder: false }));
+        divExtra.push({ extraDigits: 0 });
+      }
+    }
+  } else {
+    problems = Array.from({ length: count }, () => generateProblem(rng, cfg));
+  }
 
   let decimalPlaces: number[][];
   if (cfg.useDecimals && (cfg.operator === "add" || cfg.operator === "sub")) {
@@ -122,5 +172,5 @@ export const generateProblems = (seed: number, cfg: HissanConfig): GenerateResul
     decimalPlaces = problems.map((problem) => problem.map((): number => 0));
   }
 
-  return { problems, decimalPlaces };
+  return { problems, decimalPlaces, divExtra };
 };

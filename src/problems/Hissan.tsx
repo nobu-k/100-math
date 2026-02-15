@@ -392,14 +392,16 @@ function HissanDivProblem({
   problem,
   showAnswers,
   dps,
+  extraDigits = 0,
 }: {
   index: number;
   problem: Problem;
   showAnswers: boolean;
   dps: number[];
+  extraDigits?: number;
 }) {
   const [dividend, divisor] = problem;
-  const { quotient, remainder, steps } = computeDivDetails(dividend, divisor);
+  const { quotient, remainder, steps, extraStepCount } = computeDivDetails(dividend, divisor, extraDigits);
   const dividendDigits = String(dividend).split("").map(Number);
   const divisorDigits = String(divisor).split("").map(Number);
   const quotientStr = String(quotient);
@@ -410,14 +412,23 @@ function HissanDivProblem({
     ? Math.max(dividendDigits.length, dividendDP + 1)
     : dividendDigits.length;
   const dividendOffset = dividendDisplayWidth - dividendDigits.length;
-  const totalCols = divCols + dividendDisplayWidth;
-  const dotCol = dividendDP > 0 ? totalCols - 1 - dividendDP : -1;
+  const totalCols = divCols + dividendDisplayWidth + extraDigits;
+  // Dot column: always at the same position relative to the original dividend area
+  const dotCol = dividendDP > 0 ? divCols + dividendDisplayWidth - 1 - dividendDP : -1;
 
-  // Map quotient digits to their column positions (right-aligned to dividend area)
+  // Build extended quotient string including extra step digits
+  let extQuotientStr = quotientStr;
+  if (extraStepCount > 0) {
+    const extraSteps = steps.slice(steps.length - extraStepCount);
+    extQuotientStr += extraSteps.map(s => String(s.quotientDigit)).join("");
+  }
+
+  // Map quotient digits to their column positions (right-aligned to full grid)
+  const quotientDP = dividendDP + extraDigits;
   const quotientCols: (number | "")[] = Array(totalCols).fill("");
-  const quotientDisplayStr = dividendDP > 0
-    ? quotientStr.padStart(Math.max(quotientStr.length, dividendDP + 1), "0")
-    : quotientStr;
+  const quotientDisplayStr = quotientDP > 0
+    ? extQuotientStr.padStart(Math.max(extQuotientStr.length, quotientDP + 1), "0")
+    : extQuotientStr;
   for (let i = 0; i < quotientDisplayStr.length; i++) {
     const col = totalCols - quotientDisplayStr.length + i;
     quotientCols[col] = parseInt(quotientDisplayStr[i], 10);
@@ -451,7 +462,9 @@ function HissanDivProblem({
       const nextDigitIndex = step.position + 1;
       let remStr: string;
       if (si < steps.length - 1) {
-        remStr = String(step.remainder * 10 + dividendDigits[nextDigitIndex]);
+        // Bring down next digit: from dividend array, or 0 for extra extension steps
+        const nextDigit = nextDigitIndex < dividendDigits.length ? dividendDigits[nextDigitIndex] : 0;
+        remStr = String(step.remainder * 10 + nextDigit);
       } else {
         remStr = String(step.remainder);
       }
@@ -495,6 +508,9 @@ function HissanDivProblem({
                 {parseInt(ch, 10)}
               </td>
             ))}
+            {Array.from({ length: extraDigits }, (_, i) => (
+              <td key={`ext${i}`} className="hissan-div-cell" />
+            ))}
           </tr>
           {/* Work rows */}
           {workRows.map((row, ri) => (
@@ -518,7 +534,7 @@ function Hissan() {
   const [cfg, setCfg] = useState(getInitialConfig);
   const [showSettings, setShowSettings] = useState(false);
 
-  const { problems, decimalPlaces } = useMemo(() => generateProblems(seed, cfg), [seed, cfg]);
+  const { problems, decimalPlaces, divExtra } = useMemo(() => generateProblems(seed, cfg), [seed, cfg]);
 
   const handleNewProblems = useCallback(() => {
     const newSeed = randomSeed();
@@ -703,6 +719,7 @@ function Hissan() {
               problem={problem}
               showAnswers={showAnswers}
               dps={decimalPlaces[i]}
+              extraDigits={divExtra?.[i]?.extraDigits}
             />
           ) : cfg.operator === "mul" ? (
             <HissanMulProblem

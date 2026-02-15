@@ -53,6 +53,41 @@ describe("computeDivDetails", () => {
     expect(steps).toHaveLength(1);
     expect(steps[0]).toEqual({ position: 0, dividendSoFar: 8, quotientDigit: 2, product: 8, remainder: 0 });
   });
+
+  it("extends 14 ÷ 4 with 1 extra digit (finite extension)", () => {
+    const { quotient, remainder, steps, extraStepCount } = computeDivDetails(14, 4, 1);
+    expect(quotient).toBe(3);
+    expect(remainder).toBe(0); // extended remainder is 0
+    expect(extraStepCount).toBe(1);
+    expect(steps).toHaveLength(2);
+    // Normal step: pos=1, dividendSoFar=14, qd=3, product=12, remainder=2
+    expect(steps[0]).toEqual({ position: 1, dividendSoFar: 14, quotientDigit: 3, product: 12, remainder: 2 });
+    // Extra step: pos=2, dividendSoFar=20, qd=5, product=20, remainder=0
+    expect(steps[1]).toEqual({ position: 2, dividendSoFar: 20, quotientDigit: 5, product: 20, remainder: 0 });
+  });
+
+  it("extends 75 ÷ 4 with 2 extra digits", () => {
+    // 75 ÷ 4 = 18 r3 → 18.75 (3→30÷4=7r2, 2→20÷4=5r0)
+    const { quotient, remainder, steps, extraStepCount } = computeDivDetails(75, 4, 2);
+    expect(quotient).toBe(18);
+    expect(remainder).toBe(0);
+    expect(extraStepCount).toBe(2);
+    expect(steps).toHaveLength(4);
+    // Extra steps
+    expect(steps[2]).toEqual({ position: 2, dividendSoFar: 30, quotientDigit: 7, product: 28, remainder: 2 });
+    expect(steps[3]).toEqual({ position: 3, dividendSoFar: 20, quotientDigit: 5, product: 20, remainder: 0 });
+  });
+
+  it("stops extra steps early when remainder reaches 0", () => {
+    // 14 ÷ 4 with 3 extra digits requested, but only 1 needed
+    const { extraStepCount } = computeDivDetails(14, 4, 3);
+    expect(extraStepCount).toBe(1);
+  });
+
+  it("no extra steps when division is exact", () => {
+    const { extraStepCount } = computeDivDetails(12, 4, 3);
+    expect(extraStepCount).toBe(0);
+  });
 });
 
 describe("generateDivisionProblem", () => {
