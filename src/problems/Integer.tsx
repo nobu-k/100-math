@@ -4,7 +4,7 @@ import type { ProblemGroup } from "./types";
 import { mulberry32, randomSeed, seedToHex, hexToSeed } from "./random";
 import "../App.css";
 
-type IntegerOperator = "multiples" | "factors" | "lcm";
+type IntegerOperator = "multiples" | "factors" | "lcm" | "gcd";
 
 interface MultiplesProblem {
   kind: "multiples";
@@ -29,7 +29,16 @@ interface LcmProblem {
   ladderBottom: [number, number];
 }
 
-type IntegerProblem = MultiplesProblem | FactorsProblem | LcmProblem;
+interface GcdProblem {
+  kind: "gcd";
+  a: number;
+  b: number;
+  answer: number;
+  ladder: { divisor: number; values: [number, number] }[];
+  ladderBottom: [number, number];
+}
+
+type IntegerProblem = MultiplesProblem | FactorsProblem | LcmProblem | GcdProblem;
 
 const generateMultiplesProblems = (
   seed: number,
@@ -115,6 +124,26 @@ const generateLcmProblems = (
   return problems;
 };
 
+const generateGcdProblems = (
+  seed: number,
+  nmin: number,
+  nmax: number,
+): GcdProblem[] => {
+  const rng = mulberry32(seed);
+  const problems: GcdProblem[] = [];
+  for (let i = 0; i < 10; i++) {
+    const a = nmin + Math.floor(rng() * (nmax - nmin + 1));
+    let b: number;
+    do {
+      b = nmin + Math.floor(rng() * (nmax - nmin + 1));
+    } while (b === a);
+    const answer = gcd(a, b);
+    const { ladder, bottom } = computeLadder(a, b);
+    problems.push({ kind: "gcd", a, b, answer, ladder, ladderBottom: bottom });
+  }
+  return problems;
+};
+
 const generateProblems = (
   op: IntegerOperator,
   seed: number,
@@ -125,6 +154,7 @@ const generateProblems = (
   if (op === "multiples") return generateMultiplesProblems(seed, nmin, nmax, count);
   if (op === "factors") return generateFactorsProblems(seed, nmin, nmax);
   if (op === "lcm") return generateLcmProblems(seed, nmin, nmax);
+  if (op === "gcd") return generateGcdProblems(seed, nmin, nmax);
   return generateMultiplesProblems(seed, nmin, nmax, count);
 };
 
@@ -132,6 +162,7 @@ const DEFAULTS: Record<IntegerOperator, { nmin: number; nmax: number; count: num
   multiples: { nmin: 2, nmax: 9, count: 5 },
   factors: { nmin: 2, nmax: 36, count: 5 },
   lcm: { nmin: 2, nmax: 20, count: 5 },
+  gcd: { nmin: 2, nmax: 36, count: 5 },
 };
 
 const PARAM_KEYS = ["q", "answers", "nmin", "nmax", "count"];
@@ -329,12 +360,12 @@ function Integer({ operator }: { operator: string }) {
       )}
       <div className="integer-page">
         {problems.map((p, i) =>
-          p.kind === "lcm" ? (
+          p.kind === "lcm" || p.kind === "gcd" ? (
             <div key={i} className="integer-problem integer-lcm-problem">
               <div className="integer-question">
                 <span className="integer-number">({i + 1})</span>
                 <span className="integer-text">
-                  {p.a} と {p.b} の最小公倍数
+                  {p.a} と {p.b} の{p.kind === "lcm" ? "最小公倍数" : "最大公約数"}
                 </span>
               </div>
               <div className="integer-ladder-area">
@@ -395,6 +426,7 @@ export const integer: ProblemGroup = {
     { operator: "multiples", label: "倍数" },
     { operator: "factors", label: "約数" },
     { operator: "lcm", label: "最小公倍数" },
+    { operator: "gcd", label: "最大公約数" },
   ],
   Component: Integer,
 };
