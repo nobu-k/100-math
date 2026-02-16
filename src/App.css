@@ -675,6 +675,48 @@
   font-weight: bold;
 }
 
+/* Integer (整数) styles */
+.integer-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 32px;
+}
+
+.integer-problem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.integer-question {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.integer-number {
+  font-size: 14px;
+  color: #555;
+  flex-shrink: 0;
+}
+
+.integer-text {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.integer-answer-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: red;
+  margin-left: 24px;
+  min-height: 1.5em;
+}
+
+.integer-hidden {
+  visibility: hidden;
+}
+
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;
@@ -912,6 +954,14 @@
 
   .fraction-guide .fraction-int,
   .fraction-guide-sym {
+    font-size: 14px;
+  }
+
+  .integer-text {
+    font-size: 14px;
+  }
+
+  .integer-answer-text {
     font-size: 14px;
   }
 
