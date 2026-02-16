@@ -1,28 +1,115 @@
-import React, { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import type { ProblemGroup } from "./types";
 import { mulberry32, randomSeed, seedToHex, hexToSeed } from "./random";
 import "../App.css";
 
-interface FractionProblem {
+type FractionOperator = "addition" | "reduction";
+
+interface AdditionProblem {
+  kind: "addition";
   numerators: [number, number];
   denominator: number;
+  answerNumerator: number;
+  answerDenominator: number;
 }
 
-const generateProblems = (
+interface ReductionProblem {
+  kind: "reduction";
+  numerator: number;
+  denominator: number;
+  answerNumerator: number;
+  answerDenominator: number;
+}
+
+type FractionProblem = AdditionProblem | ReductionProblem;
+
+const gcd = (a: number, b: number): number => {
+  while (b) {
+    [a, b] = [b, a % b];
+  }
+  return a;
+};
+
+const generateAdditionProblems = (
   seed: number,
   minDenom: number,
   maxDenom: number,
-): FractionProblem[] => {
+): AdditionProblem[] => {
   const rng = mulberry32(seed);
-  const problems: FractionProblem[] = [];
+  const problems: AdditionProblem[] = [];
   for (let i = 0; i < 10; i++) {
     const d = minDenom + Math.floor(rng() * (maxDenom - minDenom + 1));
     const a = 1 + Math.floor(rng() * (d - 1));
     const b = 1 + Math.floor(rng() * (d - 1));
-    problems.push({ numerators: [a, b], denominator: d });
+    problems.push({
+      kind: "addition",
+      numerators: [a, b],
+      denominator: d,
+      answerNumerator: a + b,
+      answerDenominator: d,
+    });
   }
   return problems;
+};
+
+const generateReductionProblems = (
+  seed: number,
+  minDenom: number,
+  maxDenom: number,
+): ReductionProblem[] => {
+  const rng = mulberry32(seed);
+  const problems: ReductionProblem[] = [];
+  // Collect all reducible fractions n/D where D in [minDenom, maxDenom]
+  const candidates: { n: number; D: number; rn: number; rd: number }[] = [];
+  for (let D = Math.max(minDenom, 4); D <= maxDenom; D++) {
+    for (let n = 1; n < D; n++) {
+      const g = gcd(n, D);
+      if (g > 1) {
+        candidates.push({ n, D, rn: n / g, rd: D / g });
+      }
+    }
+  }
+  // Fallback: if no candidates (shouldn't happen for dmin>=4), use trivial
+  if (candidates.length === 0) {
+    for (let i = 0; i < 10; i++) {
+      problems.push({
+        kind: "reduction",
+        numerator: 2,
+        denominator: 4,
+        answerNumerator: 1,
+        answerDenominator: 2,
+      });
+    }
+    return problems;
+  }
+  for (let i = 0; i < 10; i++) {
+    const idx = Math.floor(rng() * candidates.length);
+    const c = candidates[idx];
+    problems.push({
+      kind: "reduction",
+      numerator: c.n,
+      denominator: c.D,
+      answerNumerator: c.rn,
+      answerDenominator: c.rd,
+    });
+  }
+  return problems;
+};
+
+const generateProblems = (
+  op: FractionOperator,
+  seed: number,
+  minDenom: number,
+  maxDenom: number,
+): FractionProblem[] => {
+  if (op === "reduction") return generateReductionProblems(seed, minDenom, maxDenom);
+  return generateAdditionProblems(seed, minDenom, maxDenom);
+};
+
+const DEFAULTS: Record<FractionOperator, { dmin: number; dmax: number }> = {
+  addition: { dmin: 2, dmax: 10 },
+  reduction: { dmin: 4, dmax: 20 },
 };
 
 const PARAM_KEYS = ["q", "answers", "dmin", "dmax"];
@@ -32,6 +119,7 @@ const updateUrl = (
   showAnswers: boolean,
   minDenom: number,
   maxDenom: number,
+  defaults: { dmin: number; dmax: number },
 ) => {
   const url = new URL(window.location.href);
   for (const key of PARAM_KEYS) {
@@ -39,21 +127,26 @@ const updateUrl = (
   }
   url.searchParams.set("q", seedToHex(seed));
   if (showAnswers) url.searchParams.set("answers", "1");
-  if (minDenom !== 2) url.searchParams.set("dmin", String(minDenom));
-  if (maxDenom !== 10) url.searchParams.set("dmax", String(maxDenom));
+  if (minDenom !== defaults.dmin) url.searchParams.set("dmin", String(minDenom));
+  if (maxDenom !== defaults.dmax) url.searchParams.set("dmax", String(maxDenom));
   window.history.replaceState(null, "", url.toString());
 };
 
-function Fraction({ operator: _operator }: { operator: string }) {
+function Fraction({ operator }: { operator: string }) {
+  const op: FractionOperator = operator === "reduction" ? "reduction" : "addition";
+  const defaults = DEFAULTS[op];
+
   const getInitialState = () => {
     const params = new URLSearchParams(window.location.search);
-    const dmin = Math.max(2, Math.min(20, parseInt(params.get("dmin") ?? "2", 10) || 2));
-    const dmax = Math.max(dmin, Math.min(20, parseInt(params.get("dmax") ?? "10", 10) || 10));
+    const minFloor = op === "reduction" ? 4 : 2;
+    const maxCeil = op === "reduction" ? 99 : 20;
+    const dmin = Math.max(minFloor, Math.min(maxCeil, parseInt(params.get("dmin") ?? String(defaults.dmin), 10) || defaults.dmin));
+    const dmax = Math.max(dmin, Math.min(maxCeil, parseInt(params.get("dmax") ?? String(defaults.dmax), 10) || defaults.dmax));
     const q = params.get("q");
     const parsedSeed = q ? hexToSeed(q) : null;
     const seed = parsedSeed ?? randomSeed();
     const showAnswers = params.get("answers") === "1";
-    if (parsedSeed === null) updateUrl(seed, showAnswers, dmin, dmax);
+    if (parsedSeed === null) updateUrl(seed, showAnswers, dmin, dmax, defaults);
     return { seed, showAnswers, minDenom: dmin, maxDenom: dmax };
   };
 
@@ -63,56 +156,67 @@ function Fraction({ operator: _operator }: { operator: string }) {
   const [minDenom, setMinDenom] = useState(initial.minDenom);
   const [maxDenom, setMaxDenom] = useState(initial.maxDenom);
   const [showSettings, setShowSettings] = useState(false);
+  const [editMin, setEditMin] = useState<string | null>(null);
+  const [editMax, setEditMax] = useState<string | null>(null);
 
   const problems = useMemo(
-    () => generateProblems(seed, minDenom, maxDenom),
-    [seed, minDenom, maxDenom],
+    () => generateProblems(op, seed, minDenom, maxDenom),
+    [op, seed, minDenom, maxDenom],
   );
 
   const handleNewProblems = useCallback(() => {
     const newSeed = randomSeed();
-    updateUrl(newSeed, false, minDenom, maxDenom);
+    updateUrl(newSeed, false, minDenom, maxDenom, defaults);
     setSeed(newSeed);
     setShowAnswers(false);
-  }, [minDenom, maxDenom]);
+  }, [minDenom, maxDenom, defaults]);
 
   const handleToggleAnswers = useCallback(() => {
     setShowAnswers((prev) => {
-      updateUrl(seed, !prev, minDenom, maxDenom);
+      updateUrl(seed, !prev, minDenom, maxDenom, defaults);
       return !prev;
     });
-  }, [seed, minDenom, maxDenom]);
+  }, [seed, minDenom, maxDenom, defaults]);
 
-  const handleMinDenom = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const v = parseInt(e.target.value, 10);
+  const minFloor = op === "reduction" ? 4 : 2;
+  const maxCeil = op === "reduction" ? 99 : 20;
+
+  const commitMin = useCallback(
+    (raw: string) => {
+      setEditMin(null);
+      const parsed = parseInt(raw, 10);
+      if (isNaN(parsed)) return;
+      const v = Math.max(minFloor, Math.min(maxCeil, parsed));
       setMinDenom(v);
       setMaxDenom((prev) => {
         const next = Math.max(prev, v);
         const newSeed = randomSeed();
         setSeed(newSeed);
         setShowAnswers(false);
-        updateUrl(newSeed, false, v, next);
+        updateUrl(newSeed, false, v, next, defaults);
         return next;
       });
     },
-    [],
+    [minFloor, maxCeil, defaults],
   );
 
-  const handleMaxDenom = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const v = parseInt(e.target.value, 10);
+  const commitMax = useCallback(
+    (raw: string) => {
+      setEditMax(null);
+      const parsed = parseInt(raw, 10);
+      if (isNaN(parsed)) return;
+      const v = Math.max(minFloor, Math.min(maxCeil, parsed));
       setMaxDenom(v);
       setMinDenom((prev) => {
         const next = Math.min(prev, v);
         const newSeed = randomSeed();
         setSeed(newSeed);
         setShowAnswers(false);
-        updateUrl(newSeed, false, next, v);
+        updateUrl(newSeed, false, next, v, defaults);
         return next;
       });
     },
-    [],
+    [minFloor, maxCeil, defaults],
   );
 
   const qrUrl = useMemo(() => {
@@ -122,12 +226,10 @@ function Fraction({ operator: _operator }: { operator: string }) {
     }
     url.searchParams.set("q", seedToHex(seed));
     url.searchParams.set("answers", "1");
-    if (minDenom !== 2) url.searchParams.set("dmin", String(minDenom));
-    if (maxDenom !== 10) url.searchParams.set("dmax", String(maxDenom));
+    if (minDenom !== defaults.dmin) url.searchParams.set("dmin", String(minDenom));
+    if (maxDenom !== defaults.dmax) url.searchParams.set("dmax", String(maxDenom));
     return url.toString();
-  }, [seed, minDenom, maxDenom]);
-
-  const denomOptions = Array.from({ length: 19 }, (_, i) => i + 2);
+  }, [seed, minDenom, maxDenom, defaults]);
 
   return (
     <>
@@ -142,57 +244,63 @@ function Fraction({ operator: _operator }: { operator: string }) {
         <div className="no-print settings-panel">
           <label>
             分母 最小{" "}
-            <select
+            <input
+              type="number"
               className="operator-select"
-              value={minDenom}
-              onChange={handleMinDenom}
-            >
-              {denomOptions.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
+              value={editMin ?? minDenom}
+              min={minFloor}
+              max={maxCeil}
+              onFocus={(e) => { setEditMin(String(minDenom)); e.target.select(); }}
+              onChange={(e) => setEditMin(e.target.value)}
+              onBlur={(e) => commitMin(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
+            />
           </label>
           <label>
             最大{" "}
-            <select
+            <input
+              type="number"
               className="operator-select"
-              value={maxDenom}
-              onChange={handleMaxDenom}
-            >
-              {denomOptions.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
+              value={editMax ?? maxDenom}
+              min={minFloor}
+              max={maxCeil}
+              onFocus={(e) => { setEditMax(String(maxDenom)); e.target.select(); }}
+              onChange={(e) => setEditMax(e.target.value)}
+              onBlur={(e) => commitMax(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
+            />
           </label>
         </div>
       )}
       <div className="fraction-page">
-        {problems.map((p, i) => {
-          const sum = p.numerators[0] + p.numerators[1];
-          return (
-            <div key={i} className="fraction-problem">
-              <span className="fraction-number">({i + 1})</span>
+        {problems.map((p, i) => (
+          <div key={i} className="fraction-problem">
+            <span className="fraction-number">({i + 1})</span>
+            {p.kind === "addition" ? (
+              <>
+                <div className="fraction-frac">
+                  <span className="fraction-numerator">{p.numerators[0]}</span>
+                  <span className="fraction-denominator">{p.denominator}</span>
+                </div>
+                <span className="fraction-operator">+</span>
+                <div className="fraction-frac">
+                  <span className="fraction-numerator">{p.numerators[1]}</span>
+                  <span className="fraction-denominator">{p.denominator}</span>
+                </div>
+              </>
+            ) : (
               <div className="fraction-frac">
-                <span className="fraction-numerator">{p.numerators[0]}</span>
+                <span className="fraction-numerator">{p.numerator}</span>
                 <span className="fraction-denominator">{p.denominator}</span>
               </div>
-              <span className="fraction-operator">+</span>
-              <div className="fraction-frac">
-                <span className="fraction-numerator">{p.numerators[1]}</span>
-                <span className="fraction-denominator">{p.denominator}</span>
-              </div>
-              <span className="fraction-equals">=</span>
-              <div className={`fraction-frac fraction-answer${showAnswers ? "" : " fraction-hidden"}`}>
-                <span className="fraction-numerator">{sum}</span>
-                <span className="fraction-denominator">{p.denominator}</span>
-              </div>
+            )}
+            <span className="fraction-equals">=</span>
+            <div className={`fraction-frac fraction-answer${showAnswers ? "" : " fraction-hidden"}`}>
+              <span className="fraction-numerator">{p.answerNumerator}</span>
+              <span className="fraction-denominator">{p.answerDenominator}</span>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
       <div className="qr-section">
         <QRCodeSVG value={qrUrl} size={80} />
@@ -205,6 +313,9 @@ function Fraction({ operator: _operator }: { operator: string }) {
 export const fraction: ProblemGroup = {
   id: "fraction",
   label: "分数",
-  operators: [{ operator: "addition", label: "たし算" }],
+  operators: [
+    { operator: "addition", label: "たし算" },
+    { operator: "reduction", label: "約分" },
+  ],
   Component: Fraction,
 };
