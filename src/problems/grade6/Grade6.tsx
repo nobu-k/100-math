@@ -9,7 +9,15 @@ import {
   generateRatio,
   generateCircleArea,
   generateProportion,
+  generateLiteralExpr,
+  generateRepresentative,
+  generateCounting,
+  generatePrismVolume,
+  generateScale,
+  generateFracMixedCalc,
+  generateFreqTable,
 } from "./generators";
+import { Frac } from "../shared/Frac";
 
 /* ================================================================
    Types
@@ -20,26 +28,20 @@ type Grade6Op =
   | "frac-div"
   | "ratio"
   | "circle-area"
-  | "proportion";
-
-/* ================================================================
-   Shared components
-   ================================================================ */
-
-function Frac({ num, den, cls }: { num: number; den: number; cls?: string }) {
-  return (
-    <span className={`dev-frac${cls ? " " + cls : ""}`}>
-      <span className="dev-frac-num">{num}</span>
-      <span className="dev-frac-den">{den}</span>
-    </span>
-  );
-}
+  | "proportion"
+  | "literal-expr"
+  | "representative"
+  | "counting"
+  | "prism-volume"
+  | "scale"
+  | "frac-mixed-calc"
+  | "freq-table";
 
 /* ================================================================
    URL state helpers
    ================================================================ */
 
-const ALL_PARAMS = ["q", "answers", "rtype", "ctype", "ptype"];
+const ALL_PARAMS = ["q", "answers", "rtype", "ctype", "ptype", "repfind", "pvshape"];
 
 function cleanParams(url: URL) {
   for (const k of ALL_PARAMS) url.searchParams.delete(k);
@@ -52,6 +54,8 @@ function cleanParams(url: URL) {
 const RATIO_DEF = { rtype: "mixed" as const };
 const CIRCLE_DEF = { ctype: "mixed" as const };
 const PROP_DEF = { ptype: "mixed" as const };
+const REP_DEF = { repfind: "mixed" as const };
+const PV_DEF = { pvshape: "mixed" as const };
 
 /* ================================================================
    Main component
@@ -81,7 +85,17 @@ function Grade6({ operator }: { operator: string }) {
       (["direct", "inverse", "mixed"] as const).includes(ptypeRaw as any)
         ? (ptypeRaw as any) : PROP_DEF.ptype;
 
-    return { seed, showAnswers, rtype, ctype, ptype };
+    const repfindRaw = p.get("repfind") ?? REP_DEF.repfind;
+    const repfind: "mean" | "median" | "mode" | "mixed" =
+      (["mean", "median", "mode", "mixed"] as const).includes(repfindRaw as any)
+        ? (repfindRaw as any) : REP_DEF.repfind;
+
+    const pvshapeRaw = p.get("pvshape") ?? PV_DEF.pvshape;
+    const pvshape: "prism" | "cylinder" | "mixed" =
+      (["prism", "cylinder", "mixed"] as const).includes(pvshapeRaw as any)
+        ? (pvshapeRaw as any) : PV_DEF.pvshape;
+
+    return { seed, showAnswers, rtype, ctype, ptype, repfind, pvshape };
   };
 
   const [initial] = useState(getInitial);
@@ -92,6 +106,8 @@ function Grade6({ operator }: { operator: string }) {
   const [rtype, setRtype] = useState(initial.rtype);
   const [ctype, setCtype] = useState(initial.ctype);
   const [ptype, setPtype] = useState(initial.ptype);
+  const [repfind, setRepfind] = useState(initial.repfind);
+  const [pvshape, setPvshape] = useState(initial.pvshape);
 
   const syncUrl = useCallback(
     (s: number, ans: boolean, overrides?: Record<string, string>) => {
@@ -119,12 +135,23 @@ function Grade6({ operator }: { operator: string }) {
       case "proportion":
         if (ptype !== PROP_DEF.ptype) m.ptype = ptype;
         break;
+      case "representative":
+        if (repfind !== REP_DEF.repfind) m.repfind = repfind;
+        break;
+      case "prism-volume":
+        if (pvshape !== PV_DEF.pvshape) m.pvshape = pvshape;
+        break;
       case "frac-mul":
       case "frac-div":
+      case "literal-expr":
+      case "counting":
+      case "scale":
+      case "frac-mixed-calc":
+      case "freq-table":
         break;
     }
     return m;
-  }, [op, rtype, ctype, ptype]);
+  }, [op, rtype, ctype, ptype, repfind, pvshape]);
 
   useState(() => { syncUrl(seed, showAnswers, settingsParams()); });
 
@@ -185,6 +212,20 @@ function Grade6({ operator }: { operator: string }) {
     regen(p);
   }, [regen]);
 
+  const onRepfindChange = useCallback((v: typeof repfind) => {
+    setRepfind(v);
+    const p: Record<string, string> = {};
+    if (v !== REP_DEF.repfind) p.repfind = v;
+    regen(p);
+  }, [regen]);
+
+  const onPvshapeChange = useCallback((v: typeof pvshape) => {
+    setPvshape(v);
+    const p: Record<string, string> = {};
+    if (v !== PV_DEF.pvshape) p.pvshape = v;
+    regen(p);
+  }, [regen]);
+
   /* ---- generate problems ---- */
 
   const fracMulProblems = useMemo(
@@ -207,6 +248,34 @@ function Grade6({ operator }: { operator: string }) {
     () => op === "proportion" ? generateProportion(seed, ptype) : [],
     [op, seed, ptype],
   );
+  const literalExprProblems = useMemo(
+    () => op === "literal-expr" ? generateLiteralExpr(seed) : [],
+    [op, seed],
+  );
+  const repProblems = useMemo(
+    () => op === "representative" ? generateRepresentative(seed, repfind) : [],
+    [op, seed, repfind],
+  );
+  const countingProblems = useMemo(
+    () => op === "counting" ? generateCounting(seed) : [],
+    [op, seed],
+  );
+  const prismProblems = useMemo(
+    () => op === "prism-volume" ? generatePrismVolume(seed, pvshape) : [],
+    [op, seed, pvshape],
+  );
+  const scaleProblems = useMemo(
+    () => op === "scale" ? generateScale(seed) : [],
+    [op, seed],
+  );
+  const fracMixedProblems = useMemo(
+    () => op === "frac-mixed-calc" ? generateFracMixedCalc(seed) : [],
+    [op, seed],
+  );
+  const freqTableProblems = useMemo(
+    () => op === "freq-table" ? generateFreqTable(seed) : [],
+    [op, seed],
+  );
 
   /* ---- settings panel ---- */
 
@@ -214,6 +283,11 @@ function Grade6({ operator }: { operator: string }) {
     switch (op) {
       case "frac-mul":
       case "frac-div":
+      case "literal-expr":
+      case "counting":
+      case "scale":
+      case "frac-mixed-calc":
+      case "freq-table":
         return null;
       case "ratio":
         return (
@@ -253,6 +327,35 @@ function Grade6({ operator }: { operator: string }) {
                 <option value="mixed">比例・反比例</option>
                 <option value="direct">比例のみ</option>
                 <option value="inverse">反比例のみ</option>
+              </select>
+            </label>
+          </div>
+        );
+      case "representative":
+        return (
+          <div className="no-print settings-panel">
+            <label>
+              求めるもの{" "}
+              <select className="operator-select" value={repfind}
+                onChange={(e) => onRepfindChange(e.target.value as any)}>
+                <option value="mixed">すべて</option>
+                <option value="mean">平均値</option>
+                <option value="median">中央値</option>
+                <option value="mode">最頻値</option>
+              </select>
+            </label>
+          </div>
+        );
+      case "prism-volume":
+        return (
+          <div className="no-print settings-panel">
+            <label>
+              形{" "}
+              <select className="operator-select" value={pvshape}
+                onChange={(e) => onPvshapeChange(e.target.value as any)}>
+                <option value="mixed">すべて</option>
+                <option value="prism">角柱</option>
+                <option value="cylinder">円柱</option>
               </select>
             </label>
           </div>
@@ -374,6 +477,154 @@ function Grade6({ operator }: { operator: string }) {
           </div>
         );
 
+      case "literal-expr":
+        return (
+          <div className="dev-text-page">
+            {literalExprProblems.map((p, i) => (
+              <div key={i} className="dev-text-row">
+                <span className="g1-num">({i + 1})</span>
+                <span className="dev-text-q">{p.question}</span>
+                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                  {p.answer}
+                </span>
+              </div>
+            ))}
+          </div>
+        );
+
+      case "representative":
+        return (
+          <div className="dev-text-page">
+            {repProblems.map((p, i) => (
+              <div key={i} className="dev-prop-block">
+                <div className="dev-prop-label">
+                  ({i + 1}) データ: {p.data.join(", ")}
+                </div>
+                {(repfind === "mean" || repfind === "mixed") && (
+                  <div className="dev-text-row">
+                    <span className="dev-text-q">平均値:</span>
+                    <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                      {p.meanAnswer}
+                    </span>
+                  </div>
+                )}
+                {(repfind === "median" || repfind === "mixed") && (
+                  <div className="dev-text-row">
+                    <span className="dev-text-q">中央値:</span>
+                    <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                      {p.medianAnswer}
+                    </span>
+                  </div>
+                )}
+                {(repfind === "mode" || repfind === "mixed") && (
+                  <div className="dev-text-row">
+                    <span className="dev-text-q">最頻値:</span>
+                    <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                      {p.modeAnswer}
+                    </span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        );
+
+      case "counting":
+        return (
+          <div className="dev-text-page">
+            {countingProblems.map((p, i) => (
+              <div key={i} className="dev-text-row">
+                <span className="g1-num">({i + 1})</span>
+                <span className="dev-text-q">{p.question}</span>
+                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                  {p.answer}
+                </span>
+              </div>
+            ))}
+          </div>
+        );
+
+      case "prism-volume":
+        return (
+          <div className="dev-text-page">
+            {prismProblems.map((p, i) => (
+              <div key={i} className="dev-text-row">
+                <span className="g1-num">({i + 1})</span>
+                <span className="dev-text-q">{p.question}</span>
+                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                  {p.answer}
+                </span>
+              </div>
+            ))}
+          </div>
+        );
+
+      case "scale":
+        return (
+          <div className="dev-text-page">
+            {scaleProblems.map((p, i) => (
+              <div key={i} className="dev-text-row">
+                <span className="g1-num">({i + 1})</span>
+                <span className="dev-text-q">{p.question}</span>
+                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                  {p.answer}
+                </span>
+              </div>
+            ))}
+          </div>
+        );
+
+      case "frac-mixed-calc":
+        return renderFracProblems(fracMixedProblems, "\u00d7");
+
+      case "freq-table":
+        return (
+          <div className="dev-text-page">
+            {freqTableProblems.map((p, idx) => {
+              let ansIdx = 0;
+              return (
+                <div key={idx} className="dev-prop-block">
+                  <div className="dev-prop-label">
+                    ({idx + 1}) データ: {p.data.join(", ")}
+                  </div>
+                  <table className="dev-prop-table">
+                    <thead>
+                      <tr>
+                        <th>階級</th>
+                        <th>度数</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {p.classes.map((cls, j) => {
+                        const freq = p.frequencies[j];
+                        if (freq !== null) {
+                          return (
+                            <tr key={j}>
+                              <td>{cls}</td>
+                              <td>{freq}</td>
+                            </tr>
+                          );
+                        }
+                        const ans = p.answers[ansIdx++];
+                        return (
+                          <tr key={j}>
+                            <td>{cls}</td>
+                            <td className="dev-prop-blank">
+                              <span className={showAnswers ? "dev-frac-ans" : "g1-hidden"}>
+                                {ans}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })}
+          </div>
+        );
+
       default:
         return <p>不明な問題タイプです</p>;
     }
@@ -409,6 +660,13 @@ export const devGrade6: ProblemGroup = {
     { operator: "ratio", label: "比" },
     { operator: "circle-area", label: "円の面積" },
     { operator: "proportion", label: "比例と反比例" },
+    { operator: "literal-expr", label: "文字式の値" },
+    { operator: "representative", label: "代表値" },
+    { operator: "counting", label: "場合の数" },
+    { operator: "prism-volume", label: "角柱・円柱の体積" },
+    { operator: "scale", label: "縮尺" },
+    { operator: "frac-mixed-calc", label: "分数の四則混合" },
+    { operator: "freq-table", label: "度数分布表" },
   ],
   Component: Grade6,
 };

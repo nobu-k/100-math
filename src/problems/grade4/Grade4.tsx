@@ -1,7 +1,26 @@
 import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { mulberry32, randomSeed, seedToHex, hexToSeed } from "../random";
+import { randomSeed, seedToHex, hexToSeed } from "../random";
 import type { ProblemGroup } from "../types";
+import {
+  generateMixedCalc,
+  generateRounding,
+  generateFracConv,
+  generateArea,
+  generateAngle,
+  generateAreaUnit,
+  generateEstimate,
+  generateDecimalPlace,
+  generateDivCheck,
+  generateLargeNum4,
+  generateCalcTrick,
+  generatePatternTable,
+  generateLineGraph,
+  generateCrossTable,
+} from "./generators";
+import type { TextProblem } from "./generators";
+import { Box } from "../shared/Box";
+import { Frac } from "../shared/Frac";
 
 /* ================================================================
    Types
@@ -12,357 +31,22 @@ type Grade4Op =
   | "rounding"
   | "frac-conv"
   | "area"
-  | "angle";
-
-interface MixedCalcProblem {
-  display: string;
-  answer: number;
-}
-
-interface RoundingProblem {
-  question: string;
-  answer: string;
-}
-
-interface FracConvProblem {
-  question: string;
-  answer: string;
-  /** For structured rendering */
-  fromWhole?: number;
-  fromNum?: number;
-  fromDen?: number;
-  toWhole?: number;
-  toNum?: number;
-  toDen?: number;
-  direction: "to-mixed" | "to-improper";
-}
-
-interface AreaProblem {
-  question: string;
-  answer: string;
-}
-
-interface AngleProblem {
-  display: string;
-  answer: number;
-}
-
-/* ================================================================
-   Generators
-   ================================================================ */
-
-function generateMixedCalc(
-  seed: number,
-  withParen: boolean,
-): MixedCalcProblem[] {
-  const rng = mulberry32(seed);
-  const problems: MixedCalcProblem[] = [];
-
-  for (let i = 0; i < 12; i++) {
-    const useParen = withParen && rng() < 0.5;
-
-    if (useParen) {
-      // (a ○ b) ○ c  or  a ○ (b ○ c)
-      const leftParen = rng() < 0.5;
-      if (leftParen) {
-        // (a ○1 b) ○2 c
-        const op2IsMul = rng() < 0.5;
-        if (op2IsMul) {
-          // (a ± b) × c
-          const c = 2 + Math.floor(rng() * 8);
-          const useAdd = rng() < 0.5;
-          if (useAdd) {
-            const a = 1 + Math.floor(rng() * 20);
-            const b = 1 + Math.floor(rng() * 20);
-            const ans = (a + b) * c;
-            problems.push({ display: `(${a} ＋ ${b}) × ${c}`, answer: ans });
-          } else {
-            const b = 1 + Math.floor(rng() * 15);
-            const a = b + 1 + Math.floor(rng() * 15);
-            const ans = (a - b) * c;
-            problems.push({ display: `(${a} − ${b}) × ${c}`, answer: ans });
-          }
-        } else {
-          // (a ± b) ÷ c — ensure divisible
-          const c = 2 + Math.floor(rng() * 8);
-          const quot = 1 + Math.floor(rng() * 10);
-          const sum = quot * c;
-          const useAdd = rng() < 0.5;
-          if (useAdd) {
-            const a = 1 + Math.floor(rng() * (sum - 1));
-            const b = sum - a;
-            if (b > 0) {
-              problems.push({ display: `(${a} ＋ ${b}) ÷ ${c}`, answer: quot });
-            }
-          } else {
-            const b = 1 + Math.floor(rng() * 20);
-            const a = sum + b;
-            problems.push({ display: `(${a} − ${b}) ÷ ${c}`, answer: quot });
-          }
-        }
-      } else {
-        // a ○2 (b ○1 c)
-        const op2IsMul = rng() < 0.5;
-        if (op2IsMul) {
-          // a × (b ± c)
-          const a = 2 + Math.floor(rng() * 8);
-          const useAdd = rng() < 0.5;
-          if (useAdd) {
-            const b = 1 + Math.floor(rng() * 15);
-            const c = 1 + Math.floor(rng() * 15);
-            const ans = a * (b + c);
-            problems.push({ display: `${a} × (${b} ＋ ${c})`, answer: ans });
-          } else {
-            const c = 1 + Math.floor(rng() * 10);
-            const b = c + 1 + Math.floor(rng() * 15);
-            const ans = a * (b - c);
-            problems.push({ display: `${a} × (${b} − ${c})`, answer: ans });
-          }
-        } else {
-          // a ± (b × c)  or  a ± (b + c)
-          const b = 2 + Math.floor(rng() * 8);
-          const c = 2 + Math.floor(rng() * 8);
-          const inner = b * c;
-          const a = inner + 1 + Math.floor(rng() * 50);
-          const ans = a - inner;
-          problems.push({ display: `${a} − (${b} × ${c})`, answer: ans });
-        }
-      }
-    } else {
-      // No parentheses: a ○1 b ○2 c (with precedence)
-      const pattern = Math.floor(rng() * 4);
-      switch (pattern) {
-        case 0: {
-          // a + b × c
-          const b = 2 + Math.floor(rng() * 9);
-          const c = 2 + Math.floor(rng() * 9);
-          const a = 1 + Math.floor(rng() * 50);
-          problems.push({ display: `${a} ＋ ${b} × ${c}`, answer: a + b * c });
-          break;
-        }
-        case 1: {
-          // a - b × c (ensure positive)
-          const b = 2 + Math.floor(rng() * 5);
-          const c = 2 + Math.floor(rng() * 5);
-          const prod = b * c;
-          const a = prod + 1 + Math.floor(rng() * 50);
-          problems.push({ display: `${a} − ${b} × ${c}`, answer: a - prod });
-          break;
-        }
-        case 2: {
-          // a × b + c
-          const a = 2 + Math.floor(rng() * 9);
-          const b = 2 + Math.floor(rng() * 9);
-          const c = 1 + Math.floor(rng() * 50);
-          problems.push({ display: `${a} × ${b} ＋ ${c}`, answer: a * b + c });
-          break;
-        }
-        default: {
-          // a × b - c (ensure positive)
-          const a = 2 + Math.floor(rng() * 9);
-          const b = 2 + Math.floor(rng() * 9);
-          const prod = a * b;
-          const c = 1 + Math.floor(rng() * (prod - 1));
-          problems.push({ display: `${a} × ${b} − ${c}`, answer: prod - c });
-          break;
-        }
-      }
-    }
-  }
-  // fill any gaps
-  while (problems.length < 12) {
-    const a = 2 + Math.floor(rng() * 9);
-    const b = 2 + Math.floor(rng() * 9);
-    const c = 1 + Math.floor(rng() * 50);
-    problems.push({ display: `${a} × ${b} ＋ ${c}`, answer: a * b + c });
-  }
-  return problems.slice(0, 12);
-}
-
-function generateRounding(
-  seed: number,
-  digits: number,
-): RoundingProblem[] {
-  const rng = mulberry32(seed);
-  const problems: RoundingProblem[] = [];
-
-  for (let i = 0; i < 10; i++) {
-    const numDigits = 3 + Math.floor(rng() * digits);
-    const min = Math.pow(10, numDigits - 1);
-    const max = Math.pow(10, numDigits) - 1;
-    const n = min + Math.floor(rng() * (max - min + 1));
-
-    // pick rounding position
-    const positions = ["十の位", "百の位", "千の位"];
-    const posIdx = Math.min(Math.floor(rng() * numDigits - 1), positions.length - 1);
-    const pos = positions[Math.max(0, posIdx)];
-
-    // round
-    let divisor: number;
-    switch (pos) {
-      case "十の位": divisor = 10; break;
-      case "百の位": divisor = 100; break;
-      default: divisor = 1000; break;
-    }
-    const rounded = Math.round(n / divisor) * divisor;
-
-    problems.push({
-      question: `${n} を${pos}までの概数にしなさい`,
-      answer: String(rounded),
-    });
-  }
-  return problems;
-}
-
-function generateFracConv(
-  seed: number,
-  direction: "to-mixed" | "to-improper" | "both",
-): FracConvProblem[] {
-  const rng = mulberry32(seed);
-  const problems: FracConvProblem[] = [];
-
-  for (let i = 0; i < 10; i++) {
-    const dir = direction === "both"
-      ? (rng() < 0.5 ? "to-mixed" : "to-improper")
-      : direction;
-
-    const den = 2 + Math.floor(rng() * 9); // 2-10
-    const whole = 1 + Math.floor(rng() * 5);
-    const partNum = 1 + Math.floor(rng() * (den - 1)); // 1 to den-1
-    const improperNum = whole * den + partNum;
-
-    if (dir === "to-mixed") {
-      problems.push({
-        question: `${improperNum}/${den} を帯分数にしなさい`,
-        answer: `${whole}と${partNum}/${den}`,
-        fromNum: improperNum, fromDen: den,
-        toWhole: whole, toNum: partNum, toDen: den,
-        direction: "to-mixed",
-      });
-    } else {
-      problems.push({
-        question: `${whole}と${partNum}/${den} を仮分数にしなさい`,
-        answer: `${improperNum}/${den}`,
-        fromWhole: whole, fromNum: partNum, fromDen: den,
-        toNum: improperNum, toDen: den,
-        direction: "to-improper",
-      });
-    }
-  }
-  return problems;
-}
-
-function generateArea(
-  seed: number,
-  shape: "square" | "rect" | "mixed",
-): AreaProblem[] {
-  const rng = mulberry32(seed);
-  const problems: AreaProblem[] = [];
-
-  for (let i = 0; i < 10; i++) {
-    const useSquare = shape === "square" ? true : shape === "rect" ? false : rng() < 0.4;
-    const reverse = rng() < 0.3;
-
-    if (useSquare) {
-      const side = 2 + Math.floor(rng() * 18);
-      const area = side * side;
-      if (reverse) {
-        problems.push({
-          question: `面積が${area}cm²の正方形の一辺の長さは？`,
-          answer: `${side}cm`,
-        });
-      } else {
-        problems.push({
-          question: `一辺${side}cmの正方形の面積は？`,
-          answer: `${area}cm²`,
-        });
-      }
-    } else {
-      const w = 2 + Math.floor(rng() * 15);
-      const h = 2 + Math.floor(rng() * 15);
-      const area = w * h;
-      if (reverse) {
-        problems.push({
-          question: `面積が${area}cm²、たて${h}cmの長方形のよこは？`,
-          answer: `${w}cm`,
-        });
-      } else {
-        problems.push({
-          question: `たて${h}cm、よこ${w}cmの長方形の面積は？`,
-          answer: `${area}cm²`,
-        });
-      }
-    }
-  }
-  return problems;
-}
-
-function generateAngle(
-  seed: number,
-): AngleProblem[] {
-  const rng = mulberry32(seed);
-  const problems: AngleProblem[] = [];
-  const baseAngles = [30, 45, 60, 90, 120, 135, 150];
-
-  for (let i = 0; i < 10; i++) {
-    const type = Math.floor(rng() * 3);
-    switch (type) {
-      case 0: {
-        // 180 - x = ?
-        const x = baseAngles[Math.floor(rng() * baseAngles.length)];
-        problems.push({ display: `180° − ${x}°`, answer: 180 - x });
-        break;
-      }
-      case 1: {
-        // x + y = ?
-        const x = baseAngles[Math.floor(rng() * baseAngles.length)];
-        const y = baseAngles[Math.floor(rng() * baseAngles.length)];
-        if (x + y <= 360) {
-          problems.push({ display: `${x}° ＋ ${y}°`, answer: x + y });
-        } else {
-          problems.push({ display: `${x}° ＋ ${30}°`, answer: x + 30 });
-        }
-        break;
-      }
-      default: {
-        // 360 - x = ?
-        const x = 90 + baseAngles[Math.floor(rng() * 4)] ; // keep it reasonable
-        problems.push({ display: `360° − ${x}°`, answer: 360 - x });
-        break;
-      }
-    }
-  }
-  return problems;
-}
-
-/* ================================================================
-   Shared components
-   ================================================================ */
-
-function Box({ answer, show }: { answer: number | string; show: boolean }) {
-  return (
-    <span className="g1-box">
-      <span className={show ? "g1-box-val" : "g1-box-val g1-hidden"}>
-        {answer}
-      </span>
-    </span>
-  );
-}
-
-function Frac({ num, den, cls }: { num: number; den: number; cls?: string }) {
-  return (
-    <span className={`dev-frac${cls ? " " + cls : ""}`}>
-      <span className="dev-frac-num">{num}</span>
-      <span className="dev-frac-den">{den}</span>
-    </span>
-  );
-}
+  | "angle"
+  | "area-unit"
+  | "estimate"
+  | "decimal-place"
+  | "div-check"
+  | "large-num4"
+  | "calc-trick"
+  | "pattern-table"
+  | "line-graph"
+  | "cross-table";
 
 /* ================================================================
    URL state helpers
    ================================================================ */
 
-const ALL_PARAMS = ["q", "answers", "paren", "rd", "fdir", "shape", "atype"];
+const ALL_PARAMS = ["q", "answers", "paren", "rd", "fdir", "shape", "atype", "aunit", "erto", "dpmode", "ln4mode"];
 
 function cleanParams(url: URL) {
   for (const k of ALL_PARAMS) url.searchParams.delete(k);
@@ -375,6 +59,10 @@ function cleanParams(url: URL) {
 const ROUND_DEF = { rd: 3 };
 const FRAC_DEF = { fdir: "both" as const };
 const AREA_DEF = { shape: "mixed" as const };
+const AUNIT_DEF = { aunit: "mixed" as const };
+const ERTO_DEF = { erto: 10 };
+const DPMODE_DEF = { dpmode: "mixed" as const };
+const LN4MODE_DEF = { ln4mode: "mixed" as const };
 
 /* ================================================================
    Main component
@@ -403,7 +91,25 @@ function Grade4({ operator }: { operator: string }) {
       (["square", "rect", "mixed"] as const).includes(shapeRaw as any)
         ? (shapeRaw as any) : AREA_DEF.shape;
 
-    return { seed, showAnswers, paren, rd, fdir, shape };
+    const aunitRaw = p.get("aunit") ?? AUNIT_DEF.aunit;
+    const aunit: "cm-m" | "m-ha" | "mixed" =
+      (["cm-m", "m-ha", "mixed"] as const).includes(aunitRaw as any)
+        ? (aunitRaw as any) : AUNIT_DEF.aunit;
+
+    const erto = Math.max(10, Math.min(100,
+      parseInt(p.get("erto") ?? String(ERTO_DEF.erto), 10) || ERTO_DEF.erto));
+
+    const dpmodeRaw = p.get("dpmode") ?? DPMODE_DEF.dpmode;
+    const dpmode: "count" | "multiply" | "mixed" =
+      (["count", "multiply", "mixed"] as const).includes(dpmodeRaw as any)
+        ? (dpmodeRaw as any) : DPMODE_DEF.dpmode;
+
+    const ln4modeRaw = p.get("ln4mode") ?? LN4MODE_DEF.ln4mode;
+    const ln4mode: "read" | "position" | "mixed" =
+      (["read", "position", "mixed"] as const).includes(ln4modeRaw as any)
+        ? (ln4modeRaw as any) : LN4MODE_DEF.ln4mode;
+
+    return { seed, showAnswers, paren, rd, fdir, shape, aunit, erto, dpmode, ln4mode };
   };
 
   const [initial] = useState(getInitial);
@@ -415,6 +121,10 @@ function Grade4({ operator }: { operator: string }) {
   const [rd, setRd] = useState(initial.rd);
   const [fdir, setFdir] = useState(initial.fdir);
   const [shape, setShape] = useState(initial.shape);
+  const [aunit, setAunit] = useState(initial.aunit);
+  const [erto, setErto] = useState(initial.erto);
+  const [dpmode, setDpmode] = useState(initial.dpmode);
+  const [ln4mode, setLn4mode] = useState(initial.ln4mode);
 
   const syncUrl = useCallback(
     (s: number, ans: boolean, overrides?: Record<string, string>) => {
@@ -447,9 +157,31 @@ function Grade4({ operator }: { operator: string }) {
         break;
       case "angle":
         break;
+      case "area-unit":
+        if (aunit !== AUNIT_DEF.aunit) m.aunit = aunit;
+        break;
+      case "estimate":
+        if (erto !== ERTO_DEF.erto) m.erto = String(erto);
+        break;
+      case "decimal-place":
+        if (dpmode !== DPMODE_DEF.dpmode) m.dpmode = dpmode;
+        break;
+      case "div-check":
+        break;
+      case "large-num4":
+        if (ln4mode !== LN4MODE_DEF.ln4mode) m.ln4mode = ln4mode;
+        break;
+      case "calc-trick":
+        break;
+      case "pattern-table":
+        break;
+      case "line-graph":
+        break;
+      case "cross-table":
+        break;
     }
     return m;
-  }, [op, paren, rd, fdir, shape]);
+  }, [op, paren, rd, fdir, shape, aunit, erto, dpmode, ln4mode]);
 
   useState(() => { syncUrl(seed, showAnswers, settingsParams()); });
 
@@ -517,6 +249,34 @@ function Grade4({ operator }: { operator: string }) {
     regen(p);
   }, [regen]);
 
+  const onAunitChange = useCallback((v: "cm-m" | "m-ha" | "mixed") => {
+    setAunit(v);
+    const p: Record<string, string> = {};
+    if (v !== AUNIT_DEF.aunit) p.aunit = v;
+    regen(p);
+  }, [regen]);
+
+  const onErtoChange = useCallback((v: number) => {
+    setErto(v);
+    const p: Record<string, string> = {};
+    if (v !== ERTO_DEF.erto) p.erto = String(v);
+    regen(p);
+  }, [regen]);
+
+  const onDpmodeChange = useCallback((v: "count" | "multiply" | "mixed") => {
+    setDpmode(v);
+    const p: Record<string, string> = {};
+    if (v !== DPMODE_DEF.dpmode) p.dpmode = v;
+    regen(p);
+  }, [regen]);
+
+  const onLn4modeChange = useCallback((v: "read" | "position" | "mixed") => {
+    setLn4mode(v);
+    const p: Record<string, string> = {};
+    if (v !== LN4MODE_DEF.ln4mode) p.ln4mode = v;
+    regen(p);
+  }, [regen]);
+
   /* ---- generate problems ---- */
 
   const mixedProblems = useMemo(
@@ -537,6 +297,42 @@ function Grade4({ operator }: { operator: string }) {
   );
   const angleProblems = useMemo(
     () => op === "angle" ? generateAngle(seed) : [],
+    [op, seed],
+  );
+  const areaUnitProblems = useMemo(
+    () => op === "area-unit" ? generateAreaUnit(seed, aunit) : [],
+    [op, seed, aunit],
+  );
+  const estimateProblems = useMemo(
+    () => op === "estimate" ? generateEstimate(seed, erto) : [],
+    [op, seed, erto],
+  );
+  const decimalPlaceProblems = useMemo(
+    () => op === "decimal-place" ? generateDecimalPlace(seed, dpmode) : [],
+    [op, seed, dpmode],
+  );
+  const divCheckProblems = useMemo(
+    () => op === "div-check" ? generateDivCheck(seed) : [],
+    [op, seed],
+  );
+  const largeNum4Problems = useMemo(
+    () => op === "large-num4" ? generateLargeNum4(seed, ln4mode) : [],
+    [op, seed, ln4mode],
+  );
+  const calcTrickProblems = useMemo(
+    () => op === "calc-trick" ? generateCalcTrick(seed) : [],
+    [op, seed],
+  );
+  const patternTableProblems = useMemo(
+    () => op === "pattern-table" ? generatePatternTable(seed) : [],
+    [op, seed],
+  );
+  const lineGraphProblems = useMemo(
+    () => op === "line-graph" ? generateLineGraph(seed) : [],
+    [op, seed],
+  );
+  const crossTableProblems = useMemo(
+    () => op === "cross-table" ? generateCrossTable(seed) : [],
     [op, seed],
   );
 
@@ -601,12 +397,91 @@ function Grade4({ operator }: { operator: string }) {
         );
       case "angle":
         return null;
+      case "area-unit":
+        return (
+          <div className="no-print settings-panel">
+            <label>
+              単位{" "}
+              <select className="operator-select" value={aunit}
+                onChange={(e) => onAunitChange(e.target.value as any)}>
+                <option value="mixed">すべて</option>
+                <option value="cm-m">cm²・m²</option>
+                <option value="m-ha">m²・ha・km²</option>
+              </select>
+            </label>
+          </div>
+        );
+      case "estimate":
+        return (
+          <div className="no-print settings-panel">
+            <label>
+              概数の位{" "}
+              <select className="operator-select" value={erto}
+                onChange={(e) => onErtoChange(Number(e.target.value))}>
+                <option value={10}>十の位</option>
+                <option value={100}>百の位</option>
+              </select>
+            </label>
+          </div>
+        );
+      case "decimal-place":
+        return (
+          <div className="no-print settings-panel">
+            <label>
+              種類{" "}
+              <select className="operator-select" value={dpmode}
+                onChange={(e) => onDpmodeChange(e.target.value as any)}>
+                <option value="mixed">すべて</option>
+                <option value="count">0.1が何個</option>
+                <option value="multiply">10倍・1/10</option>
+              </select>
+            </label>
+          </div>
+        );
+      case "div-check":
+        return null;
+      case "large-num4":
+        return (
+          <div className="no-print settings-panel">
+            <label>
+              種類{" "}
+              <select className="operator-select" value={ln4mode}
+                onChange={(e) => onLn4modeChange(e.target.value as any)}>
+                <option value="mixed">すべて</option>
+                <option value="read">読み書き</option>
+                <option value="position">位取り</option>
+              </select>
+            </label>
+          </div>
+        );
+      case "calc-trick":
+        return null;
+      case "pattern-table":
+        return null;
+      case "line-graph":
+        return null;
+      case "cross-table":
+        return null;
       default:
         return null;
     }
   };
 
   /* ---- render problems ---- */
+
+  const renderTextProblems = (items: TextProblem[]) => (
+    <div className="dev-text-page">
+      {items.map((p, i) => (
+        <div key={i} className="dev-text-row">
+          <span className="g1-num">({i + 1})</span>
+          <span className="dev-text-q">{p.question}</span>
+          <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+            {p.answer}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
 
   const renderProblems = () => {
     switch (op) {
@@ -627,19 +502,7 @@ function Grade4({ operator }: { operator: string }) {
         );
 
       case "rounding":
-        return (
-          <div className="dev-text-page">
-            {roundProblems.map((p, i) => (
-              <div key={i} className="dev-text-row">
-                <span className="g1-num">({i + 1})</span>
-                <span className="dev-text-q">{p.question}</span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
-                  {p.answer}
-                </span>
-              </div>
-            ))}
-          </div>
-        );
+        return renderTextProblems(roundProblems);
 
       case "frac-conv":
         return (
@@ -672,19 +535,7 @@ function Grade4({ operator }: { operator: string }) {
         );
 
       case "area":
-        return (
-          <div className="dev-text-page">
-            {areaProblems.map((p, i) => (
-              <div key={i} className="dev-text-row">
-                <span className="g1-num">({i + 1})</span>
-                <span className="dev-text-q">{p.question}</span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
-                  {p.answer}
-                </span>
-              </div>
-            ))}
-          </div>
-        );
+        return renderTextProblems(areaProblems);
 
       case "angle":
         return (
@@ -699,6 +550,219 @@ function Grade4({ operator }: { operator: string }) {
                 </span>
               </div>
             ))}
+          </div>
+        );
+
+      case "area-unit":
+        return renderTextProblems(areaUnitProblems);
+
+      case "estimate":
+        return renderTextProblems(estimateProblems);
+
+      case "decimal-place":
+        return renderTextProblems(decimalPlaceProblems);
+
+      case "div-check":
+        return renderTextProblems(divCheckProblems);
+
+      case "large-num4":
+        return renderTextProblems(largeNum4Problems);
+
+      case "calc-trick":
+        return renderTextProblems(calcTrickProblems);
+
+      case "pattern-table":
+        return (
+          <div className="dev-text-page">
+            {patternTableProblems.map((p, idx) => {
+              let ansIdx = 0;
+              return (
+                <div key={idx} className="dev-prop-block">
+                  <div className="dev-prop-label">
+                    ({idx + 1}) {p.label}
+                  </div>
+                  <table className="dev-prop-table">
+                    <thead>
+                      <tr>
+                        <th>x</th>
+                        {p.xValues.map((x, j) => <th key={j}>{x}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>y</td>
+                        {p.yValues.map((y, j) => {
+                          if (y !== null) {
+                            return <td key={j}>{y}</td>;
+                          }
+                          const ans = p.answers[ansIdx++];
+                          return (
+                            <td key={j} className="dev-prop-blank">
+                              <span className={showAnswers ? "dev-frac-ans" : "g1-hidden"}>
+                                {ans}
+                              </span>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })}
+          </div>
+        );
+
+      case "line-graph":
+        return (
+          <div className="dev-text-page">
+            {lineGraphProblems.map((p, idx) => {
+              const maxVal = Math.max(...p.values);
+              const minVal = Math.min(...p.values);
+              const range = maxVal - minVal || 1;
+              const padding = 40;
+              const graphWidth = 300;
+              const graphHeight = 200;
+              const stepX = graphWidth / (p.labels.length - 1);
+
+              return (
+                <div key={idx} className="dev-prop-block">
+                  <div className="dev-prop-label">
+                    ({idx + 1}) {p.title}
+                  </div>
+                  <svg
+                    width={graphWidth + padding * 2}
+                    height={graphHeight + padding * 2}
+                    style={{ display: "block", margin: "8px 0" }}
+                  >
+                    {/* Y-axis */}
+                    <line
+                      x1={padding} y1={padding}
+                      x2={padding} y2={padding + graphHeight}
+                      stroke="#333" strokeWidth={1}
+                    />
+                    {/* X-axis */}
+                    <line
+                      x1={padding} y1={padding + graphHeight}
+                      x2={padding + graphWidth} y2={padding + graphHeight}
+                      stroke="#333" strokeWidth={1}
+                    />
+                    {/* Y-axis labels */}
+                    {[0, 0.25, 0.5, 0.75, 1].map((frac, i) => {
+                      const val = Math.round(minVal + range * frac);
+                      const y = padding + graphHeight - graphHeight * frac;
+                      return (
+                        <g key={i}>
+                          <line
+                            x1={padding - 4} y1={y}
+                            x2={padding} y2={y}
+                            stroke="#333" strokeWidth={1}
+                          />
+                          <text
+                            x={padding - 8} y={y + 4}
+                            textAnchor="end" fontSize={10} fill="#333"
+                          >
+                            {val}
+                          </text>
+                        </g>
+                      );
+                    })}
+                    {/* X-axis labels */}
+                    {p.labels.map((label, i) => {
+                      const x = padding + i * stepX;
+                      return (
+                        <text
+                          key={i}
+                          x={x} y={padding + graphHeight + 16}
+                          textAnchor="middle" fontSize={9} fill="#333"
+                        >
+                          {label}
+                        </text>
+                      );
+                    })}
+                    {/* Line */}
+                    <polyline
+                      points={p.values.map((v, i) => {
+                        const x = padding + i * stepX;
+                        const y = padding + graphHeight - ((v - minVal) / range) * graphHeight;
+                        return `${x},${y}`;
+                      }).join(" ")}
+                      fill="none" stroke="#2196F3" strokeWidth={2}
+                    />
+                    {/* Dots */}
+                    {p.values.map((v, i) => {
+                      const x = padding + i * stepX;
+                      const y = padding + graphHeight - ((v - minVal) / range) * graphHeight;
+                      return (
+                        <circle
+                          key={i} cx={x} cy={y} r={3}
+                          fill="#2196F3"
+                        />
+                      );
+                    })}
+                    {/* Unit label */}
+                    <text
+                      x={padding - 8} y={padding - 8}
+                      textAnchor="end" fontSize={10} fill="#666"
+                    >
+                      ({p.unit})
+                    </text>
+                  </svg>
+                  {p.questions.map((q, qi) => (
+                    <div key={qi} className="dev-text-row">
+                      <span className="dev-text-q">{q.question}</span>
+                      <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                        {q.answer}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+        );
+
+      case "cross-table":
+        return (
+          <div className="dev-text-page">
+            {crossTableProblems.map((p, idx) => {
+              let ansIdx = 0;
+              return (
+                <div key={idx} className="dev-prop-block">
+                  <div className="dev-prop-label">
+                    ({idx + 1}) {p.title}
+                  </div>
+                  <table className="dev-prop-table">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        {p.colLabels.map((col, j) => <th key={j}>{col}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {p.rowLabels.map((row, r) => (
+                        <tr key={r}>
+                          <td><strong>{row}</strong></td>
+                          {p.cells[r].map((cell, c) => {
+                            if (cell !== null) {
+                              return <td key={c}>{cell}</td>;
+                            }
+                            const ans = p.answers[ansIdx++];
+                            return (
+                              <td key={c} className="dev-prop-blank">
+                                <span className={showAnswers ? "dev-frac-ans" : "g1-hidden"}>
+                                  {ans}
+                                </span>
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })}
           </div>
         );
 
@@ -737,6 +801,15 @@ export const devGrade4: ProblemGroup = {
     { operator: "frac-conv", label: "分数の変換" },
     { operator: "area", label: "面積" },
     { operator: "angle", label: "角度" },
+    { operator: "area-unit", label: "面積の単位換算" },
+    { operator: "estimate", label: "見積もり" },
+    { operator: "decimal-place", label: "小数の位取り" },
+    { operator: "div-check", label: "わり算の検算" },
+    { operator: "large-num4", label: "大きな数（億・兆）" },
+    { operator: "calc-trick", label: "計算のくふう" },
+    { operator: "pattern-table", label: "変わり方と表" },
+    { operator: "line-graph", label: "折れ線グラフ" },
+    { operator: "cross-table", label: "二次元の表" },
   ],
   Component: Grade4,
 };

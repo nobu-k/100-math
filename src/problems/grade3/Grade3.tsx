@@ -1,7 +1,20 @@
 import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { mulberry32, randomSeed, seedToHex, hexToSeed } from "../random";
+import { randomSeed, seedToHex, hexToSeed } from "../random";
 import type { ProblemGroup } from "../types";
+import { Box } from "../shared/Box";
+import {
+  generateDivision,
+  generateBoxEq,
+  generateMentalMath,
+  generateUnitConv3,
+  generateDecimalComp,
+  generateTimeCalc3,
+  generateLargeNum3,
+  generateBarGraph,
+  generateCircleRD,
+} from "./generators";
+import type { BarGraphProblem } from "./generators";
 
 /* ================================================================
    Types
@@ -12,272 +25,17 @@ type Grade3Op =
   | "box-eq"
   | "mental-math"
   | "unit-conv3"
-  | "decimal-comp";
-
-interface DivisionProblem {
-  dividend: number;
-  divisor: number;
-  quotient: number;
-  remainder: number;
-}
-
-interface BoxEqProblem {
-  /** Display string with □, e.g. "□ + 5 = 12" */
-  display: string;
-  answer: number;
-}
-
-interface MentalMathProblem {
-  left: number;
-  right: number;
-  op: "+" | "−";
-  answer: number;
-}
-
-interface TextProblem {
-  question: string;
-  answer: string;
-}
-
-interface DecimalCompProblem {
-  left: string;
-  right: string;
-  answer: "＞" | "＜" | "＝";
-}
-
-/* ================================================================
-   Generators
-   ================================================================ */
-
-function generateDivision(
-  seed: number,
-  remainderMode: "none" | "yes" | "mixed",
-): DivisionProblem[] {
-  const rng = mulberry32(seed);
-  const problems: DivisionProblem[] = [];
-
-  for (let i = 0; i < 15; i++) {
-    const divisor = 2 + Math.floor(rng() * 8); // 2-9
-    const useRemainder =
-      remainderMode === "none" ? false :
-      remainderMode === "yes" ? true :
-      rng() < 0.5;
-
-    if (useRemainder) {
-      const quotient = 1 + Math.floor(rng() * 9);
-      const remainder = 1 + Math.floor(rng() * (divisor - 1));
-      const dividend = divisor * quotient + remainder;
-      problems.push({ dividend, divisor, quotient, remainder });
-    } else {
-      const quotient = 1 + Math.floor(rng() * 9);
-      const dividend = divisor * quotient;
-      problems.push({ dividend, divisor, quotient, remainder: 0 });
-    }
-  }
-  return problems;
-}
-
-function generateBoxEq(
-  seed: number,
-  ops: "addsub" | "all",
-): BoxEqProblem[] {
-  const rng = mulberry32(seed);
-  const problems: BoxEqProblem[] = [];
-
-  for (let i = 0; i < 12; i++) {
-    const useMultDiv = ops === "all" && rng() < 0.5;
-
-    if (useMultDiv) {
-      // □ × b = c  or  a × □ = c  or  □ ÷ b = c  or  a ÷ □ = c
-      const useMul = rng() < 0.5;
-      if (useMul) {
-        const a = 2 + Math.floor(rng() * 8);
-        const b = 2 + Math.floor(rng() * 8);
-        const c = a * b;
-        if (rng() < 0.5) {
-          problems.push({ display: `□ × ${b} ＝ ${c}`, answer: a });
-        } else {
-          problems.push({ display: `${a} × □ ＝ ${c}`, answer: b });
-        }
-      } else {
-        const b = 2 + Math.floor(rng() * 8);
-        const c = 1 + Math.floor(rng() * 9);
-        const a = b * c;
-        if (rng() < 0.5) {
-          problems.push({ display: `□ ÷ ${b} ＝ ${c}`, answer: a });
-        } else {
-          problems.push({ display: `${a} ÷ □ ＝ ${c}`, answer: b });
-        }
-      }
-    } else {
-      // □ + b = c  or  a + □ = c  or  □ − b = c  or  a − □ = c
-      const useAdd = rng() < 0.5;
-      if (useAdd) {
-        const c = 10 + Math.floor(rng() * 90);
-        const a = 1 + Math.floor(rng() * (c - 1));
-        const b = c - a;
-        if (rng() < 0.5) {
-          problems.push({ display: `□ ＋ ${b} ＝ ${c}`, answer: a });
-        } else {
-          problems.push({ display: `${a} ＋ □ ＝ ${c}`, answer: b });
-        }
-      } else {
-        const a = 10 + Math.floor(rng() * 90);
-        const b = 1 + Math.floor(rng() * (a - 1));
-        const c = a - b;
-        if (rng() < 0.5) {
-          problems.push({ display: `□ − ${b} ＝ ${c}`, answer: a });
-        } else {
-          problems.push({ display: `${a} − □ ＝ ${c}`, answer: b });
-        }
-      }
-    }
-  }
-  return problems;
-}
-
-function generateMentalMath(
-  seed: number,
-  mode: "add" | "sub" | "mixed",
-): MentalMathProblem[] {
-  const rng = mulberry32(seed);
-  const problems: MentalMathProblem[] = [];
-
-  for (let i = 0; i < 20; i++) {
-    const useAdd = mode === "add" ? true : mode === "sub" ? false : rng() < 0.5;
-    if (useAdd) {
-      const left = 10 + Math.floor(rng() * 90);
-      const right = 1 + Math.floor(rng() * 99);
-      // keep sum ≤ 200 for mental math
-      const r = Math.min(right, 200 - left);
-      if (r < 1) { continue; }
-      problems.push({ left, right: r, op: "+", answer: left + r });
-    } else {
-      const left = 10 + Math.floor(rng() * 90);
-      const right = 1 + Math.floor(rng() * (left - 1));
-      problems.push({ left, right, op: "−", answer: left - right });
-    }
-  }
-  return problems.slice(0, 20);
-}
-
-function generateUnitConv3(
-  seed: number,
-  unitType: "length" | "weight" | "mixed",
-): TextProblem[] {
-  const rng = mulberry32(seed);
-  const problems: TextProblem[] = [];
-
-  const makeLengthProblem = (): TextProblem => {
-    const type = Math.floor(rng() * 4);
-    switch (type) {
-      case 0: {
-        const km = 1 + Math.floor(rng() * 9);
-        const m = (1 + Math.floor(rng() * 9)) * 100;
-        return { question: `${km}km ${m}m ＝ □m`, answer: `${km * 1000 + m}` };
-      }
-      case 1: {
-        const km = 1 + Math.floor(rng() * 9);
-        const m = (1 + Math.floor(rng() * 9)) * 100;
-        const total = km * 1000 + m;
-        return { question: `${total}m ＝ □km □m`, answer: `${km}km ${m}m` };
-      }
-      case 2: {
-        const m = 1 + Math.floor(rng() * 9);
-        const cm = 1 + Math.floor(rng() * 99);
-        return { question: `${m}m ${cm}cm ＝ □cm`, answer: `${m * 100 + cm}` };
-      }
-      default: {
-        const m = 1 + Math.floor(rng() * 9);
-        const cm = 1 + Math.floor(rng() * 99);
-        const total = m * 100 + cm;
-        return { question: `${total}cm ＝ □m □cm`, answer: `${m}m ${cm}cm` };
-      }
-    }
-  };
-
-  const makeWeightProblem = (): TextProblem => {
-    const type = Math.floor(rng() * 4);
-    switch (type) {
-      case 0: {
-        const kg = 1 + Math.floor(rng() * 9);
-        const g = (1 + Math.floor(rng() * 9)) * 100;
-        return { question: `${kg}kg ${g}g ＝ □g`, answer: `${kg * 1000 + g}` };
-      }
-      case 1: {
-        const kg = 1 + Math.floor(rng() * 9);
-        const g = (1 + Math.floor(rng() * 9)) * 100;
-        const total = kg * 1000 + g;
-        return { question: `${total}g ＝ □kg □g`, answer: `${kg}kg ${g}g` };
-      }
-      case 2: {
-        const t = 1 + Math.floor(rng() * 5);
-        const kg = (1 + Math.floor(rng() * 9)) * 100;
-        return { question: `${t}t ${kg}kg ＝ □kg`, answer: `${t * 1000 + kg}` };
-      }
-      default: {
-        const t = 1 + Math.floor(rng() * 5);
-        const kg = (1 + Math.floor(rng() * 9)) * 100;
-        const total = t * 1000 + kg;
-        return { question: `${total}kg ＝ □t □kg`, answer: `${t}t ${kg}kg` };
-      }
-    }
-  };
-
-  for (let i = 0; i < 10; i++) {
-    if (unitType === "length") {
-      problems.push(makeLengthProblem());
-    } else if (unitType === "weight") {
-      problems.push(makeWeightProblem());
-    } else {
-      problems.push(rng() < 0.5 ? makeLengthProblem() : makeWeightProblem());
-    }
-  }
-  return problems;
-}
-
-function generateDecimalComp(
-  seed: number,
-  maxVal: number,
-): DecimalCompProblem[] {
-  const rng = mulberry32(seed);
-  const problems: DecimalCompProblem[] = [];
-
-  for (let i = 0; i < 15; i++) {
-    let a: number, b: number;
-    if (i < 2) {
-      // guarantee some equal pairs
-      a = Math.round((0.1 + rng() * maxVal) * 10) / 10;
-      b = a;
-    } else {
-      a = Math.round((0.1 + rng() * maxVal) * 10) / 10;
-      b = Math.round((0.1 + rng() * maxVal) * 10) / 10;
-    }
-    const answer: "＞" | "＜" | "＝" = a > b ? "＞" : a < b ? "＜" : "＝";
-    problems.push({ left: a.toFixed(1), right: b.toFixed(1), answer });
-  }
-  return problems;
-}
-
-/* ================================================================
-   Shared components
-   ================================================================ */
-
-function Box({ answer, show }: { answer: number | string; show: boolean }) {
-  return (
-    <span className="g1-box">
-      <span className={show ? "g1-box-val" : "g1-box-val g1-hidden"}>
-        {answer}
-      </span>
-    </span>
-  );
-}
+  | "decimal-comp"
+  | "time-calc3"
+  | "large-num3"
+  | "bar-graph"
+  | "circle-rd";
 
 /* ================================================================
    URL state helpers
    ================================================================ */
 
-const ALL_PARAMS = ["q", "answers", "rem", "ops", "mmode", "unit3", "dmax"];
+const ALL_PARAMS = ["q", "answers", "rem", "ops", "mmode", "unit3", "dmax", "t3mode", "ln3mode", "bars"];
 
 function cleanParams(url: URL) {
   for (const k of ALL_PARAMS) url.searchParams.delete(k);
@@ -292,6 +50,9 @@ const BOX_DEF = { ops: "addsub" as const };
 const MENTAL_DEF = { mmode: "mixed" as const };
 const UNIT3_DEF = { unit3: "mixed" as const };
 const DCOMP_DEF = { dmax: 10 };
+const TIME3_DEF = { t3mode: "mixed" as const };
+const LARGE3_DEF = { ln3mode: "mixed" as const };
+const BAR_DEF = { bars: 4 };
 
 /* ================================================================
    Main component
@@ -327,7 +88,20 @@ function Grade3({ operator }: { operator: string }) {
     const dmax = Math.max(5, Math.min(100,
       parseInt(p.get("dmax") ?? String(DCOMP_DEF.dmax), 10) || DCOMP_DEF.dmax));
 
-    return { seed, showAnswers, rem, ops, mmode, unit3, dmax };
+    const t3modeRaw = p.get("t3mode") ?? TIME3_DEF.t3mode;
+    const t3mode: "after" | "duration" | "seconds" | "mixed" =
+      (["after", "duration", "seconds", "mixed"] as const).includes(t3modeRaw as any)
+        ? (t3modeRaw as any) : TIME3_DEF.t3mode;
+
+    const ln3modeRaw = p.get("ln3mode") ?? LARGE3_DEF.ln3mode;
+    const ln3mode: "read" | "count" | "multiply" | "mixed" =
+      (["read", "count", "multiply", "mixed"] as const).includes(ln3modeRaw as any)
+        ? (ln3modeRaw as any) : LARGE3_DEF.ln3mode;
+
+    const bars = Math.max(4, Math.min(6,
+      parseInt(p.get("bars") ?? String(BAR_DEF.bars), 10) || BAR_DEF.bars));
+
+    return { seed, showAnswers, rem, ops, mmode, unit3, dmax, t3mode, ln3mode, bars };
   };
 
   const [initial] = useState(getInitial);
@@ -340,6 +114,9 @@ function Grade3({ operator }: { operator: string }) {
   const [mmode, setMmode] = useState(initial.mmode);
   const [unit3, setUnit3] = useState(initial.unit3);
   const [dmax, setDmax] = useState(initial.dmax);
+  const [t3mode, setT3mode] = useState(initial.t3mode);
+  const [ln3mode, setLn3mode] = useState(initial.ln3mode);
+  const [bars, setBars] = useState(initial.bars);
 
   const syncUrl = useCallback(
     (s: number, ans: boolean, overrides?: Record<string, string>) => {
@@ -373,9 +150,20 @@ function Grade3({ operator }: { operator: string }) {
       case "decimal-comp":
         if (dmax !== DCOMP_DEF.dmax) m.dmax = String(dmax);
         break;
+      case "time-calc3":
+        if (t3mode !== TIME3_DEF.t3mode) m.t3mode = t3mode;
+        break;
+      case "large-num3":
+        if (ln3mode !== LARGE3_DEF.ln3mode) m.ln3mode = ln3mode;
+        break;
+      case "bar-graph":
+        if (bars !== BAR_DEF.bars) m.bars = String(bars);
+        break;
+      case "circle-rd":
+        break;
     }
     return m;
-  }, [op, rem, ops, mmode, unit3, dmax]);
+  }, [op, rem, ops, mmode, unit3, dmax, t3mode, ln3mode, bars]);
 
   useState(() => { syncUrl(seed, showAnswers, settingsParams()); });
 
@@ -450,6 +238,27 @@ function Grade3({ operator }: { operator: string }) {
     regen(p);
   }, [regen]);
 
+  const onT3modeChange = useCallback((v: "after" | "duration" | "seconds" | "mixed") => {
+    setT3mode(v);
+    const p: Record<string, string> = {};
+    if (v !== TIME3_DEF.t3mode) p.t3mode = v;
+    regen(p);
+  }, [regen]);
+
+  const onLn3modeChange = useCallback((v: "read" | "count" | "multiply" | "mixed") => {
+    setLn3mode(v);
+    const p: Record<string, string> = {};
+    if (v !== LARGE3_DEF.ln3mode) p.ln3mode = v;
+    regen(p);
+  }, [regen]);
+
+  const onBarsChange = useCallback((v: number) => {
+    setBars(v);
+    const p: Record<string, string> = {};
+    if (v !== BAR_DEF.bars) p.bars = String(v);
+    regen(p);
+  }, [regen]);
+
   /* ---- generate problems ---- */
 
   const divProblems = useMemo(
@@ -471,6 +280,22 @@ function Grade3({ operator }: { operator: string }) {
   const decimalProblems = useMemo(
     () => op === "decimal-comp" ? generateDecimalComp(seed, dmax) : [],
     [op, seed, dmax],
+  );
+  const timeCalc3Problems = useMemo(
+    () => op === "time-calc3" ? generateTimeCalc3(seed, t3mode) : [],
+    [op, seed, t3mode],
+  );
+  const largeNum3Problems = useMemo(
+    () => op === "large-num3" ? generateLargeNum3(seed, ln3mode) : [],
+    [op, seed, ln3mode],
+  );
+  const barGraphProblems = useMemo(
+    () => op === "bar-graph" ? generateBarGraph(seed, bars) : [],
+    [op, seed, bars],
+  );
+  const circleRDProblems = useMemo(
+    () => op === "circle-rd" ? generateCircleRD(seed) : [],
+    [op, seed],
   );
 
   /* ---- settings panel ---- */
@@ -546,9 +371,146 @@ function Grade3({ operator }: { operator: string }) {
             </label>
           </div>
         );
+      case "time-calc3":
+        return (
+          <div className="no-print settings-panel">
+            <label>
+              問題の種類{" "}
+              <select className="operator-select" value={t3mode}
+                onChange={(e) => onT3modeChange(e.target.value as any)}>
+                <option value="mixed">すべて</option>
+                <option value="after">○分後の時刻</option>
+                <option value="duration">時間の長さ</option>
+                <option value="seconds">秒の計算</option>
+              </select>
+            </label>
+          </div>
+        );
+      case "large-num3":
+        return (
+          <div className="no-print settings-panel">
+            <label>
+              問題の種類{" "}
+              <select className="operator-select" value={ln3mode}
+                onChange={(e) => onLn3modeChange(e.target.value as any)}>
+                <option value="mixed">すべて</option>
+                <option value="read">読み書き</option>
+                <option value="count">いくつ分</option>
+                <option value="multiply">何倍・1/N</option>
+              </select>
+            </label>
+          </div>
+        );
+      case "bar-graph":
+        return (
+          <div className="no-print settings-panel">
+            <label>
+              棒の数{" "}
+              <select className="operator-select" value={bars}
+                onChange={(e) => onBarsChange(Number(e.target.value))}>
+                <option value={4}>4</option>
+                <option value={5}>5</option>
+                <option value={6}>6</option>
+              </select>
+            </label>
+          </div>
+        );
+      case "circle-rd":
+        return null;
       default:
         return null;
     }
+  };
+
+  /* ---- render bar graph SVG ---- */
+
+  const renderBarChart = (bp: BarGraphProblem) => {
+    const chartWidth = 300;
+    const chartHeight = 200;
+    const marginLeft = 40;
+    const marginBottom = 40;
+    const marginTop = 10;
+    const marginRight = 10;
+    const plotWidth = chartWidth - marginLeft - marginRight;
+    const plotHeight = chartHeight - marginTop - marginBottom;
+    const barCount = bp.categories.length;
+    const barGap = 4;
+    const barWidth = Math.max(10, (plotWidth - barGap * (barCount + 1)) / barCount);
+
+    const scaleSteps: number[] = [];
+    for (let v = 0; v <= bp.scaleMax; v += bp.scaleStep) {
+      scaleSteps.push(v);
+    }
+
+    return (
+      <svg
+        width={chartWidth}
+        height={chartHeight}
+        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+        style={{ display: "block", margin: "8px 0" }}
+      >
+        {/* Y-axis */}
+        <line
+          x1={marginLeft} y1={marginTop}
+          x2={marginLeft} y2={chartHeight - marginBottom}
+          stroke="#333" strokeWidth={1}
+        />
+        {/* X-axis */}
+        <line
+          x1={marginLeft} y1={chartHeight - marginBottom}
+          x2={chartWidth - marginRight} y2={chartHeight - marginBottom}
+          stroke="#333" strokeWidth={1}
+        />
+        {/* Y-axis labels and grid lines */}
+        {scaleSteps.map((v) => {
+          const y = chartHeight - marginBottom - (v / bp.scaleMax) * plotHeight;
+          return (
+            <g key={v}>
+              <line
+                x1={marginLeft - 3} y1={y}
+                x2={chartWidth - marginRight} y2={y}
+                stroke="#ddd" strokeWidth={0.5}
+              />
+              <text
+                x={marginLeft - 6} y={y + 4}
+                textAnchor="end" fontSize={10} fill="#333"
+              >
+                {v}
+              </text>
+            </g>
+          );
+        })}
+        {/* Y-axis unit label */}
+        <text
+          x={marginLeft - 6} y={marginTop - 2}
+          textAnchor="end" fontSize={9} fill="#666"
+        >
+          ({bp.unit})
+        </text>
+        {/* Bars */}
+        {bp.categories.map((cat, i) => {
+          const x = marginLeft + barGap + i * (barWidth + barGap);
+          const barH = (bp.values[i] / bp.scaleMax) * plotHeight;
+          const y = chartHeight - marginBottom - barH;
+          return (
+            <g key={i}>
+              <rect
+                x={x} y={y}
+                width={barWidth} height={barH}
+                fill="#4a90d9" stroke="#333" strokeWidth={0.5}
+              />
+              <text
+                x={x + barWidth / 2}
+                y={chartHeight - marginBottom + 14}
+                textAnchor="middle" fontSize={10} fill="#333"
+              >
+                {cat}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    );
   };
 
   /* ---- render problems ---- */
@@ -645,6 +607,76 @@ function Grade3({ operator }: { operator: string }) {
           </div>
         );
 
+      case "time-calc3":
+        return (
+          <div className="dev-text-page">
+            {timeCalc3Problems.map((p, i) => (
+              <div key={i} className="dev-text-row">
+                <span className="g1-num">({i + 1})</span>
+                <span className="dev-text-q">{p.question}</span>
+                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                  {p.answer}
+                </span>
+              </div>
+            ))}
+          </div>
+        );
+
+      case "large-num3":
+        return (
+          <div className="dev-text-page">
+            {largeNum3Problems.map((p, i) => (
+              <div key={i} className="dev-text-row">
+                <span className="g1-num">({i + 1})</span>
+                <span className="dev-text-q">{p.question}</span>
+                <span className="dev-text-arrow">&rarr;</span>
+                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                  {p.answer}
+                </span>
+              </div>
+            ))}
+          </div>
+        );
+
+      case "bar-graph":
+        return (
+          <div className="dev-text-page">
+            {barGraphProblems.map((bp, idx) => (
+              <div key={idx} className="dev-prop-block">
+                <div className="dev-prop-label">
+                  ({idx + 1}) {bp.title}
+                </div>
+                {renderBarChart(bp)}
+                <div style={{ marginTop: 8 }}>
+                  {bp.questions.map((q, j) => (
+                    <div key={j} className="dev-text-row">
+                      <span className="dev-text-q">{q.question}</span>
+                      <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                        {q.answer}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+
+      case "circle-rd":
+        return (
+          <div className="dev-text-page">
+            {circleRDProblems.map((p, i) => (
+              <div key={i} className="dev-text-row">
+                <span className="g1-num">({i + 1})</span>
+                <span className="dev-text-q">{p.question}</span>
+                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                  {p.answer}
+                </span>
+              </div>
+            ))}
+          </div>
+        );
+
       default:
         return <p>不明な問題タイプです</p>;
     }
@@ -680,6 +712,10 @@ export const devGrade3: ProblemGroup = {
     { operator: "mental-math", label: "暗算" },
     { operator: "unit-conv3", label: "単位の換算" },
     { operator: "decimal-comp", label: "小数の大小比較" },
+    { operator: "time-calc3", label: "時刻と時間（3年）" },
+    { operator: "large-num3", label: "大きな数（万の位）" },
+    { operator: "bar-graph", label: "棒グラフ" },
+    { operator: "circle-rd", label: "円の半径と直径" },
   ],
   Component: Grade3,
 };
