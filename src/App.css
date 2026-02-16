@@ -1062,6 +1062,10 @@
   grid-template-columns: 1fr 1fr 1fr;
 }
 
+.g1-cols-4 {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
 /* Individual problem row */
 .g1-problem {
   display: flex;
