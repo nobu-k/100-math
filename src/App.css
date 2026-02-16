@@ -630,6 +630,51 @@
   visibility: hidden;
 }
 
+.fraction-symbol {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.fraction-int {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.fraction-cd-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fraction-cd-answers {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fraction-guide {
+  margin-left: 28px;
+}
+
+.fraction-guide-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fraction-guide .fraction-frac {
+  font-size: 20px;
+}
+
+.fraction-guide .fraction-int {
+  font-size: 20px;
+}
+
+.fraction-guide-sym {
+  font-size: 20px;
+  font-weight: bold;
+}
+
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;
@@ -855,8 +900,19 @@
   }
 
   .fraction-operator,
-  .fraction-equals {
+  .fraction-equals,
+  .fraction-symbol,
+  .fraction-int {
     font-size: 20px;
+  }
+
+  .fraction-guide .fraction-frac {
+    font-size: 14px;
+  }
+
+  .fraction-guide .fraction-int,
+  .fraction-guide-sym {
+    font-size: 14px;
   }
 
   @page {
