@@ -4,7 +4,7 @@ import type { ProblemGroup } from "./types";
 import { mulberry32, randomSeed, seedToHex, hexToSeed } from "./random";
 import "../App.css";
 
-type IntegerOperator = "multiples" | "factors";
+type IntegerOperator = "multiples" | "factors" | "lcm";
 
 interface MultiplesProblem {
   kind: "multiples";
@@ -19,7 +19,17 @@ interface FactorsProblem {
   answers: number[];
 }
 
-type IntegerProblem = MultiplesProblem | FactorsProblem;
+interface LcmProblem {
+  kind: "lcm";
+  a: number;
+  b: number;
+  answer: number;
+  // Ladder division steps: each row is [divisor, ...remainders]
+  ladder: { divisor: number; values: [number, number] }[];
+  ladderBottom: [number, number];
+}
+
+type IntegerProblem = MultiplesProblem | FactorsProblem | LcmProblem;
 
 const generateMultiplesProblems = (
   seed: number,
@@ -63,6 +73,48 @@ const generateFactorsProblems = (
   return problems;
 };
 
+const computeLadder = (a: number, b: number): { ladder: { divisor: number; values: [number, number] }[]; bottom: [number, number] } => {
+  const ladder: { divisor: number; values: [number, number] }[] = [];
+  let x = a, y = b;
+  for (let d = 2; d <= Math.min(x, y); ) {
+    if (x % d === 0 && y % d === 0) {
+      ladder.push({ divisor: d, values: [x, y] });
+      x /= d;
+      y /= d;
+    } else {
+      d++;
+    }
+  }
+  return { ladder, bottom: [x, y] };
+};
+
+const gcd = (a: number, b: number): number => {
+  while (b) { [a, b] = [b, a % b]; }
+  return a;
+};
+
+const lcmOf = (a: number, b: number): number => (a / gcd(a, b)) * b;
+
+const generateLcmProblems = (
+  seed: number,
+  nmin: number,
+  nmax: number,
+): LcmProblem[] => {
+  const rng = mulberry32(seed);
+  const problems: LcmProblem[] = [];
+  for (let i = 0; i < 10; i++) {
+    const a = nmin + Math.floor(rng() * (nmax - nmin + 1));
+    let b: number;
+    do {
+      b = nmin + Math.floor(rng() * (nmax - nmin + 1));
+    } while (b === a);
+    const answer = lcmOf(a, b);
+    const { ladder, bottom } = computeLadder(a, b);
+    problems.push({ kind: "lcm", a, b, answer, ladder, ladderBottom: bottom });
+  }
+  return problems;
+};
+
 const generateProblems = (
   op: IntegerOperator,
   seed: number,
@@ -72,12 +124,14 @@ const generateProblems = (
 ): IntegerProblem[] => {
   if (op === "multiples") return generateMultiplesProblems(seed, nmin, nmax, count);
   if (op === "factors") return generateFactorsProblems(seed, nmin, nmax);
+  if (op === "lcm") return generateLcmProblems(seed, nmin, nmax);
   return generateMultiplesProblems(seed, nmin, nmax, count);
 };
 
 const DEFAULTS: Record<IntegerOperator, { nmin: number; nmax: number; count: number }> = {
   multiples: { nmin: 2, nmax: 9, count: 5 },
   factors: { nmin: 2, nmax: 36, count: 5 },
+  lcm: { nmin: 2, nmax: 20, count: 5 },
 };
 
 const PARAM_KEYS = ["q", "answers", "nmin", "nmax", "count"];
@@ -274,25 +328,57 @@ function Integer({ operator }: { operator: string }) {
         </div>
       )}
       <div className="integer-page">
-        {problems.map((p, i) => (
-          <div key={i} className="integer-problem">
-            <div className="integer-question">
-              <span className="integer-number">({i + 1})</span>
-              {p.kind === "multiples" ? (
+        {problems.map((p, i) =>
+          p.kind === "lcm" ? (
+            <div key={i} className="integer-problem integer-lcm-problem">
+              <div className="integer-question">
+                <span className="integer-number">({i + 1})</span>
                 <span className="integer-text">
-                  {p.number} の倍数を {p.count} つ書きなさい
+                  {p.a} と {p.b} の最小公倍数
                 </span>
-              ) : p.kind === "factors" ? (
-                <span className="integer-text">
-                  {p.number} の約数をすべて書きなさい
-                </span>
-              ) : null}
+              </div>
+              <div className="integer-ladder-area">
+                <table className={`integer-ladder${showAnswers ? "" : " integer-hidden"}`}>
+                  <tbody>
+                    {p.ladder.map((row, ri) => (
+                      <tr key={ri}>
+                        <td className="integer-ladder-div">{row.divisor}</td>
+                        <td className="integer-ladder-val">{row.values[0]}</td>
+                        <td className="integer-ladder-val">{row.values[1]}</td>
+                      </tr>
+                    ))}
+                    <tr>
+                      <td className="integer-ladder-div"></td>
+                      <td className="integer-ladder-bottom">{p.ladderBottom[0]}</td>
+                      <td className="integer-ladder-bottom">{p.ladderBottom[1]}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div className={`integer-answer-text${showAnswers ? "" : " integer-hidden"}`}>
+                  答え: {p.answer}
+                </div>
+              </div>
             </div>
-            <div className={`integer-answer-text${showAnswers ? "" : " integer-hidden"}`}>
-              {p.answers.join(", ")}
+          ) : (
+            <div key={i} className="integer-problem">
+              <div className="integer-question">
+                <span className="integer-number">({i + 1})</span>
+                {p.kind === "multiples" ? (
+                  <span className="integer-text">
+                    {p.number} の倍数を {p.count} つ書きなさい
+                  </span>
+                ) : p.kind === "factors" ? (
+                  <span className="integer-text">
+                    {p.number} の約数をすべて書きなさい
+                  </span>
+                ) : null}
+              </div>
+              <div className={`integer-answer-text${showAnswers ? "" : " integer-hidden"}`}>
+                {p.answers.join(", ")}
+              </div>
             </div>
-          </div>
-        ))}
+          ),
+        )}
       </div>
       <div className="qr-section">
         <QRCodeSVG value={qrUrl} size={80} />
@@ -308,6 +394,7 @@ export const integer: ProblemGroup = {
   operators: [
     { operator: "multiples", label: "倍数" },
     { operator: "factors", label: "約数" },
+    { operator: "lcm", label: "最小公倍数" },
   ],
   Component: Integer,
 };

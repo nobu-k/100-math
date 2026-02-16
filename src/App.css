@@ -717,6 +717,39 @@
   visibility: hidden;
 }
 
+.integer-lcm-problem {
+  min-height: 120px;
+}
+
+.integer-ladder-area {
+  margin-left: 24px;
+}
+
+.integer-ladder {
+  border-collapse: collapse;
+  margin-bottom: 4px;
+}
+
+.integer-ladder td {
+  font-size: 18px;
+  font-weight: bold;
+  padding: 2px 8px;
+  text-align: center;
+  color: red;
+}
+
+.integer-ladder-div {
+  border-right: 2px solid red;
+}
+
+.integer-ladder-val {
+  border-bottom: 2px solid red;
+}
+
+.integer-ladder-bottom {
+  padding-top: 2px;
+}
+
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;
@@ -963,6 +996,11 @@
 
   .integer-answer-text {
     font-size: 14px;
+  }
+
+  .integer-ladder td {
+    font-size: 14px;
+    padding: 1px 4px;
   }
 
   @page {
