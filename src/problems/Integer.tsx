@@ -40,6 +40,19 @@ interface GcdProblem {
 
 type IntegerProblem = MultiplesProblem | FactorsProblem | LcmProblem | GcdProblem;
 
+const pickUnique = (rng: () => number, min: number, max: number, n: number): number[] => {
+  const range = max - min + 1;
+  const pool = Array.from({ length: range }, (_, i) => i + min);
+  const limit = Math.min(n, range);
+  for (let i = 0; i < limit; i++) {
+    const j = i + Math.floor(rng() * (range - i));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  const result: number[] = [];
+  for (let i = 0; i < n; i++) result.push(pool[i % limit]);
+  return result;
+};
+
 const generateMultiplesProblems = (
   seed: number,
   nmin: number,
@@ -47,14 +60,12 @@ const generateMultiplesProblems = (
   count: number,
 ): MultiplesProblem[] => {
   const rng = mulberry32(seed);
-  const problems: MultiplesProblem[] = [];
-  for (let i = 0; i < 10; i++) {
-    const n = nmin + Math.floor(rng() * (nmax - nmin + 1));
+  const nums = pickUnique(rng, nmin, nmax, 10);
+  return nums.map((n) => {
     const answers: number[] = [];
     for (let j = 1; j <= count; j++) answers.push(n * j);
-    problems.push({ kind: "multiples", number: n, count, answers });
-  }
-  return problems;
+    return { kind: "multiples" as const, number: n, count, answers };
+  });
 };
 
 const getFactors = (n: number): number[] => {
@@ -74,12 +85,12 @@ const generateFactorsProblems = (
   nmax: number,
 ): FactorsProblem[] => {
   const rng = mulberry32(seed);
-  const problems: FactorsProblem[] = [];
-  for (let i = 0; i < 10; i++) {
-    const n = nmin + Math.floor(rng() * (nmax - nmin + 1));
-    problems.push({ kind: "factors", number: n, answers: getFactors(n) });
-  }
-  return problems;
+  const nums = pickUnique(rng, nmin, nmax, 10);
+  return nums.map((n) => ({
+    kind: "factors" as const,
+    number: n,
+    answers: getFactors(n),
+  }));
 };
 
 const computeLadder = (a: number, b: number): { ladder: { divisor: number; values: [number, number] }[]; bottom: [number, number] } => {
@@ -396,7 +407,7 @@ function Integer({ operator }: { operator: string }) {
                 <span className="integer-number">({i + 1})</span>
                 {p.kind === "multiples" ? (
                   <span className="integer-text">
-                    {p.number} の倍数を {p.count} つ書きなさい
+                    {p.number} の倍数を小さい方から {p.count} つ書きなさい
                   </span>
                 ) : p.kind === "factors" ? (
                   <span className="integer-text">
