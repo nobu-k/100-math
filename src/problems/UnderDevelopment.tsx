@@ -1,16 +1,15 @@
 import type { ProblemGroup } from "./types";
-
-function UnderDevelopment({ operator }: { operator: string }) {
-  return (
-    <div style={{ padding: "2em", color: "#888" }}>
-      <p>この問題は開発中です: {operator}</p>
-    </div>
-  );
-}
+import Grade1 from "./grade1/Grade1";
 
 export const underDevelopment: ProblemGroup = {
   id: "dev",
   label: "開発中",
-  operators: [],
-  Component: UnderDevelopment,
+  operators: [
+    { operator: "decomposition", label: "数の分解" },
+    { operator: "fill-blank", label: "穴埋め加減" },
+    { operator: "comparison", label: "大小くらべ" },
+    { operator: "sequence", label: "数のならび" },
+    { operator: "clock", label: "時計のよみ方" },
+  ],
+  Component: Grade1,
 };
