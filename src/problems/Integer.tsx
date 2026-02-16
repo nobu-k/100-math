@@ -123,14 +123,36 @@ const generateLcmProblems = (
   const rng = mulberry32(seed);
   const problems: LcmProblem[] = [];
   for (let i = 0; i < 10; i++) {
-    const a = nmin + Math.floor(rng() * (nmax - nmin + 1));
-    let b: number;
-    do {
-      b = nmin + Math.floor(rng() * (nmax - nmin + 1));
-    } while (b === a);
-    const answer = lcmOf(a, b);
-    const { ladder, bottom } = computeLadder(a, b);
-    problems.push({ kind: "lcm", a, b, answer, ladder, ladderBottom: bottom });
+    let a: number, b: number;
+    // Pick a shared factor g >= 2, then two coprime multipliers
+    let found = false;
+    for (let attempt = 0; attempt < 100; attempt++) {
+      const maxG = Math.floor(nmax / 2);
+      if (maxG < 2) break;
+      const g = 2 + Math.floor(rng() * (maxG - 1));
+      const lo = Math.max(1, Math.ceil(nmin / g));
+      const hi = Math.floor(nmax / g);
+      if (hi - lo < 1) continue;
+      const ma = lo + Math.floor(rng() * (hi - lo + 1));
+      const mb = lo + Math.floor(rng() * (hi - lo + 1));
+      if (ma === mb || gcd(ma, mb) !== 1) continue;
+      a = g * ma;
+      b = g * mb;
+      const answer = lcmOf(a, b);
+      const { ladder, bottom } = computeLadder(a, b);
+      problems.push({ kind: "lcm", a, b, answer, ladder, ladderBottom: bottom });
+      found = true;
+      break;
+    }
+    if (!found) {
+      a = nmin + Math.floor(rng() * (nmax - nmin + 1));
+      do {
+        b = nmin + Math.floor(rng() * (nmax - nmin + 1));
+      } while (b === a);
+      const answer = lcmOf(a, b);
+      const { ladder, bottom } = computeLadder(a, b);
+      problems.push({ kind: "lcm", a, b, answer, ladder, ladderBottom: bottom });
+    }
   }
   return problems;
 };
@@ -143,14 +165,37 @@ const generateGcdProblems = (
   const rng = mulberry32(seed);
   const problems: GcdProblem[] = [];
   for (let i = 0; i < 10; i++) {
-    const a = nmin + Math.floor(rng() * (nmax - nmin + 1));
-    let b: number;
-    do {
-      b = nmin + Math.floor(rng() * (nmax - nmin + 1));
-    } while (b === a);
-    const answer = gcd(a, b);
-    const { ladder, bottom } = computeLadder(a, b);
-    problems.push({ kind: "gcd", a, b, answer, ladder, ladderBottom: bottom });
+    let a: number, b: number;
+    // Pick a non-trivial GCD g, then two coprime multipliers
+    let found = false;
+    for (let attempt = 0; attempt < 100; attempt++) {
+      const maxG = Math.floor(nmax / 2);
+      if (maxG < 2) break;
+      const g = 2 + Math.floor(rng() * (maxG - 1));
+      const lo = Math.max(1, Math.ceil(nmin / g));
+      const hi = Math.floor(nmax / g);
+      if (hi - lo < 1) continue;
+      const ma = lo + Math.floor(rng() * (hi - lo + 1));
+      const mb = lo + Math.floor(rng() * (hi - lo + 1));
+      if (ma === mb || gcd(ma, mb) !== 1) continue;
+      a = g * ma;
+      b = g * mb;
+      const answer = g;
+      const { ladder, bottom } = computeLadder(a, b);
+      problems.push({ kind: "gcd", a, b, answer, ladder, ladderBottom: bottom });
+      found = true;
+      break;
+    }
+    if (!found) {
+      // Fallback: random pair
+      a = nmin + Math.floor(rng() * (nmax - nmin + 1));
+      do {
+        b = nmin + Math.floor(rng() * (nmax - nmin + 1));
+      } while (b === a);
+      const answer = gcd(a, b);
+      const { ladder, bottom } = computeLadder(a, b);
+      problems.push({ kind: "gcd", a, b, answer, ladder, ladderBottom: bottom });
+    }
   }
   return problems;
 };
