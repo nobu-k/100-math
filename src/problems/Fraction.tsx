@@ -186,12 +186,10 @@ function Fraction({ operator: _operator }: { operator: string }) {
                 <span className="fraction-denominator">{p.denominator}</span>
               </div>
               <span className="fraction-equals">=</span>
-              {showAnswers && (
-                <div className="fraction-frac fraction-answer">
-                  <span className="fraction-numerator">{sum}</span>
-                  <span className="fraction-denominator">{p.denominator}</span>
-                </div>
-              )}
+              <div className={`fraction-frac fraction-answer${showAnswers ? "" : " fraction-hidden"}`}>
+                <span className="fraction-numerator">{sum}</span>
+                <span className="fraction-denominator">{p.denominator}</span>
+              </div>
             </div>
           );
         })}
