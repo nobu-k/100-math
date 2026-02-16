@@ -4,7 +4,7 @@ import type { ProblemGroup } from "./types";
 import { mulberry32, randomSeed, seedToHex, hexToSeed } from "./random";
 import "../App.css";
 
-type IntegerOperator = "multiples";
+type IntegerOperator = "multiples" | "factors";
 
 interface MultiplesProblem {
   kind: "multiples";
@@ -13,7 +13,13 @@ interface MultiplesProblem {
   answers: number[];
 }
 
-type IntegerProblem = MultiplesProblem;
+interface FactorsProblem {
+  kind: "factors";
+  number: number;
+  answers: number[];
+}
+
+type IntegerProblem = MultiplesProblem | FactorsProblem;
 
 const generateMultiplesProblems = (
   seed: number,
@@ -32,6 +38,31 @@ const generateMultiplesProblems = (
   return problems;
 };
 
+const getFactors = (n: number): number[] => {
+  const factors: number[] = [];
+  for (let i = 1; i * i <= n; i++) {
+    if (n % i === 0) {
+      factors.push(i);
+      if (i !== n / i) factors.push(n / i);
+    }
+  }
+  return factors.sort((a, b) => a - b);
+};
+
+const generateFactorsProblems = (
+  seed: number,
+  nmin: number,
+  nmax: number,
+): FactorsProblem[] => {
+  const rng = mulberry32(seed);
+  const problems: FactorsProblem[] = [];
+  for (let i = 0; i < 10; i++) {
+    const n = nmin + Math.floor(rng() * (nmax - nmin + 1));
+    problems.push({ kind: "factors", number: n, answers: getFactors(n) });
+  }
+  return problems;
+};
+
 const generateProblems = (
   op: IntegerOperator,
   seed: number,
@@ -40,11 +71,13 @@ const generateProblems = (
   count: number,
 ): IntegerProblem[] => {
   if (op === "multiples") return generateMultiplesProblems(seed, nmin, nmax, count);
+  if (op === "factors") return generateFactorsProblems(seed, nmin, nmax);
   return generateMultiplesProblems(seed, nmin, nmax, count);
 };
 
 const DEFAULTS: Record<IntegerOperator, { nmin: number; nmax: number; count: number }> = {
   multiples: { nmin: 2, nmax: 9, count: 5 },
+  factors: { nmin: 2, nmax: 36, count: 5 },
 };
 
 const PARAM_KEYS = ["q", "answers", "nmin", "nmax", "count"];
@@ -245,11 +278,15 @@ function Integer({ operator }: { operator: string }) {
           <div key={i} className="integer-problem">
             <div className="integer-question">
               <span className="integer-number">({i + 1})</span>
-              {p.kind === "multiples" && (
+              {p.kind === "multiples" ? (
                 <span className="integer-text">
                   {p.number} の倍数を {p.count} つ書きなさい
                 </span>
-              )}
+              ) : p.kind === "factors" ? (
+                <span className="integer-text">
+                  {p.number} の約数をすべて書きなさい
+                </span>
+              ) : null}
             </div>
             <div className={`integer-answer-text${showAnswers ? "" : " integer-hidden"}`}>
               {p.answers.join(", ")}
@@ -270,6 +307,7 @@ export const integer: ProblemGroup = {
   label: "整数",
   operators: [
     { operator: "multiples", label: "倍数" },
+    { operator: "factors", label: "約数" },
   ],
   Component: Integer,
 };
