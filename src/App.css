@@ -1310,6 +1310,52 @@
   color: red;
 }
 
+/* ============================================================
+   Shared dev-grade fraction row
+   ============================================================ */
+
+.dev-frac-row {
+  align-items: center;
+}
+
+/* ============================================================
+   Proportion table (Grade 6)
+   ============================================================ */
+
+.dev-prop-block {
+  margin-bottom: 16px;
+}
+
+.dev-prop-label {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.dev-prop-table {
+  border-collapse: collapse;
+}
+
+.dev-prop-table th,
+.dev-prop-table td {
+  border: 2px solid #000;
+  padding: 6px 16px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  min-width: 48px;
+}
+
+.dev-prop-table th {
+  background: #f0f0f0;
+}
+
+.dev-prop-blank {
+  background: #fff;
+  min-width: 48px;
+  min-height: 32px;
+}
+
 @media print {
   .dev-text-q {
     font-size: 18px;
@@ -1321,5 +1367,11 @@
 
   .dev-text-arrow {
     font-size: 18px;
+  }
+
+  .dev-prop-table th,
+  .dev-prop-table td {
+    font-size: 16px;
+    padding: 4px 12px;
   }
 }
