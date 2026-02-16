@@ -750,6 +750,11 @@
   padding-top: 2px;
 }
 
+.integer-ladder-hl {
+  background: #fff0f0;
+  border-radius: 50%;
+}
+
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;

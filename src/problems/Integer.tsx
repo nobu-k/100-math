@@ -429,20 +429,24 @@ function Integer({ operator }: { operator: string }) {
                   <tbody>
                     {p.ladder.map((row, ri) => (
                       <tr key={ri}>
-                        <td className="integer-ladder-div">{row.divisor}</td>
+                        <td className="integer-ladder-div integer-ladder-hl">{row.divisor}</td>
                         <td className="integer-ladder-val">{row.values[0]}</td>
                         <td className="integer-ladder-val">{row.values[1]}</td>
                       </tr>
                     ))}
                     <tr>
                       <td className="integer-ladder-div"></td>
-                      <td className="integer-ladder-bottom">{p.ladderBottom[0]}</td>
-                      <td className="integer-ladder-bottom">{p.ladderBottom[1]}</td>
+                      <td className={`integer-ladder-bottom${p.kind === "lcm" ? " integer-ladder-hl" : ""}`}>{p.ladderBottom[0]}</td>
+                      <td className={`integer-ladder-bottom${p.kind === "lcm" ? " integer-ladder-hl" : ""}`}>{p.ladderBottom[1]}</td>
                     </tr>
                   </tbody>
                 </table>
                 <div className={`integer-answer-text${showAnswers ? "" : " integer-hidden"}`}>
-                  答え: {p.answer}
+                  {(() => {
+                    const parts = p.ladder.map((r) => r.divisor);
+                    if (p.kind === "lcm") parts.push(p.ladderBottom[0], p.ladderBottom[1]);
+                    return parts.join(" × ") + " = " + p.answer;
+                  })()}
                 </div>
               </div>
             </div>
