@@ -429,15 +429,20 @@ function Integer({ operator }: { operator: string }) {
                   <tbody>
                     {p.ladder.map((row, ri) => (
                       <tr key={ri}>
-                        <td className="integer-ladder-div integer-ladder-hl">{row.divisor}</td>
-                        <td className="integer-ladder-val">{row.values[0]}</td>
-                        <td className="integer-ladder-val">{row.values[1]}</td>
+                        <td className="integer-ladder-cell integer-ladder-div integer-ladder-hl">{row.divisor}</td>
+                        <td className="integer-ladder-cell integer-ladder-val integer-ladder-val-start">
+                          <svg className="integer-ladder-bracket" viewBox="0 0 10 30" preserveAspectRatio="none">
+                            <path d="M0,8 C10,14 10,22 0,30" stroke="currentColor" strokeWidth="3" fill="none" />
+                          </svg>
+                          {row.values[0]}
+                        </td>
+                        <td className="integer-ladder-cell integer-ladder-val">{row.values[1]}</td>
                       </tr>
                     ))}
                     <tr>
-                      <td className="integer-ladder-div"></td>
-                      <td className={`integer-ladder-bottom${p.kind === "lcm" ? " integer-ladder-hl" : ""}`}>{p.ladderBottom[0]}</td>
-                      <td className={`integer-ladder-bottom${p.kind === "lcm" ? " integer-ladder-hl" : ""}`}>{p.ladderBottom[1]}</td>
+                      <td className="integer-ladder-cell integer-ladder-div"></td>
+                      <td className={`integer-ladder-cell integer-ladder-bottom${p.kind === "lcm" ? " integer-ladder-hl" : ""}`}>{p.ladderBottom[0]}</td>
+                      <td className={`integer-ladder-cell integer-ladder-bottom${p.kind === "lcm" ? " integer-ladder-hl" : ""}`}>{p.ladderBottom[1]}</td>
                     </tr>
                   </tbody>
                 </table>
