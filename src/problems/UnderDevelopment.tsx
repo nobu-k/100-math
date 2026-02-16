@@ -3,7 +3,7 @@ import Grade1 from "./grade1/Grade1";
 
 export const underDevelopment: ProblemGroup = {
   id: "dev",
-  label: "開発中",
+  label: "1年（開発中）",
   operators: [
     { operator: "decomposition", label: "数の分解" },
     { operator: "fill-blank", label: "穴埋め加減" },

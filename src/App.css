@@ -1243,3 +1243,79 @@
     font-size: 12px;
   }
 }
+
+/* ============================================================
+   Shared dev-grade text-based problems
+   ============================================================ */
+
+.dev-text-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.dev-text-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.dev-text-q {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.dev-text-arrow {
+  font-size: 22px;
+  color: #888;
+}
+
+.dev-text-a {
+  font-size: 22px;
+  font-weight: bold;
+  color: red;
+  margin-left: 4px;
+}
+
+/* ============================================================
+   Shared dev-grade fraction display
+   ============================================================ */
+
+.dev-frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  margin: 0 4px;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1.1;
+}
+
+.dev-frac-num {
+  border-bottom: 2px solid #000;
+  padding: 0 6px 2px;
+}
+
+.dev-frac-den {
+  padding: 2px 6px 0;
+}
+
+.dev-frac-ans {
+  color: red;
+}
+
+@media print {
+  .dev-text-q {
+    font-size: 18px;
+  }
+
+  .dev-text-a {
+    font-size: 18px;
+  }
+
+  .dev-text-arrow {
+    font-size: 18px;
+  }
+}
