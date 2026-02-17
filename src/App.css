@@ -1051,19 +1051,18 @@
 .g1-page {
   display: grid;
   gap: 18px 32px;
-  width: 100%;
 }
 
 .g1-cols-2 {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto auto;
 }
 
 .g1-cols-3 {
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: auto auto auto;
 }
 
 .g1-cols-4 {
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: auto auto auto auto;
 }
 
 /* Individual problem row */
@@ -1203,6 +1202,22 @@
    Grade 1 print overrides
    ============================================================ */
 @media print {
+  .g1-page {
+    width: 100%;
+  }
+
+  .g1-cols-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .g1-cols-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .g1-cols-4 {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+
   .g1-val {
     font-size: 22px;
   }
