@@ -869,6 +869,13 @@
     padding: 0;
   }
 
+  .qr-section {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin-top: 0;
+  }
+
   .grid th,
   .grid td {
     width: 17mm;
