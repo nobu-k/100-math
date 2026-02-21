@@ -33,9 +33,29 @@ export function generateCalcTrick(seed: number): TextProblem[] {
     },
   ];
 
-  for (let i = 0; i < 8; i++) {
-    const pat = patterns[Math.floor(rng() * patterns.length)];
-    problems.push(pat());
+  // Round-robin: 2 of each pattern (4 patterns × 2 = 8)
+  const patternOrder: number[] = [];
+  for (let j = 0; j < 2; j++) {
+    for (let k = 0; k < patterns.length; k++) {
+      patternOrder.push(k);
+    }
+  }
+  // Shuffle for variety
+  for (let i = patternOrder.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [patternOrder[i], patternOrder[j]] = [patternOrder[j], patternOrder[i]];
+  }
+
+  const seen = new Set<string>();
+  for (const patIdx of patternOrder) {
+    for (let attempt = 0; attempt < 20; attempt++) {
+      const p = patterns[patIdx]();
+      if (!seen.has(p.question) || attempt === 19) {
+        seen.add(p.question);
+        problems.push(p);
+        break;
+      }
+    }
   }
   return problems;
 }

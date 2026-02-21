@@ -43,8 +43,8 @@ describe("generateCounting", () => {
     }
   });
 
-  it("permutation answers are factorials of 3-5", () => {
-    const validFactorials = [6, 24, 120]; // 3!, 4!, 5!
+  it("permutation answers are factorials of 3-7", () => {
+    const validFactorials = [6, 24, 120, 720, 5040]; // 3!, 4!, 5!, 6!, 7!
     for (const seed of seeds) {
       const problems = generateCounting(seed);
       for (const p of problems) {
@@ -65,11 +65,11 @@ describe("generateCounting", () => {
     const combFn = (n: number, r: number) =>
       factorial(n) / (factorial(r) * factorial(n - r));
 
-    // All valid C(n,r) for n=4-6, r=2-3
+    // All valid C(n,r) for n=4-8, r=2-4
     const validCombs = new Set<number>();
-    for (let n = 4; n <= 6; n++) {
-      for (let r = 2; r <= 3; r++) {
-        if (r <= n - 2 + 1) validCombs.add(combFn(n, r));
+    for (let n = 4; n <= 8; n++) {
+      for (let r = 2; r <= 4; r++) {
+        if (r <= n - 1) validCombs.add(combFn(n, r));
       }
     }
 

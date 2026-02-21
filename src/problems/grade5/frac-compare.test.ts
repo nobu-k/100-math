@@ -29,11 +29,14 @@ describe("generateFracCompare", () => {
     }
   });
 
-  it("first two problems have equal fractions", () => {
+  it("has balanced answer distribution (5 each of ＞, ＜, ＝)", () => {
     for (const seed of seeds) {
       const problems = generateFracCompare(seed);
-      expect(problems[0].answer).toBe("＝");
-      expect(problems[1].answer).toBe("＝");
+      const counts = { "＞": 0, "＜": 0, "＝": 0 };
+      for (const p of problems) counts[p.answer]++;
+      expect(counts["＞"]).toBe(5);
+      expect(counts["＜"]).toBe(5);
+      expect(counts["＝"]).toBe(5);
     }
   });
 

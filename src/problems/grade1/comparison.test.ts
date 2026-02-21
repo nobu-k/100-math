@@ -20,11 +20,14 @@ describe("generateComparison", () => {
     }
   });
 
-  it("first two problems have equal pairs", () => {
+  it("has balanced answer distribution (5 each of ＞, ＜, ＝)", () => {
     for (const seed of seeds) {
       const problems = generateComparison(seed, 20);
-      expect(problems[0].left).toBe(problems[0].right);
-      expect(problems[1].left).toBe(problems[1].right);
+      const counts = { "＞": 0, "＜": 0, "＝": 0 };
+      for (const p of problems) counts[p.answer]++;
+      expect(counts["＞"]).toBe(5);
+      expect(counts["＜"]).toBe(5);
+      expect(counts["＝"]).toBe(5);
     }
   });
 

@@ -14,7 +14,12 @@ export function generatePercent(
       : find;
 
     const base = (2 + Math.floor(rng() * 19)) * 10;
-    const pct = (1 + Math.floor(rng() * 19)) * 5;
+    // Build valid pct values for this base (where base*pct/100 is integer)
+    const validPcts: number[] = [];
+    for (let p = 1; p <= 99; p++) {
+      if ((base * p) % 100 === 0) validPcts.push(p);
+    }
+    const pct = validPcts[Math.floor(rng() * validPcts.length)];
     const compared = base * pct / 100;
 
     switch (type) {

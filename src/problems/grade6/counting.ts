@@ -27,20 +27,27 @@ export function generateCounting(seed: number): TextProblem[] {
     }),
   ];
 
+  const seen = new Set<string>();
   for (let i = 0; i < 8; i++) {
-    if (rng() < 0.5) {
-      // permutation
-      const n = 3 + Math.floor(rng() * 3); // 3-5
-      const tmpl = permTemplates[Math.floor(rng() * permTemplates.length)];
-      const { q, a } = tmpl(n);
-      problems.push({ question: q, answer: `${a}通り` });
-    } else {
-      // combination
-      const n = 4 + Math.floor(rng() * 3); // 4-6
-      const r = 2 + Math.floor(rng() * Math.min(2, n - 2)); // 2-3
-      const tmpl = combTemplates[Math.floor(rng() * combTemplates.length)];
-      const { q, a } = tmpl(n, r);
-      problems.push({ question: q, answer: `${a}通り` });
+    for (let attempt = 0; attempt < 20; attempt++) {
+      let q: string, a: number;
+      if (rng() < 0.5) {
+        // permutation
+        const n = 3 + Math.floor(rng() * 5); // 3-7
+        const tmpl = permTemplates[Math.floor(rng() * permTemplates.length)];
+        ({ q, a } = tmpl(n));
+      } else {
+        // combination
+        const n = 4 + Math.floor(rng() * 5); // 4-8
+        const r = 2 + Math.floor(rng() * Math.min(3, n - 2)); // 2-4
+        const tmpl = combTemplates[Math.floor(rng() * combTemplates.length)];
+        ({ q, a } = tmpl(n, r));
+      }
+      if (!seen.has(q) || attempt === 19) {
+        seen.add(q);
+        problems.push({ question: q, answer: `${a}通り` });
+        break;
+      }
     }
   }
   return problems;

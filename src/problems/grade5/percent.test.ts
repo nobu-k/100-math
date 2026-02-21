@@ -22,16 +22,15 @@ describe("generatePercent", () => {
         const ansMatch = p.answer.match(/^(\d+)%$/);
         expect(ansMatch).not.toBeNull();
         const pct = Number(ansMatch![1]);
-        // percentage is a multiple of 5 between 5 and 95
-        expect(pct % 5).toBe(0);
-        expect(pct).toBeGreaterThanOrEqual(5);
-        expect(pct).toBeLessThanOrEqual(95);
-        // verify: base * pct / 100 = compared
+        expect(pct).toBeGreaterThanOrEqual(1);
+        expect(pct).toBeLessThanOrEqual(99);
+        // verify: base * pct / 100 = compared (must be integer)
         const qMatch = p.question.match(/([\d.]+)人中([\d.]+)人/);
         expect(qMatch).not.toBeNull();
         const base = Number(qMatch![1]);
         const compared = Number(qMatch![2]);
         expect(base * pct / 100).toBeCloseTo(compared, 10);
+        expect(Number.isInteger(compared)).toBe(true);
       }
     }
   });
@@ -103,15 +102,16 @@ describe("generatePercent", () => {
     }
   });
 
-  it("percentage is a multiple of 5 between 5 and 95", () => {
+  it("percentage is between 1 and 99 with integer result", () => {
     for (const seed of seeds) {
       const problems = generatePercent(seed, "compared");
       for (const p of problems) {
         const match = p.question.match(/(\d+)の(\d+)%/);
+        const base = Number(match![1]);
         const pct = Number(match![2]);
-        expect(pct % 5).toBe(0);
-        expect(pct).toBeGreaterThanOrEqual(5);
-        expect(pct).toBeLessThanOrEqual(95);
+        expect(pct).toBeGreaterThanOrEqual(1);
+        expect(pct).toBeLessThanOrEqual(99);
+        expect(Number.isInteger(base * pct / 100)).toBe(true);
       }
     }
   });
