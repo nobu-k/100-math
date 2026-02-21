@@ -116,7 +116,7 @@ function App() {
 
   const renderCategoryView = () => (
     <ul className="sidebar-menu">
-      {problemGroups.map((group) => (
+      {problemGroups.filter((g) => !g.id.startsWith("dev")).map((group) => (
         <li key={group.id} className="sidebar-group">
           <div
             className="sidebar-group-header"
