@@ -289,10 +289,10 @@ export const hissan: ProblemGroup = {
   id: "hissan",
   label: "ひっ算",
   operators: [
-    { operator: "addition", label: "たし算" },
-    { operator: "subtraction", label: "ひき算" },
-    { operator: "multiplication", label: "かけ算" },
-    { operator: "division", label: "わり算" },
+    { operator: "addition", label: "たし算", grades: [2, 3] },
+    { operator: "subtraction", label: "ひき算", grades: [2, 3] },
+    { operator: "multiplication", label: "かけ算", grades: [3, 4] },
+    { operator: "division", label: "わり算", grades: [3, 4] },
   ],
   Component: Hissan,
 };

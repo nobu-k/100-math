@@ -488,10 +488,10 @@ export const integer: ProblemGroup = {
   id: "integer",
   label: "整数",
   operators: [
-    { operator: "multiples", label: "倍数" },
-    { operator: "factors", label: "約数" },
-    { operator: "lcm", label: "最小公倍数" },
-    { operator: "gcd", label: "最大公約数" },
+    { operator: "multiples", label: "倍数", grades: [5] },
+    { operator: "factors", label: "約数", grades: [5] },
+    { operator: "lcm", label: "最小公倍数", grades: [5] },
+    { operator: "gcd", label: "最大公約数", grades: [5] },
   ],
   Component: Integer,
 };

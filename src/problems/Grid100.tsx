@@ -142,9 +142,9 @@ export const grid100: ProblemGroup = {
   id: "grid100",
   label: "百マス計算",
   operators: [
-    { operator: "addition", label: "たし算" },
-    { operator: "subtraction", label: "ひき算" },
-    { operator: "multiplication", label: "かけ算" },
+    { operator: "addition", label: "たし算", grades: [1, 2] },
+    { operator: "subtraction", label: "ひき算", grades: [1, 2] },
+    { operator: "multiplication", label: "かけ算", grades: [2, 3] },
   ],
   Component: Grid100,
 };
