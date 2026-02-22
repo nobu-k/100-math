@@ -1,8 +1,16 @@
 import { mulberry32 } from "../random";
 
+export interface AreaFigure {
+  shape: "square" | "rect";
+  width: number;
+  height: number;
+  unknown: "area" | "width" | "height";
+}
+
 export interface AreaProblem {
   question: string;
   answer: string;
+  figure: AreaFigure;
 }
 
 export const generateArea = (
@@ -23,11 +31,13 @@ export const generateArea = (
         problems.push({
           question: `面積が${area}cm²の正方形の一辺の長さは？`,
           answer: `${side}cm`,
+          figure: { shape: "square", width: side, height: side, unknown: "width" },
         });
       } else {
         problems.push({
           question: `一辺${side}cmの正方形の面積は？`,
           answer: `${area}cm²`,
+          figure: { shape: "square", width: side, height: side, unknown: "area" },
         });
       }
     } else {
@@ -38,11 +48,13 @@ export const generateArea = (
         problems.push({
           question: `面積が${area}cm²、たて${h}cmの長方形のよこは？`,
           answer: `${w}cm`,
+          figure: { shape: "rect", width: w, height: h, unknown: "width" },
         });
       } else {
         problems.push({
           question: `たて${h}cm、よこ${w}cmの長方形の面積は？`,
           answer: `${area}cm²`,
+          figure: { shape: "rect", width: w, height: h, unknown: "area" },
         });
       }
     }
