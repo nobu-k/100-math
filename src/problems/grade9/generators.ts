@@ -17,16 +17,19 @@ export {
 } from "./quadratic-eq";
 export {
   type SimilarityProblem,
+  type SimilarityFigure,
   type SimilarityMode,
   generateSimilarity,
 } from "./similarity";
 export {
   type CircleAngleProblem,
+  type CircleAngleFigure,
   type CircleAngleMode,
   generateCircleAngle,
 } from "./circle-angle";
 export {
   type PythagoreanProblem,
+  type PythagoreanFigure,
   type PythagoreanMode,
   generatePythagorean,
 } from "./pythagorean";
