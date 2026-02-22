@@ -1,33 +1,17 @@
 import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { randomSeed, seedToHex, hexToSeed } from "../random";
-import type { ProblemGroup } from "../types";
-import { Frac } from "../shared/Frac";
-import {
-  generatePolyAddSub,
-  generateMonoMulDiv,
-  generateSimEq,
-  generatePolygonAngle,
-  generateTriAngle,
-  generateParallelAngle,
-  generateParallelogram,
-  generateLinearFunc,
-  generateProbability,
-} from "./generators";
-import type {
-  MonoMulDivMode,
-  SimEqMode,
-  PolygonAngleMode,
-  PolygonAngleProblem,
-  TriAngleMode,
-  TriAngleProblem,
-  ParallelAngleMode,
-  ParallelAngleProblem,
-  ParallelogramMode,
-  ParallelogramProblem,
-  LinearFuncMode,
-  ProbabilityMode,
-} from "./generators";
+import { randomSeed, seedToHex, hexToSeed } from "./random";
+import type { ProblemGroup } from "./types";
+import { Frac } from "./shared/Frac";
+import { generatePolyAddSub } from "./computation/poly-add-sub";
+import { type MonoMulDivMode, generateMonoMulDiv } from "./computation/mono-mul-div";
+import { type SimEqMode, generateSimEq } from "./equations/simultaneous-eq";
+import { type PolygonAngleMode, type PolygonAngleProblem, generatePolygonAngle } from "./geometry/polygon-angle";
+import { type TriAngleMode, type TriAngleProblem, generateTriAngle } from "./geometry/triangle-angle";
+import { type ParallelAngleMode, type ParallelAngleProblem, generateParallelAngle } from "./geometry/parallel-angle";
+import { type ParallelogramMode, type ParallelogramProblem, generateParallelogram } from "./geometry/parallelogram";
+import { type LinearFuncMode, generateLinearFunc } from "./relations/linear-func";
+import { type ProbabilityMode, generateProbability } from "./data/probability";
 
 /* ================================================================
    Types

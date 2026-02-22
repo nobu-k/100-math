@@ -1,23 +1,21 @@
 import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { randomSeed, seedToHex, hexToSeed } from "../random";
-import type { ProblemGroup } from "../types";
-import type { FracProblem, CircleAreaProblem, PrismVolumeProblem } from "./generators";
-import {
-  generateFracMul,
-  generateFracDiv,
-  generateRatio,
-  generateCircleArea,
-  generateProportion,
-  generateLiteralExpr,
-  generateRepresentative,
-  generateCounting,
-  generatePrismVolume,
-  generateScale,
-  generateFracMixedCalc,
-  generateFreqTable,
-} from "./generators";
-import { Frac } from "../shared/Frac";
+import { randomSeed, seedToHex, hexToSeed } from "./random";
+import type { ProblemGroup } from "./types";
+import type { FracProblem } from "./fractions/types";
+import { generateFracMul } from "./fractions/frac-mul";
+import { generateFracDiv } from "./fractions/frac-div";
+import { generateRatio } from "./relations/ratio";
+import { type CircleAreaProblem, generateCircleArea } from "./geometry/circle-area";
+import { generateProportion } from "./relations/proportion-table";
+import { generateLiteralExpr } from "./equations/literal-expr";
+import { generateRepresentative } from "./data/representative";
+import { generateCounting } from "./data/counting";
+import { type PrismVolumeProblem, generatePrismVolume } from "./geometry/prism-volume";
+import { generateScale } from "./geometry/scale";
+import { generateFracMixedCalc } from "./computation/frac-mixed-calc";
+import { generateFreqTable } from "./data/freq-table";
+import { Frac } from "./shared/Frac";
 
 /* ================================================================
    Types

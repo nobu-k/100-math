@@ -1,25 +1,23 @@
 import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { randomSeed, seedToHex, hexToSeed } from "../random";
-import type { ProblemGroup } from "../types";
-import {
-  generatePercent,
-  generateSpeed,
-  generateAreaFormula,
-  generateFracDecimal,
-  generateAverage,
-  generateDiffFrac,
-  generateVolume,
-  generateCircumference,
-  generateEvenOdd,
-  generateFracCompare,
-  generateUnitAmount,
-  generateDecimalShift,
-  generatePatternEq,
-} from "./generators";
-import type { TextProblem, AreaFormulaProblem, CircumferenceProblem, VolumeProblem } from "./generators";
-import { Box } from "../shared/Box";
-import { Frac } from "../shared/Frac";
+import { randomSeed, seedToHex, hexToSeed } from "./random";
+import type { ProblemGroup } from "./types";
+import { generatePercent } from "./relations/percent";
+import { generateSpeed } from "./measurement/speed";
+import { type AreaFormulaProblem, generateAreaFormula } from "./geometry/area-formula";
+import { generateFracDecimal } from "./fractions/frac-decimal";
+import { generateAverage } from "./measurement/average";
+import { generateDiffFrac } from "./fractions/diff-frac";
+import { type VolumeProblem, generateVolume } from "./geometry/volume";
+import { type CircumferenceProblem, generateCircumference } from "./geometry/circumference";
+import { generateEvenOdd } from "./numbers/even-odd";
+import { generateFracCompare } from "./fractions/frac-compare";
+import { generateUnitAmount } from "./measurement/unit-amount";
+import { generateDecimalShift } from "./fractions/decimal-shift";
+import { generatePatternEq } from "./equations/pattern-eq";
+import type { TextProblem } from "./shared/types";
+import { Box } from "./shared/Box";
+import { Frac } from "./shared/Frac";
 
 /* ================================================================
    Types

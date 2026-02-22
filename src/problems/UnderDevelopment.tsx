@@ -1,5 +1,5 @@
 import type { ProblemGroup } from "./types";
-import Grade1 from "./grade1/Grade1";
+import Grade1 from "./Grade1";
 
 export const underDevelopment: ProblemGroup = {
   id: "dev",

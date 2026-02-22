@@ -1,40 +1,21 @@
 import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { randomSeed, seedToHex, hexToSeed } from "../random";
-import type { ProblemGroup } from "../types";
-import { Box } from "../shared/Box";
-import {
-  generatePosNegAddSub,
-  generatePosNegMulDiv,
-  generatePosNegMixed,
-  generateAbsoluteValue,
-  generatePrime,
-  generateExprValue,
-  generateLinearExpr,
-  generateLinearEq,
-  generateSector,
-  generateSolid,
-  generateProportion,
-  generateDataAnalysis,
-  generateCoordinate,
-} from "./generators";
-import type {
-  PosNegMulDivMode,
-  AbsoluteValueMode,
-  PrimeMode,
-  ExprValueVars,
-  LinearExprMode,
-  LinearEqMode,
-  SectorMode,
-  SolidMode,
-  ProportionMode,
-  DataAnalysisMode,
-  CoordinateMode,
-  CoordinateProblem,
-  SectorProblem,
-  SolidProblem,
-  DataAnalysisProblem,
-} from "./generators";
+import { randomSeed, seedToHex, hexToSeed } from "./random";
+import type { ProblemGroup } from "./types";
+import { Box } from "./shared/Box";
+import { generatePosNegAddSub } from "./computation/pos-neg-add-sub";
+import { type PosNegMulDivMode, generatePosNegMulDiv } from "./computation/pos-neg-mul-div";
+import { generatePosNegMixed } from "./computation/pos-neg-mixed";
+import { type AbsoluteValueMode, generateAbsoluteValue } from "./numbers/absolute-value";
+import { type PrimeMode, generatePrime } from "./numbers/prime";
+import { type ExprValueVars, generateExprValue } from "./equations/expr-value";
+import { type LinearExprMode, generateLinearExpr } from "./equations/linear-expr";
+import { type LinearEqMode, generateLinearEq } from "./equations/linear-eq";
+import { type SectorProblem, type SectorMode, generateSector } from "./geometry/sector";
+import { type SolidProblem, type SolidMode, generateSolid } from "./geometry/solid-volume";
+import { type ProportionMode, generateProportion } from "./relations/proportion-eq";
+import { type DataAnalysisProblem, type DataAnalysisMode, generateDataAnalysis } from "./data/data-analysis";
+import { type CoordinateProblem, type CoordinateMode, generateCoordinate } from "./relations/coordinate";
 
 /* ================================================================
    Types

@@ -1,26 +1,24 @@
 import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { randomSeed, seedToHex, hexToSeed } from "../random";
-import type { ProblemGroup } from "../types";
-import {
-  generateMixedCalc,
-  generateRounding,
-  generateFracConv,
-  generateArea,
-  generateAngle,
-  generateAreaUnit,
-  generateEstimate,
-  generateDecimalPlace,
-  generateDivCheck,
-  generateLargeNum4,
-  generateCalcTrick,
-  generatePatternTable,
-  generateLineGraph,
-  generateCrossTable,
-} from "./generators";
-import type { TextProblem, AreaProblem, AngleProblem } from "./generators";
-import { Box } from "../shared/Box";
-import { Frac } from "../shared/Frac";
+import { randomSeed, seedToHex, hexToSeed } from "./random";
+import type { ProblemGroup } from "./types";
+import { generateMixedCalc } from "./computation/mixed-calc";
+import { generateRounding } from "./numbers/rounding";
+import { generateFracConv } from "./fractions/frac-conv";
+import { type AreaProblem, generateArea } from "./geometry/area";
+import { type AngleProblem, generateAngle } from "./geometry/angle";
+import { generateAreaUnit } from "./geometry/area-unit";
+import { generateEstimate } from "./computation/estimate";
+import { generateDecimalPlace } from "./numbers/decimal-place";
+import { generateDivCheck } from "./computation/div-check";
+import { generateLargeNum4 } from "./numbers/large-num4";
+import { generateCalcTrick } from "./computation/calc-trick";
+import { generatePatternTable } from "./relations/pattern-table";
+import { generateLineGraph } from "./data/line-graph";
+import { generateCrossTable } from "./data/cross-table";
+import type { TextProblem } from "./shared/types";
+import { Box } from "./shared/Box";
+import { Frac } from "./shared/Frac";
 
 /* ================================================================
    Types

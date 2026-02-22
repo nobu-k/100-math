@@ -1,6 +1,6 @@
 import { mulberry32 } from "../random";
 import { lcm, simplify } from "../shared/math-utils";
-import type { FracProblem } from "./types";
+import type { FracProblem } from "../fractions/types";
 
 export const generateFracMixedCalc = (seed: number): FracProblem[] => {
   const rng = mulberry32(seed);

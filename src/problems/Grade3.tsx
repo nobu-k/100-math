@@ -1,20 +1,17 @@
 import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { randomSeed, seedToHex, hexToSeed } from "../random";
-import type { ProblemGroup } from "../types";
-import { Box } from "../shared/Box";
-import {
-  generateDivision,
-  generateBoxEq,
-  generateMentalMath,
-  generateUnitConv3,
-  generateDecimalComp,
-  generateTimeCalc3,
-  generateLargeNum3,
-  generateBarGraph,
-  generateCircleRD,
-} from "./generators";
-import type { BarGraphProblem, CircleRDProblem } from "./generators";
+import { randomSeed, seedToHex, hexToSeed } from "./random";
+import type { ProblemGroup } from "./types";
+import { Box } from "./shared/Box";
+import { generateDivision } from "./computation/division";
+import { generateBoxEq } from "./equations/box-eq";
+import { generateMentalMath } from "./computation/mental-math";
+import { generateUnitConv3 } from "./measurement/unit-conv3";
+import { generateDecimalComp } from "./fractions/decimal-comp";
+import { generateTimeCalc3 } from "./measurement/time-calc3";
+import { generateLargeNum3 } from "./numbers/large-num3";
+import { type BarGraphProblem, generateBarGraph } from "./data/bar-graph";
+import { type CircleRDProblem, generateCircleRD } from "./geometry/circle-rd";
 
 /* ================================================================
    Types

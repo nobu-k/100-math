@@ -1,16 +1,14 @@
 import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { randomSeed, seedToHex, hexToSeed } from "../random";
-import type { ProblemGroup } from "../types";
-import { Box } from "../shared/Box";
-import {
-  generateKukuBlank,
-  generateMushikui,
-  generateUnitConv,
-  generateTimeCalc,
-  generateLargeNum,
-  generateTableRead,
-} from "./generators";
+import { randomSeed, seedToHex, hexToSeed } from "./random";
+import type { ProblemGroup } from "./types";
+import { Box } from "./shared/Box";
+import { generateKukuBlank } from "./computation/kuku-blank";
+import { generateMushikui } from "./computation/mushikui";
+import { generateUnitConv } from "./measurement/unit-conv";
+import { generateTimeCalc } from "./measurement/time-calc";
+import { generateLargeNum } from "./numbers/large-num";
+import { generateTableRead } from "./data/table-read";
 
 /* ================================================================
    Types

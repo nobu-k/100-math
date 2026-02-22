@@ -1,32 +1,16 @@
 import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { randomSeed, seedToHex, hexToSeed } from "../random";
-import type { ProblemGroup } from "../types";
-import {
-  generateSqrt,
-  generateExpansion,
-  generateFactoring,
-  generateQuadEq,
-  generateSimilarity,
-  generateCircleAngle,
-  generatePythagorean,
-  generateQuadFunc,
-  generateSampling,
-} from "./generators";
-import type {
-  SqrtMode,
-  ExpansionMode,
-  FactoringMode,
-  QuadEqMode,
-  SimilarityMode,
-  SimilarityProblem,
-  CircleAngleMode,
-  CircleAngleProblem,
-  PythagoreanMode,
-  PythagoreanProblem,
-  QuadFuncMode,
-  SamplingMode,
-} from "./generators";
+import { randomSeed, seedToHex, hexToSeed } from "./random";
+import type { ProblemGroup } from "./types";
+import { type SqrtMode, generateSqrt } from "./numbers/square-root";
+import { type ExpansionMode, generateExpansion } from "./equations/expansion";
+import { type FactoringMode, generateFactoring } from "./equations/factoring";
+import { type QuadEqMode, generateQuadEq } from "./equations/quadratic-eq";
+import { type SimilarityMode, type SimilarityProblem, generateSimilarity } from "./geometry/similarity";
+import { type CircleAngleMode, type CircleAngleProblem, generateCircleAngle } from "./geometry/circle-angle";
+import { type PythagoreanMode, type PythagoreanProblem, generatePythagorean } from "./geometry/pythagorean";
+import { type QuadFuncMode, generateQuadFunc } from "./relations/quadratic-func";
+import { type SamplingMode, generateSampling } from "./data/sampling";
 
 /* ================================================================
    Types

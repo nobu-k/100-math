@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { generateProportion } from "./proportion";
+import { generateProportion } from "./proportion-eq";
 
 const seeds = [1, 2, 42, 100, 999];
 

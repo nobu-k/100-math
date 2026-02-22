@@ -1,13 +1,11 @@
 import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { randomSeed, seedToHex, hexToSeed } from "../random";
-import {
-  generateDecomposition,
-  generateFillBlank,
-  generateComparison,
-  generateSequence,
-  generateClock,
-} from "./generators";
+import { randomSeed, seedToHex, hexToSeed } from "./random";
+import { generateDecomposition } from "./numbers/decomposition";
+import { generateFillBlank } from "./computation/fill-blank";
+import { generateComparison } from "./numbers/comparison";
+import { generateSequence } from "./numbers/sequence";
+import { generateClock } from "./measurement/clock";
 
 /* ================================================================
    Types
