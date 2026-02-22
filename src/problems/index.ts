@@ -9,6 +9,9 @@ export { devGrade3 } from "./grade3/Grade3";
 export { devGrade4 } from "./grade4/Grade4";
 export { devGrade5 } from "./grade5/Grade5";
 export { devGrade6 } from "./grade6/Grade6";
+export { devGrade7 } from "./grade7/Grade7";
+export { devGrade8 } from "./grade8/Grade8";
+export { devGrade9 } from "./grade9/Grade9";
 
 import { grid100 } from "./Grid100";
 import { hissan } from "./Hissan";
@@ -20,6 +23,9 @@ import { devGrade3 } from "./grade3/Grade3";
 import { devGrade4 } from "./grade4/Grade4";
 import { devGrade5 } from "./grade5/Grade5";
 import { devGrade6 } from "./grade6/Grade6";
+import { devGrade7 } from "./grade7/Grade7";
+import { devGrade8 } from "./grade8/Grade8";
+import { devGrade9 } from "./grade9/Grade9";
 import type { ProblemGroup } from "./types";
 
-export const problemGroups: ProblemGroup[] = [grid100, hissan, fraction, integer, underDevelopment, devGrade2, devGrade3, devGrade4, devGrade5, devGrade6];
+export const problemGroups: ProblemGroup[] = [grid100, hissan, fraction, integer, underDevelopment, devGrade2, devGrade3, devGrade4, devGrade5, devGrade6, devGrade7, devGrade8, devGrade9];
