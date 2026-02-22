@@ -11,7 +11,7 @@ export { generateProportion } from "./proportion";
 export { generateLiteralExpr } from "./literal-expr";
 export { generateRepresentative } from "./representative";
 export { generateCounting } from "./counting";
-export { generatePrismVolume } from "./prism-volume";
+export { type PrismVolumeProblem, generatePrismVolume } from "./prism-volume";
 export { generateScale } from "./scale";
 export { generateFracMixedCalc } from "./frac-mixed-calc";
 export { generateFreqTable } from "./freq-table";
