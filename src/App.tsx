@@ -14,7 +14,8 @@ interface GradeEntry {
 }
 
 const GRADE_LABELS: Record<number, string> = {
-  1: "1年", 2: "2年", 3: "3年", 4: "4年", 5: "5年", 6: "6年",
+  1: "小1", 2: "小2", 3: "小3", 4: "小4", 5: "小5", 6: "小6",
+  7: "中1", 8: "中2", 9: "中3", 10: "高1", 11: "高2", 12: "高3",
 };
 
 const CATEGORY_LABELS: [string, string][] = [
@@ -80,7 +81,7 @@ const App = () => {
     return (
       <span className="grade-badges">
         {op.grades.map((g) => (
-          <span key={g} className="grade-badge">{g}</span>
+          <span key={g} className="grade-badge">{GRADE_LABELS[g] ?? g}</span>
         ))}
       </span>
     );
