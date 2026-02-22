@@ -2,10 +2,26 @@ import { mulberry32 } from "../random";
 
 export type PythagoreanMode = "basic" | "special" | "applied" | "mixed";
 
+export interface PythagoreanFigure {
+  type: "basic" | "special-45" | "special-30-60" | "equilateral-height" | "coordinate" | "cuboid";
+  a?: number;
+  b?: number;
+  c?: number;
+  unknownSide?: "a" | "b" | "c";
+  side?: number;
+  findHypotenuse?: boolean;
+  shortSide?: number;
+  findTarget?: "hypotenuse" | "long-leg" | "short-leg";
+  pointA?: { x: number; y: number };
+  pointB?: { x: number; y: number };
+  dims?: { a: number; b: number; c: number };
+}
+
 export interface PythagoreanProblem {
   type: PythagoreanMode;
   question: string;
   answerDisplay: string;
+  figure: PythagoreanFigure;
 }
 
 // Pythagorean triples for integer-answer problems
@@ -31,6 +47,7 @@ export const generatePythagorean = (
 
       let question: string;
       let answerDisplay: string;
+      let figure: PythagoreanFigure;
 
       if (type === "basic") {
         const triple = TRIPLES[Math.floor(rng() * TRIPLES.length)];
@@ -40,10 +57,12 @@ export const generatePythagorean = (
           // Find hypotenuse
           question = `直角三角形の2辺が ${triple[0]}cm と ${triple[1]}cm のとき斜辺は？`;
           answerDisplay = `${triple[2]}cm`;
+          figure = { type: "basic", a: triple[0], b: triple[1], c: triple[2], unknownSide: "c" };
         } else if (variant === 1) {
           // Find a leg
           question = `直角三角形の斜辺が ${triple[2]}cm、一辺が ${triple[0]}cm のとき他の辺は？`;
           answerDisplay = `${triple[1]}cm`;
+          figure = { type: "basic", a: triple[0], b: triple[1], c: triple[2], unknownSide: "b" };
         } else {
           // Non-integer answer: use two sides that aren't a triple
           const a = 2 + Math.floor(rng() * 8); // 2-9
@@ -54,6 +73,7 @@ export const generatePythagorean = (
           const [outer, inner] = simplifyRoot(cSq);
           question = `直角三角形の2辺が ${a}cm と ${b}cm のとき斜辺は？`;
           answerDisplay = `${fmtRoot(outer, inner)}cm`;
+          figure = { type: "basic", a, b, unknownSide: "c" };
         }
       } else if (type === "special") {
         const specialType = Math.floor(rng() * 3);
@@ -65,10 +85,12 @@ export const generatePythagorean = (
           if (variant) {
             question = `直角二等辺三角形の一辺が ${side}cm のとき斜辺は？`;
             answerDisplay = `${side}√2cm`;
+            figure = { type: "special-45", side, findHypotenuse: true };
           } else {
             const hyp = side; // hypotenuse given
             question = `直角二等辺三角形の斜辺が ${hyp}√2cm のとき他の辺は？`;
             answerDisplay = `${hyp}cm`;
+            figure = { type: "special-45", side: hyp, findHypotenuse: false };
           }
         } else if (specialType === 1) {
           // 30-60-90: sides 1:√3:2
@@ -77,12 +99,15 @@ export const generatePythagorean = (
           if (variant === 0) {
             question = `30°-60°-90° の三角形で短い辺が ${short}cm のとき斜辺は？`;
             answerDisplay = `${short * 2}cm`;
+            figure = { type: "special-30-60", shortSide: short, findTarget: "hypotenuse" };
           } else if (variant === 1) {
             question = `30°-60°-90° の三角形で短い辺が ${short}cm のとき長い辺は？`;
             answerDisplay = `${short}√3cm`;
+            figure = { type: "special-30-60", shortSide: short, findTarget: "long-leg" };
           } else {
             question = `30°-60°-90° の三角形で斜辺が ${short * 2}cm のとき短い辺は？`;
             answerDisplay = `${short}cm`;
+            figure = { type: "special-30-60", shortSide: short, findTarget: "short-leg" };
           }
         } else {
           // Equilateral triangle height
@@ -97,6 +122,7 @@ export const generatePythagorean = (
             // side√3 / 2
             answerDisplay = `${side}√3/2cm`;
           }
+          figure = { type: "equilateral-height", side };
         }
       } else {
         // Applied: distance between two points, cuboid diagonal
@@ -119,6 +145,7 @@ export const generatePythagorean = (
             const [outer, inner] = simplifyRoot(distSq);
             answerDisplay = fmtRoot(outer, inner);
           }
+          figure = { type: "coordinate", pointA: { x: x1, y: y1 }, pointB: { x: x2, y: y2 } };
         } else {
           // Cuboid diagonal
           const a = 2 + Math.floor(rng() * 8);
@@ -133,13 +160,14 @@ export const generatePythagorean = (
             const [outer, inner] = simplifyRoot(diagSq);
             answerDisplay = `${fmtRoot(outer, inner)}cm`;
           }
+          figure = { type: "cuboid", dims: { a, b, c } };
         }
       }
 
       const key = question;
       if (!seen.has(key) || attempt === 39) {
         seen.add(key);
-        problems.push({ type, question, answerDisplay });
+        problems.push({ type, question, answerDisplay, figure });
         break;
       }
     }
