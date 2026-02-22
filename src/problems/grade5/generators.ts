@@ -6,7 +6,7 @@ export { generateFracDecimal } from "./frac-decimal";
 export { generateAverage } from "./average";
 export { type FracCalcProblem, generateDiffFrac } from "./diff-frac";
 export { generateVolume } from "./volume";
-export { generateCircumference } from "./circumference";
+export { type CircumferenceProblem, generateCircumference } from "./circumference";
 export { type EvenOddProblem, generateEvenOdd } from "./even-odd";
 export { type FracCompareProblem, generateFracCompare } from "./frac-compare";
 export { generateUnitAmount } from "./unit-amount";
