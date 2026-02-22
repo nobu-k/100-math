@@ -2,11 +2,24 @@ import { mulberry32 } from "../random";
 
 export type SimilarityMode = "ratio" | "parallel-line" | "midpoint" | "mixed";
 
+export interface SimilarityFigure {
+  type: "similar-triangles" | "parallel-line" | "midpoint";
+  ratioA?: number;
+  ratioB?: number;
+  knownValue?: number;
+  findTarget?: "side" | "perimeter" | "area";
+  m?: number;
+  n?: number;
+  ae?: number;
+  bc?: number;
+}
+
 export interface SimilarityProblem {
   type: SimilarityMode;
   question: string;
   answer: number;
   answerDisplay: string;
+  figure: SimilarityFigure;
 }
 
 export const generateSimilarity = (
@@ -28,6 +41,7 @@ export const generateSimilarity = (
       let question: string;
       let answer: number;
       let answerDisplay: string;
+      let figure: SimilarityFigure;
 
       if (type === "ratio") {
         // Similarity ratio problems
@@ -44,6 +58,7 @@ export const generateSimilarity = (
           question = `△ABC ∽ △DEF で相似比が ${ratioA}:${ratioB}。AB = ${sideA}cm のとき DE = ?`;
           answer = sideB;
           answerDisplay = `${sideB}cm`;
+          figure = { type: "similar-triangles", ratioA, ratioB, knownValue: sideA, findTarget: "side" };
         } else if (variant === 1) {
           // Perimeter
           const perimA = ratioA * (3 + Math.floor(rng() * 6));
@@ -51,6 +66,7 @@ export const generateSimilarity = (
           question = `相似比 ${ratioA}:${ratioB} で、小さい方の周の長さが ${perimA}cm。大きい方は？`;
           answer = perimB;
           answerDisplay = `${perimB}cm`;
+          figure = { type: "similar-triangles", ratioA, ratioB, knownValue: perimA, findTarget: "perimeter" };
         } else {
           // Area ratio
           const areaA = ratioA * ratioA * (1 + Math.floor(rng() * 4));
@@ -58,6 +74,7 @@ export const generateSimilarity = (
           question = `相似比 ${ratioA}:${ratioB} で、小さい方の面積が ${areaA}cm²。大きい方の面積は？`;
           answer = areaB;
           answerDisplay = `${areaB}cm²`;
+          figure = { type: "similar-triangles", ratioA, ratioB, knownValue: areaA, findTarget: "area" };
         }
       } else if (type === "parallel-line") {
         // DE // BC, AD:DB = m:n, find EC given AE
@@ -74,18 +91,20 @@ export const generateSimilarity = (
         question = `△ABCで DE // BC、AD:DB = ${m}:${n}、AE = ${ae} のとき EC = ?`;
         answer = ec;
         answerDisplay = `${ec}`;
+        figure = { type: "parallel-line", m, n, ae };
       } else {
         // Midpoint theorem: MN = BC/2
         const bc = (2 + Math.floor(rng() * 10)) * 2; // even number 4-22
         question = `△ABCで M, N がそれぞれ AB, AC の中点。BC = ${bc}cm のとき MN = ?`;
         answer = bc / 2;
         answerDisplay = `${bc / 2}cm`;
+        figure = { type: "midpoint", bc };
       }
 
       const key = question;
       if (!seen.has(key) || attempt === 29) {
         seen.add(key);
-        problems.push({ type, question, answer, answerDisplay });
+        problems.push({ type, question, answer, answerDisplay, figure });
         break;
       }
     }
