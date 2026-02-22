@@ -1,13 +1,24 @@
 import { mulberry32 } from "../random";
-import type { TextProblem } from "../shared/types";
 
-/* ---- volume ---- */
+export interface VolumeFigure {
+  shape: "cube" | "rect";
+  width: number;
+  height: number;
+  depth: number;
+}
+
+export interface VolumeProblem {
+  question: string;
+  answer: string;
+  figure: VolumeFigure;
+}
+
 export const generateVolume = (
   seed: number,
   shape: "cube" | "rect" | "mixed",
-): TextProblem[] => {
+): VolumeProblem[] => {
   const rng = mulberry32(seed);
-  const problems: TextProblem[] = [];
+  const problems: VolumeProblem[] = [];
 
   for (let i = 0; i < 10; i++) {
     const useCube = shape === "cube" ? true : shape === "rect" ? false : rng() < 0.4;
@@ -18,6 +29,7 @@ export const generateVolume = (
       problems.push({
         question: `一辺${side}cmの立方体の体積は？`,
         answer: `${vol}cm³`,
+        figure: { shape: "cube", width: side, height: side, depth: side },
       });
     } else {
       const a = 2 + Math.floor(rng() * 10);
@@ -27,6 +39,7 @@ export const generateVolume = (
       problems.push({
         question: `たて${a}cm、よこ${b}cm、高さ${c}cmの直方体の体積は？`,
         answer: `${vol}cm³`,
+        figure: { shape: "rect", width: b, height: c, depth: a },
       });
     }
   }
