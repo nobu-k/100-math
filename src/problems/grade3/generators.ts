@@ -7,4 +7,4 @@ export { type DecimalCompProblem, generateDecimalComp } from "./decimal-comp";
 export { generateTimeCalc3 } from "./time-calc3";
 export { generateLargeNum3 } from "./large-num3";
 export { type BarGraphProblem, generateBarGraph } from "./bar-graph";
-export { generateCircleRD } from "./circle-rd";
+export { type CircleRDProblem, generateCircleRD } from "./circle-rd";
