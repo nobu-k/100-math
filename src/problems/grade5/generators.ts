@@ -1,7 +1,7 @@
 export type { TextProblem } from "../shared/types";
 export { generatePercent } from "./percent";
 export { generateSpeed } from "./speed";
-export { generateAreaFormula } from "./area-formula";
+export { type AreaFormulaProblem, generateAreaFormula } from "./area-formula";
 export { generateFracDecimal } from "./frac-decimal";
 export { generateAverage } from "./average";
 export { type FracCalcProblem, generateDiffFrac } from "./diff-frac";
