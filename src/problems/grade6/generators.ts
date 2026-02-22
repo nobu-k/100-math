@@ -6,7 +6,7 @@ export type { FreqTableProblem } from "./freq-table";
 export { generateFracMul } from "./frac-mul";
 export { generateFracDiv } from "./frac-div";
 export { generateRatio } from "./ratio";
-export { generateCircleArea } from "./circle-area";
+export { type CircleAreaProblem, generateCircleArea } from "./circle-area";
 export { generateProportion } from "./proportion";
 export { generateLiteralExpr } from "./literal-expr";
 export { generateRepresentative } from "./representative";

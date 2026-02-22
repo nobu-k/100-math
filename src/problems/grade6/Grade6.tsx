@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { randomSeed, seedToHex, hexToSeed } from "../random";
 import type { ProblemGroup } from "../types";
-import type { FracProblem } from "./generators";
+import type { FracProblem, CircleAreaProblem } from "./generators";
 import {
   generateFracMul,
   generateFracDiv,
@@ -395,6 +395,48 @@ const Grade6 = ({ operator }: { operator: string }) => {
     </div>
   );
 
+  /* ---- render circle area SVG ---- */
+
+  const renderCircleAreaFigure = (p: CircleAreaProblem) => {
+    const W = 160;
+    const H = 160;
+    const cx = W / 2;
+    const cy = H / 2;
+    const cr = 50;
+    const { figure } = p;
+
+    if (figure.type === "full") {
+      return (
+        <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: "block", margin: "8px 0" }}>
+          <circle cx={cx} cy={cy} r={cr} fill="#e3f2fd" stroke="#333" strokeWidth={1.5} />
+          <circle cx={cx} cy={cy} r={2.5} fill="#333" />
+          <line x1={cx} y1={cy} x2={cx + cr} y2={cy} stroke="#1976d2" strokeWidth={1.5} />
+          <text x={cx + cr / 2} y={cy + 16} textAnchor="middle" fontSize={10} fill="#1976d2" fontWeight="bold">
+            半径 = {figure.radius}cm
+          </text>
+        </svg>
+      );
+    }
+
+    // Semicircle
+    return (
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: "block", margin: "8px 0" }}>
+        <defs>
+          <clipPath id="semiclip">
+            <rect x={cx - cr - 1} y={cy - cr - 1} width={cr * 2 + 2} height={cr + 1} />
+          </clipPath>
+        </defs>
+        <circle cx={cx} cy={cy} r={cr} fill="#e3f2fd" stroke="#333" strokeWidth={1.5} clipPath="url(#semiclip)" />
+        <line x1={cx - cr} y1={cy} x2={cx + cr} y2={cy} stroke="#333" strokeWidth={1.5} />
+        <circle cx={cx} cy={cy} r={2.5} fill="#333" />
+        <line x1={cx} y1={cy} x2={cx + cr} y2={cy} stroke="#1976d2" strokeWidth={2} />
+        <text x={cx + cr / 2} y={cy + 16} textAnchor="middle" fontSize={10} fill="#1976d2" fontWeight="bold">
+          半径 = {figure.radius}cm
+        </text>
+      </svg>
+    );
+  };
+
   /* ---- render problems ---- */
 
   const renderProblems = () => {
@@ -424,12 +466,17 @@ const Grade6 = ({ operator }: { operator: string }) => {
         return (
           <div className="dev-text-page">
             {circleProblems.map((p, i) => (
-              <div key={i} className="dev-text-row">
-                <span className="g1-num">({i + 1})</span>
-                <span className="dev-text-q">{p.question}</span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
-                  {p.answer}
-                </span>
+              <div key={i} className="dev-prop-block">
+                <div className="dev-prop-label">({i + 1})</div>
+                {renderCircleAreaFigure(p)}
+                <div style={{ marginTop: 8 }}>
+                  <div className="dev-text-row">
+                    <span className="dev-text-q">{p.question}</span>
+                    <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                      {p.answer}
+                    </span>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
