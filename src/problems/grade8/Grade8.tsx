@@ -659,7 +659,7 @@ const Grade8 = ({ operator }: { operator: string }) => {
 
       case "polygon-angle":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {polyAngleProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>
@@ -675,7 +675,7 @@ const Grade8 = ({ operator }: { operator: string }) => {
 
       case "triangle-angle":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {triAngleProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>
@@ -691,7 +691,7 @@ const Grade8 = ({ operator }: { operator: string }) => {
 
       case "parallel-angle":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {parallelProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>
@@ -707,7 +707,7 @@ const Grade8 = ({ operator }: { operator: string }) => {
 
       case "parallelogram":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {pgramProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>

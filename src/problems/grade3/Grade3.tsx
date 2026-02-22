@@ -710,7 +710,7 @@ const Grade3 = ({ operator }: { operator: string }) => {
 
       case "circle-rd":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {circleRDProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>

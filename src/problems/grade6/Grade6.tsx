@@ -588,7 +588,7 @@ const Grade6 = ({ operator }: { operator: string }) => {
 
       case "circle-area":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {circleProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>
@@ -717,7 +717,7 @@ const Grade6 = ({ operator }: { operator: string }) => {
 
       case "prism-volume":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {prismProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>

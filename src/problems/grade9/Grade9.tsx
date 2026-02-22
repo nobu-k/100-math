@@ -1025,7 +1025,7 @@ const Grade9 = ({ operator }: { operator: string }) => {
 
       case "similarity":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {simProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>
@@ -1041,7 +1041,7 @@ const Grade9 = ({ operator }: { operator: string }) => {
 
       case "circle-angle":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {circleProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>
@@ -1057,7 +1057,7 @@ const Grade9 = ({ operator }: { operator: string }) => {
 
       case "pythagorean":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {pythProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>

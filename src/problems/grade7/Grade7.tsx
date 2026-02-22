@@ -944,7 +944,7 @@ const Grade7 = ({ operator }: { operator: string }) => {
 
       case "sector":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {sectorProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>
@@ -967,7 +967,7 @@ const Grade7 = ({ operator }: { operator: string }) => {
 
       case "solid-volume":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {solidProblems.map((p, i) => {
               let question = "";
               if (p.solidType === "cylinder") {
@@ -1082,7 +1082,7 @@ const Grade7 = ({ operator }: { operator: string }) => {
 
       case "coordinate":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {coordProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>

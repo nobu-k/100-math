@@ -674,7 +674,7 @@ const Grade4 = ({ operator }: { operator: string }) => {
 
       case "area":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {areaProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>
@@ -694,7 +694,7 @@ const Grade4 = ({ operator }: { operator: string }) => {
 
       case "angle":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {angleProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>

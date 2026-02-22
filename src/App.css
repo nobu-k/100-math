@@ -1377,17 +1377,22 @@
    Proportion table (Grade 6)
    ============================================================ */
 
+.dev-fig-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  width: 100%;
+}
+
 .dev-prop-block {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 0;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .dev-prop-block svg {
-  flex-shrink: 0;
-  height: 80px;
-  width: auto;
+  max-width: 100%;
+  height: auto;
 }
 
 .dev-prop-label {
@@ -1437,8 +1442,12 @@
     font-size: 16px;
   }
 
+  .dev-fig-page {
+    gap: 4px 12px;
+  }
+
   .dev-prop-block svg {
-    height: 60px;
+    height: auto;
   }
 
   .dev-prop-label {

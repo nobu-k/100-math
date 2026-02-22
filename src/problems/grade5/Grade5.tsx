@@ -679,7 +679,7 @@ const Grade5 = ({ operator }: { operator: string }) => {
         return renderTextProblems(spdProblems);
       case "area-formula":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {areaProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>
@@ -732,7 +732,7 @@ const Grade5 = ({ operator }: { operator: string }) => {
 
       case "volume":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {volProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>
@@ -752,7 +752,7 @@ const Grade5 = ({ operator }: { operator: string }) => {
 
       case "circumference":
         return (
-          <div className="dev-text-page">
+          <div className="dev-fig-page">
             {circProblems.map((p, i) => (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1})</div>
