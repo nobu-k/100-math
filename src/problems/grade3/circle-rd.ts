@@ -1,7 +1,7 @@
 import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
-export function generateCircleRD(seed: number): TextProblem[] {
+export const generateCircleRD = (seed: number): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -32,4 +32,4 @@ export function generateCircleRD(seed: number): TextProblem[] {
     }
   }
   return problems;
-}
+};

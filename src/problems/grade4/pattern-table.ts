@@ -8,7 +8,7 @@ export interface PatternTableProblem {
   rule: string;
 }
 
-export function generatePatternTable(seed: number): PatternTableProblem[] {
+export const generatePatternTable = (seed: number): PatternTableProblem[] => {
   const rng = mulberry32(seed);
   const problems: PatternTableProblem[] = [];
 
@@ -44,4 +44,4 @@ export function generatePatternTable(seed: number): PatternTableProblem[] {
     problems.push({ label, xValues, yValues, answers, rule });
   }
   return problems;
-}
+};

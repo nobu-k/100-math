@@ -5,11 +5,11 @@ export interface SequenceProblem {
   answers: number[];
 }
 
-export function generateSequence(
+export const generateSequence = (
   seed: number,
   step: number,
   max: number,
-): SequenceProblem[] {
+): SequenceProblem[] => {
   const rng = mulberry32(seed);
   const problems: SequenceProblem[] = [];
   const length = 8;
@@ -62,4 +62,4 @@ export function generateSequence(
     problems.push({ cells, answers });
   }
   return problems;
-}
+};

@@ -9,10 +9,10 @@ export interface CircleAngleProblem {
   answerDisplay: string;
 }
 
-export function generateCircleAngle(
+export const generateCircleAngle = (
   seed: number,
   mode: CircleAngleMode = "mixed",
-): CircleAngleProblem[] {
+): CircleAngleProblem[] => {
   const rng = mulberry32(seed);
   const problems: CircleAngleProblem[] = [];
   const seen = new Set<string>();
@@ -76,4 +76,4 @@ export function generateCircleAngle(
     }
   }
   return problems;
-}
+};

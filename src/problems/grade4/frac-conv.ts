@@ -12,10 +12,10 @@ export interface FracConvProblem {
   direction: "to-mixed" | "to-improper";
 }
 
-export function generateFracConv(
+export const generateFracConv = (
   seed: number,
   direction: "to-mixed" | "to-improper" | "both",
-): FracConvProblem[] {
+): FracConvProblem[] => {
   const rng = mulberry32(seed);
   const problems: FracConvProblem[] = [];
 
@@ -48,4 +48,4 @@ export function generateFracConv(
     }
   }
   return problems;
-}
+};

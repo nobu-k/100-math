@@ -5,10 +5,10 @@ export interface ClockProblem {
   minute: number; // 0‑59
 }
 
-export function generateClock(
+export const generateClock = (
   seed: number,
   precision: "hour" | "half" | "5min" | "1min",
-): ClockProblem[] {
+): ClockProblem[] => {
   const rng = mulberry32(seed);
   const problems: ClockProblem[] = [];
   for (let i = 0; i < 8; i++) {
@@ -31,4 +31,4 @@ export function generateClock(
     problems.push({ hour, minute });
   }
   return problems;
-}
+};

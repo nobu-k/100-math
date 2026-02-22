@@ -3,7 +3,7 @@ import { toDigitCells, decimalDisplayWidth } from "./common";
 import { computeMulDetails } from "./mul";
 import { cx } from "./render-utils";
 
-export function HissanMulProblem({
+export const HissanMulProblem = ({
   index,
   problem,
   showAnswers,
@@ -15,7 +15,7 @@ export function HissanMulProblem({
   showAnswers: boolean;
   cfg: HissanConfig;
   dps: number[];
-}) {
+}) => {
   const [multiplicand, multiplier] = problem;
   const [dp1, dp2] = dps;
   const dpTotal = dp1 + dp2;
@@ -146,4 +146,4 @@ export function HissanMulProblem({
       </table>
     </div>
   );
-}
+};

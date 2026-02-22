@@ -43,32 +43,10 @@ type Grade4Op =
   | "cross-table";
 
 /* ================================================================
-   URL state helpers
-   ================================================================ */
-
-const ALL_PARAMS = ["q", "answers", "paren", "rd", "fdir", "shape", "atype", "aunit", "erto", "dpmode", "ln4mode"];
-
-function cleanParams(url: URL) {
-  for (const k of ALL_PARAMS) url.searchParams.delete(k);
-}
-
-/* ================================================================
-   Defaults
-   ================================================================ */
-
-const ROUND_DEF = { rd: 3 };
-const FRAC_DEF = { fdir: "both" as const };
-const AREA_DEF = { shape: "mixed" as const };
-const AUNIT_DEF = { aunit: "mixed" as const };
-const ERTO_DEF = { erto: 10 };
-const DPMODE_DEF = { dpmode: "mixed" as const };
-const LN4MODE_DEF = { ln4mode: "mixed" as const };
-
-/* ================================================================
    Main component
    ================================================================ */
 
-function Grade4({ operator }: { operator: string }) {
+const Grade4 = ({ operator }: { operator: string }) => {
   const op = operator as Grade4Op;
 
   const getInitial = () => {
@@ -788,7 +766,7 @@ function Grade4({ operator }: { operator: string }) {
       </div>
     </>
   );
-}
+};
 
 export default Grade4;
 
@@ -813,3 +791,25 @@ export const devGrade4: ProblemGroup = {
   ],
   Component: Grade4,
 };
+
+/* ================================================================
+   URL state helpers
+   ================================================================ */
+
+const ALL_PARAMS = ["q", "answers", "paren", "rd", "fdir", "shape", "atype", "aunit", "erto", "dpmode", "ln4mode"];
+
+const cleanParams = (url: URL) => {
+  for (const k of ALL_PARAMS) url.searchParams.delete(k);
+};
+
+/* ================================================================
+   Defaults
+   ================================================================ */
+
+const ROUND_DEF = { rd: 3 };
+const FRAC_DEF = { fdir: "both" as const };
+const AREA_DEF = { shape: "mixed" as const };
+const AUNIT_DEF = { aunit: "mixed" as const };
+const ERTO_DEF = { erto: 10 };
+const DPMODE_DEF = { dpmode: "mixed" as const };
+const LN4MODE_DEF = { ln4mode: "mixed" as const };

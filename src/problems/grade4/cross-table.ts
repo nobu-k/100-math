@@ -8,7 +8,7 @@ export interface CrossTableProblem {
   answers: number[];
 }
 
-export function generateCrossTable(seed: number): CrossTableProblem[] {
+export const generateCrossTable = (seed: number): CrossTableProblem[] => {
   const rng = mulberry32(seed);
   const problems: CrossTableProblem[] = [];
 
@@ -82,4 +82,4 @@ export function generateCrossTable(seed: number): CrossTableProblem[] {
     problems.push({ title: s.title, rowLabels: fullRows, colLabels: fullCols, cells, answers });
   }
   return problems;
-}
+};

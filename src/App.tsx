@@ -7,59 +7,19 @@ const BASE = import.meta.env.BASE_URL; // "/100-math/"
 
 type ViewMode = "category" | "grade";
 
-function parseRoute(pathname: string): { groupId: string; operator: string } | null {
-  const rel = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname;
-  const parts = rel.replace(/\/$/, "").split("/");
-  if (parts.length !== 2 || !parts[0] || !parts[1]) return null;
-  const group = problemGroups.find((g) => g.id === parts[0]);
-  if (!group) return null;
-  const op = group.operators.find((o) => o.operator === parts[1]);
-  if (!op) return null;
-  return { groupId: group.id, operator: op.operator };
-}
-
-const DEFAULT_PATH = `${BASE}grid100/addition`;
-
-function getInitialRoute(): { groupId: string; operator: string } {
-  const parsed = parseRoute(window.location.pathname);
-  if (parsed) return parsed;
-  window.history.replaceState(null, "", DEFAULT_PATH + window.location.search);
-  return { groupId: "grid100", operator: "addition" };
-}
-
 interface GradeEntry {
   groupId: string;
   groupLabel: string;
   op: OperatorRoute;
 }
 
-function buildGradeView(): Map<number, GradeEntry[]> {
-  const map = new Map<number, GradeEntry[]>();
-  for (const group of problemGroups) {
-    for (const op of group.operators) {
-      const grades = op.grades ?? [];
-      for (const g of grades) {
-        if (!map.has(g)) map.set(g, []);
-        map.get(g)!.push({ groupId: group.id, groupLabel: group.label, op });
-      }
-    }
-  }
-  return new Map([...map.entries()].sort((a, b) => a[0] - b[0]));
-}
-
 const GRADE_LABELS: Record<number, string> = {
   1: "1年", 2: "2年", 3: "3年", 4: "4年", 5: "5年", 6: "6年",
 };
 
-function getInitialViewMode(): ViewMode {
-  try {
-    const v = localStorage.getItem("sidebar-view");
-    if (v === "grade") return "grade";
-  } catch { /* ignore */ }
-  return "category";
-}
+const DEFAULT_PATH = `${BASE}grid100/addition`;
 
-function App() {
+const App = () => {
   const [route, setRoute] = useState(getInitialRoute);
   const [menuOpen, setMenuOpen] = useState(false);
   const [controlsOpen, setControlsOpen] = useState(false);
@@ -230,6 +190,46 @@ function App() {
       </div>
     </div>
   );
-}
+};
 
 export default App;
+
+const getInitialRoute = (): { groupId: string; operator: string } => {
+  const parsed = parseRoute(window.location.pathname);
+  if (parsed) return parsed;
+  window.history.replaceState(null, "", DEFAULT_PATH + window.location.search);
+  return { groupId: "grid100", operator: "addition" };
+};
+
+const parseRoute = (pathname: string): { groupId: string; operator: string } | null => {
+  const rel = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname;
+  const parts = rel.replace(/\/$/, "").split("/");
+  if (parts.length !== 2 || !parts[0] || !parts[1]) return null;
+  const group = problemGroups.find((g) => g.id === parts[0]);
+  if (!group) return null;
+  const op = group.operators.find((o) => o.operator === parts[1]);
+  if (!op) return null;
+  return { groupId: group.id, operator: op.operator };
+};
+
+const buildGradeView = (): Map<number, GradeEntry[]> => {
+  const map = new Map<number, GradeEntry[]>();
+  for (const group of problemGroups) {
+    for (const op of group.operators) {
+      const grades = op.grades ?? [];
+      for (const g of grades) {
+        if (!map.has(g)) map.set(g, []);
+        map.get(g)!.push({ groupId: group.id, groupLabel: group.label, op });
+      }
+    }
+  }
+  return new Map([...map.entries()].sort((a, b) => a[0] - b[0]));
+};
+
+const getInitialViewMode = (): ViewMode => {
+  try {
+    const v = localStorage.getItem("sidebar-view");
+    if (v === "grade") return "grade";
+  } catch { /* ignore */ }
+  return "category";
+};

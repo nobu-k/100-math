@@ -2,10 +2,10 @@ import { mulberry32 } from "../random";
 import { numberToKanji } from "../shared/math-utils";
 import type { TextProblem } from "../shared/types";
 
-export function generateLargeNum(
+export const generateLargeNum = (
   seed: number,
   maxRange: number,
-): TextProblem[] {
+): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
   const minVal = maxRange <= 100 ? 10 : maxRange <= 1000 ? 100 : 1000;
@@ -20,4 +20,4 @@ export function generateLargeNum(
     }
   }
   return problems;
-}
+};

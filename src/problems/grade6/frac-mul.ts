@@ -2,7 +2,7 @@ import { mulberry32 } from "../random";
 import { simplify } from "../shared/math-utils";
 import type { FracProblem } from "./types";
 
-export function generateFracMul(seed: number): FracProblem[] {
+export const generateFracMul = (seed: number): FracProblem[] => {
   const rng = mulberry32(seed);
   const problems: FracProblem[] = [];
 
@@ -26,4 +26,4 @@ export function generateFracMul(seed: number): FracProblem[] {
     });
   }
   return problems;
-}
+};

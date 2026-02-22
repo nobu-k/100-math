@@ -9,43 +9,7 @@ export interface PolyAddSubProblem {
   coeffs: Record<string, number>;
 }
 
-function formatPoly(
-  xCoeff: number,
-  yCoeff: number,
-  constant: number,
-): string {
-  const parts: string[] = [];
-  if (xCoeff !== 0) {
-    if (xCoeff === 1) parts.push("x");
-    else if (xCoeff === -1) parts.push("−x");
-    else parts.push(`${xCoeff}x`);
-  }
-  if (yCoeff !== 0) {
-    if (parts.length === 0) {
-      if (yCoeff === 1) parts.push("y");
-      else if (yCoeff === -1) parts.push("−y");
-      else parts.push(`${yCoeff}y`);
-    } else {
-      if (yCoeff === 1) parts.push("+ y");
-      else if (yCoeff === -1) parts.push("− y");
-      else if (yCoeff > 0) parts.push(`+ ${yCoeff}y`);
-      else parts.push(`− ${Math.abs(yCoeff)}y`);
-    }
-  }
-  if (constant !== 0) {
-    if (parts.length === 0) {
-      parts.push(`${constant}`);
-    } else if (constant > 0) {
-      parts.push(`+ ${constant}`);
-    } else {
-      parts.push(`− ${Math.abs(constant)}`);
-    }
-  }
-  if (parts.length === 0) return "0";
-  return parts.join(" ");
-}
-
-export function generatePolyAddSub(seed: number): PolyAddSubProblem[] {
+export const generatePolyAddSub = (seed: number): PolyAddSubProblem[] => {
   const rng = mulberry32(seed);
   const problems: PolyAddSubProblem[] = [];
   const seen = new Set<string>();
@@ -86,4 +50,40 @@ export function generatePolyAddSub(seed: number): PolyAddSubProblem[] {
     }
   }
   return problems;
-}
+};
+
+const formatPoly = (
+  xCoeff: number,
+  yCoeff: number,
+  constant: number,
+): string => {
+  const parts: string[] = [];
+  if (xCoeff !== 0) {
+    if (xCoeff === 1) parts.push("x");
+    else if (xCoeff === -1) parts.push("−x");
+    else parts.push(`${xCoeff}x`);
+  }
+  if (yCoeff !== 0) {
+    if (parts.length === 0) {
+      if (yCoeff === 1) parts.push("y");
+      else if (yCoeff === -1) parts.push("−y");
+      else parts.push(`${yCoeff}y`);
+    } else {
+      if (yCoeff === 1) parts.push("+ y");
+      else if (yCoeff === -1) parts.push("− y");
+      else if (yCoeff > 0) parts.push(`+ ${yCoeff}y`);
+      else parts.push(`− ${Math.abs(yCoeff)}y`);
+    }
+  }
+  if (constant !== 0) {
+    if (parts.length === 0) {
+      parts.push(`${constant}`);
+    } else if (constant > 0) {
+      parts.push(`+ ${constant}`);
+    } else {
+      parts.push(`− ${Math.abs(constant)}`);
+    }
+  }
+  if (parts.length === 0) return "0";
+  return parts.join(" ");
+};

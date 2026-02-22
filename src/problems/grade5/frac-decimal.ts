@@ -1,10 +1,10 @@
 import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
-export function generateFracDecimal(
+export const generateFracDecimal = (
   seed: number,
   direction: "to-decimal" | "to-fraction" | "mixed",
-): TextProblem[] {
+): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -33,4 +33,4 @@ export function generateFracDecimal(
     }
   }
   return problems;
-}
+};

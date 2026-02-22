@@ -7,10 +7,10 @@ export interface ProportionProblem {
   answers: number[];
 }
 
-export function generateProportion(
+export const generateProportion = (
   seed: number,
   propType: "direct" | "inverse" | "mixed",
-): ProportionProblem[] {
+): ProportionProblem[] => {
   const rng = mulberry32(seed);
   const problems: ProportionProblem[] = [];
 
@@ -52,4 +52,4 @@ export function generateProportion(
     }
   }
   return problems;
-}
+};

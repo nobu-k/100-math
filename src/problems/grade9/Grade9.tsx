@@ -49,9 +49,9 @@ const ALL_PARAMS = [
   "smmode", "camode", "ptmode", "qfmode", "spmode",
 ];
 
-function cleanParams(url: URL) {
+const cleanParams = (url: URL) => {
   for (const k of ALL_PARAMS) url.searchParams.delete(k);
-}
+};
 
 /* ================================================================
    Defaults
@@ -71,7 +71,7 @@ const SAMP_DEF = { spmode: "mixed" as SamplingMode };
    Main component
    ================================================================ */
 
-function Grade9({ operator }: { operator: string }) {
+const Grade9 = ({ operator }: { operator: string }) => {
   const op = operator as Grade9Op;
 
   const getInitial = () => {
@@ -526,7 +526,7 @@ function Grade9({ operator }: { operator: string }) {
       </div>
     </>
   );
-}
+};
 
 export default Grade9;
 

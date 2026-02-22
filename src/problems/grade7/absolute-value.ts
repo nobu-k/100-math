@@ -17,10 +17,10 @@ export interface AbsoluteValueProblem {
   eqAnswers?: number[];
 }
 
-export function generateAbsoluteValue(
+export const generateAbsoluteValue = (
   seed: number,
   mode: AbsoluteValueMode = "find",
-): AbsoluteValueProblem[] {
+): AbsoluteValueProblem[] => {
   const rng = mulberry32(seed);
   const problems: AbsoluteValueProblem[] = [];
   const seen = new Set<string>();
@@ -76,4 +76,4 @@ export function generateAbsoluteValue(
     }
   }
   return problems;
-}
+};

@@ -8,11 +8,11 @@ export interface MushikuiProblem {
   answer: number;
 }
 
-export function generateMushikui(
+export const generateMushikui = (
   seed: number,
   max: number,
   mode: "add" | "sub" | "mixed",
-): MushikuiProblem[] {
+): MushikuiProblem[] => {
   const rng = mulberry32(seed);
   const problems: MushikuiProblem[] = [];
   for (let i = 0; i < 12; i++) {
@@ -44,4 +44,4 @@ export function generateMushikui(
     }
   }
   return problems;
-}
+};

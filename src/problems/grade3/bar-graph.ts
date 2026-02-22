@@ -17,10 +17,10 @@ export const BAR_CATEGORIES = [
 ];
 export const BAR_TITLES = ["好きな果物", "好きな教科", "クラス別の人数"];
 
-export function generateBarGraph(
+export const generateBarGraph = (
   seed: number,
   bars: number,
-): BarGraphProblem[] {
+): BarGraphProblem[] => {
   const rng = mulberry32(seed);
   const problems: BarGraphProblem[] = [];
 
@@ -72,4 +72,4 @@ export function generateBarGraph(
     problems.push({ title, categories, values, unit: "人", scaleMax, scaleStep: step, questions });
   }
   return problems;
-}
+};

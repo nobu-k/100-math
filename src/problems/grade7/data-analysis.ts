@@ -34,15 +34,10 @@ export interface FrequencyProblem {
 
 export type DataAnalysisProblem = RepresentativeProblem | FrequencyProblem;
 
-function roundTo(n: number, decimals: number): number {
-  const factor = Math.pow(10, decimals);
-  return Math.round(n * factor) / factor;
-}
-
-export function generateDataAnalysis(
+export const generateDataAnalysis = (
   seed: number,
   mode: DataAnalysisMode = "mixed",
-): DataAnalysisProblem[] {
+): DataAnalysisProblem[] => {
   const rng = mulberry32(seed);
   const problems: DataAnalysisProblem[] = [];
 
@@ -166,4 +161,11 @@ export function generateDataAnalysis(
     }
   }
   return problems;
-}
+};
+
+/* ---- helpers ---- */
+
+const roundTo = (n: number, decimals: number): number => {
+  const factor = Math.pow(10, decimals);
+  return Math.round(n * factor) / factor;
+};

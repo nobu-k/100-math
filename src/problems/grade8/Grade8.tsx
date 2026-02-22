@@ -49,9 +49,9 @@ const ALL_PARAMS = [
   "plmode", "pgmode", "lfmode", "pbmode",
 ];
 
-function cleanParams(url: URL) {
+const cleanParams = (url: URL) => {
   for (const k of ALL_PARAMS) url.searchParams.delete(k);
-}
+};
 
 /* ================================================================
    Defaults
@@ -70,7 +70,7 @@ const PROB_DEF = { pbmode: "mixed" as ProbabilityMode };
    Main component
    ================================================================ */
 
-function Grade8({ operator }: { operator: string }) {
+const Grade8 = ({ operator }: { operator: string }) => {
   const op = operator as Grade8Op;
 
   const getInitial = () => {
@@ -563,7 +563,7 @@ function Grade8({ operator }: { operator: string }) {
       </div>
     </>
   );
-}
+};
 
 export default Grade8;
 

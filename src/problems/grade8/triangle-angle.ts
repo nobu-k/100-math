@@ -13,10 +13,10 @@ export interface TriAngleProblem {
   answerDisplay: string;
 }
 
-export function generateTriAngle(
+export const generateTriAngle = (
   seed: number,
   mode: TriAngleMode = "mixed",
-): TriAngleProblem[] {
+): TriAngleProblem[] => {
   const rng = mulberry32(seed);
   const problems: TriAngleProblem[] = [];
   const seen = new Set<string>();
@@ -62,4 +62,4 @@ export function generateTriAngle(
     }
   }
   return problems;
-}
+};

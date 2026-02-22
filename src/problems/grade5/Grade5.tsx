@@ -41,34 +41,10 @@ type Grade5Op =
   | "pattern-eq";
 
 /* ================================================================
-   URL state helpers
-   ================================================================ */
-
-const ALL_PARAMS = ["q", "answers", "pfind", "sfind", "ashape", "fdir", "acnt", "dfop", "vshape", "cmode", "eorange"];
-
-function cleanParams(url: URL) {
-  for (const k of ALL_PARAMS) url.searchParams.delete(k);
-}
-
-/* ================================================================
-   Defaults
-   ================================================================ */
-
-const PCT_DEF = { pfind: "mixed" as const };
-const SPD_DEF = { sfind: "mixed" as const };
-const AREA_DEF = { ashape: "mixed" as const };
-const FRAC_DEF = { fdir: "mixed" as const };
-const AVG_DEF = { acnt: 5 };
-const DFRAC_DEF = { dfop: "mixed" as const };
-const VOL_DEF = { vshape: "mixed" as const };
-const CIRC_DEF = { cmode: "mixed" as const };
-const EO_DEF = { eorange: 100 };
-
-/* ================================================================
    Main component
    ================================================================ */
 
-function Grade5({ operator }: { operator: string }) {
+const Grade5 = ({ operator }: { operator: string }) => {
   const op = operator as Grade5Op;
 
   const getInitial = () => {
@@ -617,7 +593,7 @@ function Grade5({ operator }: { operator: string }) {
       </div>
     </>
   );
-}
+};
 
 export default Grade5;
 
@@ -641,3 +617,27 @@ export const devGrade5: ProblemGroup = {
   ],
   Component: Grade5,
 };
+
+/* ================================================================
+   URL state helpers
+   ================================================================ */
+
+const cleanParams = (url: URL) => {
+  for (const k of ALL_PARAMS) url.searchParams.delete(k);
+};
+
+const ALL_PARAMS = ["q", "answers", "pfind", "sfind", "ashape", "fdir", "acnt", "dfop", "vshape", "cmode", "eorange"];
+
+/* ================================================================
+   Defaults
+   ================================================================ */
+
+const PCT_DEF = { pfind: "mixed" as const };
+const SPD_DEF = { sfind: "mixed" as const };
+const AREA_DEF = { ashape: "mixed" as const };
+const FRAC_DEF = { fdir: "mixed" as const };
+const AVG_DEF = { acnt: 5 };
+const DFRAC_DEF = { dfop: "mixed" as const };
+const VOL_DEF = { vshape: "mixed" as const };
+const CIRC_DEF = { cmode: "mixed" as const };
+const EO_DEF = { eorange: 100 };

@@ -243,7 +243,7 @@ const updateUrl = (
   window.history.replaceState(null, "", url.toString());
 };
 
-function Integer({ operator }: { operator: string }) {
+const Integer = ({ operator }: { operator: string }) => {
   const op: IntegerOperator = operator as IntegerOperator;
   const defaults = DEFAULTS[op] ?? DEFAULTS.multiples;
 
@@ -482,7 +482,7 @@ function Integer({ operator }: { operator: string }) {
       </div>
     </>
   );
-}
+};
 
 export const integer: ProblemGroup = {
   id: "integer",

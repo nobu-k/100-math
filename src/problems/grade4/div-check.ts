@@ -1,7 +1,7 @@
 import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
-export function generateDivCheck(seed: number): TextProblem[] {
+export const generateDivCheck = (seed: number): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -24,4 +24,4 @@ export function generateDivCheck(seed: number): TextProblem[] {
     }
   }
   return problems;
-}
+};

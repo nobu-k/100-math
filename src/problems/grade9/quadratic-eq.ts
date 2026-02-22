@@ -12,56 +12,10 @@ export interface QuadEqProblem {
   type: "factoring" | "formula";
 }
 
-function formatQuadratic(a: number, b: number, c: number): string {
-  const parts: string[] = [];
-  if (a !== 0) {
-    if (a === 1) parts.push("x²");
-    else if (a === -1) parts.push("−x²");
-    else parts.push(`${a}x²`);
-  }
-  if (b !== 0) {
-    if (parts.length === 0) {
-      if (b === 1) parts.push("x");
-      else if (b === -1) parts.push("−x");
-      else parts.push(`${b}x`);
-    } else {
-      if (b === 1) parts.push("+ x");
-      else if (b === -1) parts.push("− x");
-      else if (b > 0) parts.push(`+ ${b}x`);
-      else parts.push(`− ${Math.abs(b)}x`);
-    }
-  }
-  if (c !== 0) {
-    if (parts.length === 0) parts.push(`${c}`);
-    else if (c > 0) parts.push(`+ ${c}`);
-    else parts.push(`− ${Math.abs(c)}`);
-  }
-  return parts.join(" ");
-}
-
-function simplifyRoot(n: number): [number, number] {
-  let outer = 1;
-  let inner = n;
-  for (let d = 2; d * d <= inner; d++) {
-    while (inner % (d * d) === 0) {
-      outer *= d;
-      inner /= d * d;
-    }
-  }
-  return [outer, inner];
-}
-
-function gcd(a: number, b: number): number {
-  a = Math.abs(a);
-  b = Math.abs(b);
-  while (b) { [a, b] = [b, a % b]; }
-  return a;
-}
-
-export function generateQuadEq(
+export const generateQuadEq = (
   seed: number,
   mode: QuadEqMode = "mixed",
-): QuadEqProblem[] {
+): QuadEqProblem[] => {
   const rng = mulberry32(seed);
   const problems: QuadEqProblem[] = [];
   const seen = new Set<string>();
@@ -175,4 +129,50 @@ export function generateQuadEq(
     }
   }
   return problems;
-}
+};
+
+const formatQuadratic = (a: number, b: number, c: number): string => {
+  const parts: string[] = [];
+  if (a !== 0) {
+    if (a === 1) parts.push("x²");
+    else if (a === -1) parts.push("−x²");
+    else parts.push(`${a}x²`);
+  }
+  if (b !== 0) {
+    if (parts.length === 0) {
+      if (b === 1) parts.push("x");
+      else if (b === -1) parts.push("−x");
+      else parts.push(`${b}x`);
+    } else {
+      if (b === 1) parts.push("+ x");
+      else if (b === -1) parts.push("− x");
+      else if (b > 0) parts.push(`+ ${b}x`);
+      else parts.push(`− ${Math.abs(b)}x`);
+    }
+  }
+  if (c !== 0) {
+    if (parts.length === 0) parts.push(`${c}`);
+    else if (c > 0) parts.push(`+ ${c}`);
+    else parts.push(`− ${Math.abs(c)}`);
+  }
+  return parts.join(" ");
+};
+
+const simplifyRoot = (n: number): [number, number] => {
+  let outer = 1;
+  let inner = n;
+  for (let d = 2; d * d <= inner; d++) {
+    while (inner % (d * d) === 0) {
+      outer *= d;
+      inner /= d * d;
+    }
+  }
+  return [outer, inner];
+};
+
+const gcd = (a: number, b: number): number => {
+  a = Math.abs(a);
+  b = Math.abs(b);
+  while (b) { [a, b] = [b, a % b]; }
+  return a;
+};

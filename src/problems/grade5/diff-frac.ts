@@ -10,10 +10,10 @@ export interface FracCalcProblem {
 }
 
 /* ---- diff-frac (異分母分数の加減) ---- */
-export function generateDiffFrac(
+export const generateDiffFrac = (
   seed: number,
   op: "add" | "sub" | "mixed",
-): FracCalcProblem[] {
+): FracCalcProblem[] => {
   const rng = mulberry32(seed);
   const problems: FracCalcProblem[] = [];
 
@@ -64,4 +64,4 @@ export function generateDiffFrac(
     });
   }
   return problems;
-}
+};

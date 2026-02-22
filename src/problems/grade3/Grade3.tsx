@@ -32,16 +32,6 @@ type Grade3Op =
   | "circle-rd";
 
 /* ================================================================
-   URL state helpers
-   ================================================================ */
-
-const ALL_PARAMS = ["q", "answers", "rem", "ops", "mmode", "unit3", "dmax", "t3mode", "ln3mode", "bars"];
-
-function cleanParams(url: URL) {
-  for (const k of ALL_PARAMS) url.searchParams.delete(k);
-}
-
-/* ================================================================
    Defaults
    ================================================================ */
 
@@ -58,7 +48,7 @@ const BAR_DEF = { bars: 4 };
    Main component
    ================================================================ */
 
-function Grade3({ operator }: { operator: string }) {
+const Grade3 = ({ operator }: { operator: string }) => {
   const op = operator as Grade3Op;
 
   const getInitial = () => {
@@ -699,9 +689,23 @@ function Grade3({ operator }: { operator: string }) {
       </div>
     </>
   );
-}
+};
 
 export default Grade3;
+
+/* ================================================================
+   URL state helpers
+   ================================================================ */
+
+const ALL_PARAMS = ["q", "answers", "rem", "ops", "mmode", "unit3", "dmax", "t3mode", "ln3mode", "bars"];
+
+const cleanParams = (url: URL) => {
+  for (const k of ALL_PARAMS) url.searchParams.delete(k);
+};
+
+/* ================================================================
+   Exported group definition
+   ================================================================ */
 
 export const devGrade3: ProblemGroup = {
   id: "dev3",

@@ -1,10 +1,10 @@
 import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
-export function generateUnitConv(
+export const generateUnitConv = (
   seed: number,
   unitType: "length" | "volume" | "mixed",
-): TextProblem[] {
+): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -74,4 +74,4 @@ export function generateUnitConv(
     }
   }
   return problems;
-}
+};

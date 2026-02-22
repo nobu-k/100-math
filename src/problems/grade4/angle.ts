@@ -5,7 +5,7 @@ export interface AngleProblem {
   answer: number;
 }
 
-export function generateAngle(seed: number): AngleProblem[] {
+export const generateAngle = (seed: number): AngleProblem[] => {
   const rng = mulberry32(seed);
   const problems: AngleProblem[] = [];
   const baseAngles = [30, 45, 60, 90, 120, 135, 150];
@@ -36,4 +36,4 @@ export function generateAngle(seed: number): AngleProblem[] {
     }
   }
   return problems;
-}
+};

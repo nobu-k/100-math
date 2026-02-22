@@ -7,10 +7,10 @@ export interface MentalMathProblem {
   answer: number;
 }
 
-export function generateMentalMath(
+export const generateMentalMath = (
   seed: number,
   mode: "add" | "sub" | "mixed",
-): MentalMathProblem[] {
+): MentalMathProblem[] => {
   const rng = mulberry32(seed);
   const problems: MentalMathProblem[] = [];
 
@@ -29,4 +29,4 @@ export function generateMentalMath(
     }
   }
   return problems.slice(0, 20);
-}
+};

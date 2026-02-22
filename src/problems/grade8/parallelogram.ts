@@ -9,10 +9,10 @@ export interface ParallelogramProblem {
   answerDisplay: string;
 }
 
-export function generateParallelogram(
+export const generateParallelogram = (
   seed: number,
   mode: ParallelogramMode = "mixed",
-): ParallelogramProblem[] {
+): ParallelogramProblem[] => {
   const rng = mulberry32(seed);
   const problems: ParallelogramProblem[] = [];
   const seen = new Set<string>();
@@ -79,4 +79,4 @@ export function generateParallelogram(
     }
   }
   return problems;
-}
+};

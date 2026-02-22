@@ -61,9 +61,9 @@ const ALL_PARAMS = [
   "lemode", "eqmode", "secmode", "solmode", "propmode", "damode", "comode",
 ];
 
-function cleanParams(url: URL) {
+const cleanParams = (url: URL) => {
   for (const k of ALL_PARAMS) url.searchParams.delete(k);
-}
+};
 
 /* ================================================================
    Defaults
@@ -86,7 +86,7 @@ const COORD_DEF = { comode: "mixed" as CoordinateMode };
    Main component
    ================================================================ */
 
-function Grade7({ operator }: { operator: string }) {
+const Grade7 = ({ operator }: { operator: string }) => {
   const op = operator as Grade7Op;
 
   const getInitial = () => {
@@ -883,7 +883,7 @@ function Grade7({ operator }: { operator: string }) {
       </div>
     </>
   );
-}
+};
 
 export default Grade7;
 

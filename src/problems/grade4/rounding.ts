@@ -5,10 +5,10 @@ export interface RoundingProblem {
   answer: string;
 }
 
-export function generateRounding(
+export const generateRounding = (
   seed: number,
   digits: number,
-): RoundingProblem[] {
+): RoundingProblem[] => {
   const rng = mulberry32(seed);
   const problems: RoundingProblem[] = [];
 
@@ -36,4 +36,4 @@ export function generateRounding(
     });
   }
   return problems;
-}
+};

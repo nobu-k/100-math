@@ -12,19 +12,58 @@ export interface ProbabilityProblem {
   answerDisplay: string;
 }
 
-function gcd(a: number, b: number): number {
+export const generateProbability = (
+  seed: number,
+  mode: ProbabilityMode = "mixed",
+): ProbabilityProblem[] => {
+  const rng = mulberry32(seed);
+  const problems: ProbabilityProblem[] = [];
+  const seen = new Set<string>();
+
+  for (let i = 0; i < 10; i++) {
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const type: "basic" | "two-dice" =
+        mode === "mixed"
+          ? rng() < 0.5 ? "basic" : "two-dice"
+          : mode as any;
+
+      const templates = type === "basic" ? basicTemplates : twoDiceTemplates;
+      const tmpl = templates[Math.floor(rng() * templates.length)];
+      const result = tmpl.build(rng);
+      if (!result) continue;
+
+      const [sNum, sDen] = simplify(result.num, result.den);
+      const key = result.question;
+      if (!seen.has(key) || attempt === 29) {
+        seen.add(key);
+        problems.push({
+          type,
+          question: result.question,
+          ansNum: sNum,
+          ansDen: sDen,
+          answerDisplay:
+            sDen === 1 ? `${sNum}` : `${sNum}/${sDen}`,
+        });
+        break;
+      }
+    }
+  }
+  return problems;
+};
+
+const gcd = (a: number, b: number): number => {
   a = Math.abs(a);
   b = Math.abs(b);
   while (b) {
     [a, b] = [b, a % b];
   }
   return a;
-}
+};
 
-function simplify(num: number, den: number): [number, number] {
+const simplify = (num: number, den: number): [number, number] => {
   const g = gcd(num, den);
   return [num / g, den / g];
-}
+};
 
 interface BasicTemplate {
   build: (rng: () => number) => { question: string; num: number; den: number } | null;
@@ -204,42 +243,3 @@ const twoDiceTemplates: TwoDiceTemplate[] = [
     },
   },
 ];
-
-export function generateProbability(
-  seed: number,
-  mode: ProbabilityMode = "mixed",
-): ProbabilityProblem[] {
-  const rng = mulberry32(seed);
-  const problems: ProbabilityProblem[] = [];
-  const seen = new Set<string>();
-
-  for (let i = 0; i < 10; i++) {
-    for (let attempt = 0; attempt < 30; attempt++) {
-      const type: "basic" | "two-dice" =
-        mode === "mixed"
-          ? rng() < 0.5 ? "basic" : "two-dice"
-          : mode as any;
-
-      const templates = type === "basic" ? basicTemplates : twoDiceTemplates;
-      const tmpl = templates[Math.floor(rng() * templates.length)];
-      const result = tmpl.build(rng);
-      if (!result) continue;
-
-      const [sNum, sDen] = simplify(result.num, result.den);
-      const key = result.question;
-      if (!seen.has(key) || attempt === 29) {
-        seen.add(key);
-        problems.push({
-          type,
-          question: result.question,
-          ansNum: sNum,
-          ansDen: sDen,
-          answerDisplay:
-            sDen === 1 ? `${sNum}` : `${sNum}/${sDen}`,
-        });
-        break;
-      }
-    }
-  }
-  return problems;
-}

@@ -8,24 +8,6 @@ export interface PythagoreanProblem {
   answerDisplay: string;
 }
 
-function simplifyRoot(n: number): [number, number] {
-  let outer = 1;
-  let inner = n;
-  for (let d = 2; d * d <= inner; d++) {
-    while (inner % (d * d) === 0) {
-      outer *= d;
-      inner /= d * d;
-    }
-  }
-  return [outer, inner];
-}
-
-function fmtRoot(outer: number, inner: number): string {
-  if (inner === 1) return `${outer}`;
-  if (outer === 1) return `√${inner}`;
-  return `${outer}√${inner}`;
-}
-
 // Pythagorean triples for integer-answer problems
 const TRIPLES = [
   [3, 4, 5], [5, 12, 13], [8, 15, 17], [7, 24, 25],
@@ -33,10 +15,10 @@ const TRIPLES = [
   [9, 40, 41], [11, 60, 61], [20, 21, 29],
 ];
 
-export function generatePythagorean(
+export const generatePythagorean = (
   seed: number,
   mode: PythagoreanMode = "mixed",
-): PythagoreanProblem[] {
+): PythagoreanProblem[] => {
   const rng = mulberry32(seed);
   const problems: PythagoreanProblem[] = [];
   const seen = new Set<string>();
@@ -163,4 +145,22 @@ export function generatePythagorean(
     }
   }
   return problems;
-}
+};
+
+const simplifyRoot = (n: number): [number, number] => {
+  let outer = 1;
+  let inner = n;
+  for (let d = 2; d * d <= inner; d++) {
+    while (inner % (d * d) === 0) {
+      outer *= d;
+      inner /= d * d;
+    }
+  }
+  return [outer, inner];
+};
+
+const fmtRoot = (outer: number, inner: number): string => {
+  if (inner === 1) return `${outer}`;
+  if (outer === 1) return `√${inner}`;
+  return `${outer}√${inner}`;
+};

@@ -9,10 +9,10 @@ export interface DecompositionProblem {
   position: "left" | "right";
 }
 
-export function generateDecomposition(
+export const generateDecomposition = (
   seed: number,
   target: number,
-): DecompositionProblem[] {
+): DecompositionProblem[] => {
   const rng = mulberry32(seed);
   const problems: DecompositionProblem[] = [];
   const seen = new Set<string>();
@@ -30,4 +30,4 @@ export function generateDecomposition(
     }
   }
   return problems;
-}
+};

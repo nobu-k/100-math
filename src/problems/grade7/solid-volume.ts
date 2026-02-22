@@ -23,11 +23,11 @@ export interface SolidProblem {
   answerDisplay: string;
 }
 
-export function generateSolid(
+export const generateSolid = (
   seed: number,
   mode: SolidMode = "mixed",
   calcType: SolidCalcType = "volume",
-): SolidProblem[] {
+): SolidProblem[] => {
   const rng = mulberry32(seed);
   const problems: SolidProblem[] = [];
   const seen = new Set<string>();
@@ -190,4 +190,4 @@ export function generateSolid(
     }
   }
   return problems;
-}
+};

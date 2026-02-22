@@ -58,7 +58,7 @@ const getInitialSeed = (): number => {
   return seed;
 };
 
-function Grid100({ operator: operatorPath }: { operator: string }) {
+const Grid100 = ({ operator: operatorPath }: { operator: string }) => {
   const operator = operatorFromPath(operatorPath);
   const [seed, setSeed] = useState(getInitialSeed);
   const [showAnswers, setShowAnswers] = useState(() => {
@@ -136,7 +136,7 @@ function Grid100({ operator: operatorPath }: { operator: string }) {
       </div>
     </>
   );
-}
+};
 
 export const grid100: ProblemGroup = {
   id: "grid100",

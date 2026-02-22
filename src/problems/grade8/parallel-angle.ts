@@ -10,10 +10,10 @@ export interface ParallelAngleProblem {
   answerDisplay: string;
 }
 
-export function generateParallelAngle(
+export const generateParallelAngle = (
   seed: number,
   mode: ParallelAngleMode = "mixed",
-): ParallelAngleProblem[] {
+): ParallelAngleProblem[] => {
   const rng = mulberry32(seed);
   const problems: ParallelAngleProblem[] = [];
   const seen = new Set<string>();
@@ -65,4 +65,4 @@ export function generateParallelAngle(
     }
   }
   return problems;
-}
+};

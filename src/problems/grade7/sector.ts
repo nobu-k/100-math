@@ -17,10 +17,10 @@ export interface SectorProblem {
   unit: string;
 }
 
-export function generateSector(
+export const generateSector = (
   seed: number,
   mode: SectorMode = "mixed",
-): SectorProblem[] {
+): SectorProblem[] => {
   const rng = mulberry32(seed);
   const problems: SectorProblem[] = [];
   const seen = new Set<string>();
@@ -74,4 +74,4 @@ export function generateSector(
     }
   }
   return problems;
-}
+};

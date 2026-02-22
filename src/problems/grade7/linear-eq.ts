@@ -15,30 +15,10 @@ export interface LinearEqProblem {
   fracDen?: number;
 }
 
-function formatLinearSide(coeff: number, constant: number): string {
-  const parts: string[] = [];
-  if (coeff !== 0) {
-    if (coeff === 1) parts.push("x");
-    else if (coeff === -1) parts.push("−x");
-    else parts.push(`${coeff}x`);
-  }
-  if (constant !== 0) {
-    if (parts.length === 0) {
-      parts.push(`${constant}`);
-    } else if (constant > 0) {
-      parts.push(`+ ${constant}`);
-    } else {
-      parts.push(`− ${Math.abs(constant)}`);
-    }
-  }
-  if (parts.length === 0) return "0";
-  return parts.join(" ");
-}
-
-export function generateLinearEq(
+export const generateLinearEq = (
   seed: number,
   mode: LinearEqMode = "mixed",
-): LinearEqProblem[] {
+): LinearEqProblem[] => {
   const rng = mulberry32(seed);
   const problems: LinearEqProblem[] = [];
   const seen = new Set<string>();
@@ -119,4 +99,26 @@ export function generateLinearEq(
     }
   }
   return problems;
-}
+};
+
+/* ---- helpers ---- */
+
+const formatLinearSide = (coeff: number, constant: number): string => {
+  const parts: string[] = [];
+  if (coeff !== 0) {
+    if (coeff === 1) parts.push("x");
+    else if (coeff === -1) parts.push("−x");
+    else parts.push(`${coeff}x`);
+  }
+  if (constant !== 0) {
+    if (parts.length === 0) {
+      parts.push(`${constant}`);
+    } else if (constant > 0) {
+      parts.push(`+ ${constant}`);
+    } else {
+      parts.push(`− ${Math.abs(constant)}`);
+    }
+  }
+  if (parts.length === 0) return "0";
+  return parts.join(" ");
+};

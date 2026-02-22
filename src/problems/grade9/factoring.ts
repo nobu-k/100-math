@@ -9,43 +9,10 @@ export interface FactoringProblem {
   answerExpr: string;
 }
 
-function formatQuadratic(a: number, b: number, c: number): string {
-  const parts: string[] = [];
-  if (a !== 0) {
-    if (a === 1) parts.push("x²");
-    else if (a === -1) parts.push("−x²");
-    else parts.push(`${a}x²`);
-  }
-  if (b !== 0) {
-    if (parts.length === 0) {
-      if (b === 1) parts.push("x");
-      else if (b === -1) parts.push("−x");
-      else parts.push(`${b}x`);
-    } else {
-      if (b === 1) parts.push("+ x");
-      else if (b === -1) parts.push("− x");
-      else if (b > 0) parts.push(`+ ${b}x`);
-      else parts.push(`− ${Math.abs(b)}x`);
-    }
-  }
-  if (c !== 0) {
-    if (parts.length === 0) parts.push(`${c}`);
-    else if (c > 0) parts.push(`+ ${c}`);
-    else parts.push(`− ${Math.abs(c)}`);
-  }
-  if (parts.length === 0) return "0";
-  return parts.join(" ");
-}
-
-function fmtFactor(a: number): string {
-  if (a >= 0) return `x + ${a}`;
-  return `x − ${Math.abs(a)}`;
-}
-
-export function generateFactoring(
+export const generateFactoring = (
   seed: number,
   mode: FactoringMode = "mixed",
-): FactoringProblem[] {
+): FactoringProblem[] => {
   const rng = mulberry32(seed);
   const problems: FactoringProblem[] = [];
   const seen = new Set<string>();
@@ -116,4 +83,37 @@ export function generateFactoring(
     }
   }
   return problems;
-}
+};
+
+const formatQuadratic = (a: number, b: number, c: number): string => {
+  const parts: string[] = [];
+  if (a !== 0) {
+    if (a === 1) parts.push("x²");
+    else if (a === -1) parts.push("−x²");
+    else parts.push(`${a}x²`);
+  }
+  if (b !== 0) {
+    if (parts.length === 0) {
+      if (b === 1) parts.push("x");
+      else if (b === -1) parts.push("−x");
+      else parts.push(`${b}x`);
+    } else {
+      if (b === 1) parts.push("+ x");
+      else if (b === -1) parts.push("− x");
+      else if (b > 0) parts.push(`+ ${b}x`);
+      else parts.push(`− ${Math.abs(b)}x`);
+    }
+  }
+  if (c !== 0) {
+    if (parts.length === 0) parts.push(`${c}`);
+    else if (c > 0) parts.push(`+ ${c}`);
+    else parts.push(`− ${Math.abs(c)}`);
+  }
+  if (parts.length === 0) return "0";
+  return parts.join(" ");
+};
+
+const fmtFactor = (a: number): string => {
+  if (a >= 0) return `x + ${a}`;
+  return `x − ${Math.abs(a)}`;
+};

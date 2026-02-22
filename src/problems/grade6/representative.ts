@@ -7,10 +7,10 @@ export interface RepresentativeProblem {
   modeAnswer: string;
 }
 
-export function generateRepresentative(
+export const generateRepresentative = (
   seed: number,
   _find?: "mean" | "median" | "mode" | "mixed",
-): RepresentativeProblem[] {
+): RepresentativeProblem[] => {
   const rng = mulberry32(seed);
   const problems: RepresentativeProblem[] = [];
 
@@ -68,4 +68,4 @@ export function generateRepresentative(
     });
   }
   return problems;
-}
+};

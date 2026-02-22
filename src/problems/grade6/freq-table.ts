@@ -9,7 +9,7 @@ export interface FreqTableProblem {
   answers: number[];
 }
 
-export function generateFreqTable(seed: number): FreqTableProblem[] {
+export const generateFreqTable = (seed: number): FreqTableProblem[] => {
   const rng = mulberry32(seed);
   const problems: FreqTableProblem[] = [];
 
@@ -51,4 +51,4 @@ export function generateFreqTable(seed: number): FreqTableProblem[] {
     problems.push({ data, classWidth, classStart, classes, frequencies, answers });
   }
   return problems;
-}
+};

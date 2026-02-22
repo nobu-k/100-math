@@ -2,7 +2,7 @@ import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
 /* ---- pattern-eq ---- */
-export function generatePatternEq(seed: number): TextProblem[] {
+export const generatePatternEq = (seed: number): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -23,4 +23,4 @@ export function generatePatternEq(seed: number): TextProblem[] {
     });
   }
   return problems;
-}
+};

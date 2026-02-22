@@ -1,7 +1,7 @@
 import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
-export function generateScale(seed: number): TextProblem[] {
+export const generateScale = (seed: number): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -38,4 +38,4 @@ export function generateScale(seed: number): TextProblem[] {
     }
   }
   return problems;
-}
+};

@@ -2,7 +2,7 @@ import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
 /* ---- unit-amount ---- */
-export function generateUnitAmount(seed: number): TextProblem[] {
+export const generateUnitAmount = (seed: number): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -33,4 +33,4 @@ export function generateUnitAmount(seed: number): TextProblem[] {
     }
   }
   return problems;
-}
+};

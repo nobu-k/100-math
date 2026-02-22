@@ -1,10 +1,10 @@
 import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
-export function generateSpeed(
+export const generateSpeed = (
   seed: number,
   find: "speed" | "time" | "distance" | "mixed",
-): TextProblem[] {
+): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -30,4 +30,4 @@ export function generateSpeed(
     }
   }
   return problems;
-}
+};

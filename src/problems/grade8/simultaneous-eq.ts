@@ -13,36 +13,10 @@ export interface SimEqProblem {
   answerY: number;
 }
 
-function formatLinearEq(
-  xCoeff: number,
-  yCoeff: number,
-  constant: number,
-): string {
-  const parts: string[] = [];
-  if (xCoeff !== 0) {
-    if (xCoeff === 1) parts.push("x");
-    else if (xCoeff === -1) parts.push("−x");
-    else parts.push(`${xCoeff}x`);
-  }
-  if (yCoeff !== 0) {
-    if (parts.length === 0) {
-      if (yCoeff === 1) parts.push("y");
-      else if (yCoeff === -1) parts.push("−y");
-      else parts.push(`${yCoeff}y`);
-    } else {
-      if (yCoeff === 1) parts.push("+ y");
-      else if (yCoeff === -1) parts.push("− y");
-      else if (yCoeff > 0) parts.push(`+ ${yCoeff}y`);
-      else parts.push(`− ${Math.abs(yCoeff)}y`);
-    }
-  }
-  return `${parts.join(" ")} = ${constant}`;
-}
-
-export function generateSimEq(
+export const generateSimEq = (
   seed: number,
   mode: SimEqMode = "mixed",
-): SimEqProblem[] {
+): SimEqProblem[] => {
   const rng = mulberry32(seed);
   const problems: SimEqProblem[] = [];
   const seen = new Set<string>();
@@ -112,4 +86,30 @@ export function generateSimEq(
     }
   }
   return problems;
-}
+};
+
+const formatLinearEq = (
+  xCoeff: number,
+  yCoeff: number,
+  constant: number,
+): string => {
+  const parts: string[] = [];
+  if (xCoeff !== 0) {
+    if (xCoeff === 1) parts.push("x");
+    else if (xCoeff === -1) parts.push("−x");
+    else parts.push(`${xCoeff}x`);
+  }
+  if (yCoeff !== 0) {
+    if (parts.length === 0) {
+      if (yCoeff === 1) parts.push("y");
+      else if (yCoeff === -1) parts.push("−y");
+      else parts.push(`${yCoeff}y`);
+    } else {
+      if (yCoeff === 1) parts.push("+ y");
+      else if (yCoeff === -1) parts.push("− y");
+      else if (yCoeff > 0) parts.push(`+ ${yCoeff}y`);
+      else parts.push(`− ${Math.abs(yCoeff)}y`);
+    }
+  }
+  return `${parts.join(" ")} = ${constant}`;
+};

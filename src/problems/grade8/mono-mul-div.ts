@@ -7,25 +7,10 @@ export interface MonoMulDivProblem {
   answerExpr: string;
 }
 
-function formatMono(coeff: number, vars: Record<string, number>): string {
-  if (coeff === 0) return "0";
-  let result = "";
-  if (coeff === 1 && Object.keys(vars).length > 0) result = "";
-  else if (coeff === -1 && Object.keys(vars).length > 0) result = "−";
-  else result = `${coeff}`;
-
-  for (const [v, exp] of Object.entries(vars).sort()) {
-    if (exp === 1) result += v;
-    else if (exp > 1) result += `${v}${exp === 2 ? "²" : "³"}`;
-  }
-  if (result === "" || result === "−") result = result + "1";
-  return result;
-}
-
-export function generateMonoMulDiv(
+export const generateMonoMulDiv = (
   seed: number,
   mode: MonoMulDivMode = "mixed",
-): MonoMulDivProblem[] {
+): MonoMulDivProblem[] => {
   const rng = mulberry32(seed);
   const problems: MonoMulDivProblem[] = [];
   const seen = new Set<string>();
@@ -120,4 +105,19 @@ export function generateMonoMulDiv(
     }
   }
   return problems;
-}
+};
+
+const formatMono = (coeff: number, vars: Record<string, number>): string => {
+  if (coeff === 0) return "0";
+  let result = "";
+  if (coeff === 1 && Object.keys(vars).length > 0) result = "";
+  else if (coeff === -1 && Object.keys(vars).length > 0) result = "−";
+  else result = `${coeff}`;
+
+  for (const [v, exp] of Object.entries(vars).sort()) {
+    if (exp === 1) result += v;
+    else if (exp > 1) result += `${v}${exp === 2 ? "²" : "³"}`;
+  }
+  if (result === "" || result === "−") result = result + "1";
+  return result;
+};

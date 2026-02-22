@@ -30,9 +30,9 @@ type Grade2Op =
 
 const ALL_PARAMS = ["q", "answers", "blank", "max", "mode", "unit", "ttype", "range", "cats"];
 
-function cleanParams(url: URL) {
+const cleanParams = (url: URL) => {
   for (const k of ALL_PARAMS) url.searchParams.delete(k);
-}
+};
 
 /* ================================================================
    Defaults
@@ -49,7 +49,7 @@ const TABLE_DEF = { cats: 4 };
    Main component
    ================================================================ */
 
-function Grade2({ operator }: { operator: string }) {
+const Grade2 = ({ operator }: { operator: string }) => {
   const op = operator as Grade2Op;
 
   const getInitial = () => {
@@ -527,7 +527,7 @@ function Grade2({ operator }: { operator: string }) {
       </div>
     </>
   );
-}
+};
 
 export default Grade2;
 

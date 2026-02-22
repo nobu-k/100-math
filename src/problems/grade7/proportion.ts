@@ -24,11 +24,11 @@ export interface ProportionProblem {
   answerDisplay: string;
 }
 
-export function generateProportion(
+export const generateProportion = (
   seed: number,
   mode: ProportionMode = "mixed",
   task: ProportionTask = "mixed",
-): ProportionProblem[] {
+): ProportionProblem[] => {
   const rng = mulberry32(seed);
   const problems: ProportionProblem[] = [];
   const seen = new Set<string>();
@@ -164,4 +164,4 @@ export function generateProportion(
     }
   }
   return problems;
-}
+};

@@ -43,9 +43,9 @@ type Grade6Op =
 
 const ALL_PARAMS = ["q", "answers", "rtype", "ctype", "ptype", "repfind", "pvshape"];
 
-function cleanParams(url: URL) {
+const cleanParams = (url: URL) => {
   for (const k of ALL_PARAMS) url.searchParams.delete(k);
-}
+};
 
 /* ================================================================
    Defaults
@@ -61,7 +61,7 @@ const PV_DEF = { pvshape: "mixed" as const };
    Main component
    ================================================================ */
 
-function Grade6({ operator }: { operator: string }) {
+const Grade6 = ({ operator }: { operator: string }) => {
   const op = operator as Grade6Op;
 
   const getInitial = () => {
@@ -647,7 +647,7 @@ function Grade6({ operator }: { operator: string }) {
       </div>
     </>
   );
-}
+};
 
 export default Grade6;
 

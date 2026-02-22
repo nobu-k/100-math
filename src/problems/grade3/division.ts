@@ -7,10 +7,10 @@ export interface DivisionProblem {
   remainder: number;
 }
 
-export function generateDivision(
+export const generateDivision = (
   seed: number,
   remainderMode: "none" | "yes" | "mixed",
-): DivisionProblem[] {
+): DivisionProblem[] => {
   const rng = mulberry32(seed);
   const problems: DivisionProblem[] = [];
   const seen = new Set<string>();
@@ -43,4 +43,4 @@ export function generateDivision(
     }
   }
   return problems;
-}
+};

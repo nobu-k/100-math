@@ -90,15 +90,10 @@ const templates: Template[] = [
   },
 ];
 
-function formatS(n: number): string {
-  if (n < 0) return `(${n})`;
-  return `${n}`;
-}
-
-export function generatePosNegMixed(
+export const generatePosNegMixed = (
   seed: number,
   includePower: boolean = true,
-): PosNegMixedProblem[] {
+): PosNegMixedProblem[] => {
   const rng = mulberry32(seed);
   const problems: PosNegMixedProblem[] = [];
   const seen = new Set<string>();
@@ -120,4 +115,11 @@ export function generatePosNegMixed(
     }
   }
   return problems;
-}
+};
+
+/* ---- helpers ---- */
+
+const formatS = (n: number): string => {
+  if (n < 0) return `(${n})`;
+  return `${n}`;
+};

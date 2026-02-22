@@ -5,10 +5,10 @@ export interface BoxEqProblem {
   answer: number;
 }
 
-export function generateBoxEq(
+export const generateBoxEq = (
   seed: number,
   ops: "addsub" | "all",
-): BoxEqProblem[] {
+): BoxEqProblem[] => {
   const rng = mulberry32(seed);
   const problems: BoxEqProblem[] = [];
 
@@ -60,4 +60,4 @@ export function generateBoxEq(
     }
   }
   return problems;
-}
+};

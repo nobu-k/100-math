@@ -9,10 +9,10 @@ export interface SimilarityProblem {
   answerDisplay: string;
 }
 
-export function generateSimilarity(
+export const generateSimilarity = (
   seed: number,
   mode: SimilarityMode = "mixed",
-): SimilarityProblem[] {
+): SimilarityProblem[] => {
   const rng = mulberry32(seed);
   const problems: SimilarityProblem[] = [];
   const seen = new Set<string>();
@@ -91,9 +91,9 @@ export function generateSimilarity(
     }
   }
   return problems;
-}
+};
 
-function gcd(a: number, b: number): number {
+const gcd = (a: number, b: number): number => {
   while (b) { [a, b] = [b, a % b]; }
   return a;
-}
+};

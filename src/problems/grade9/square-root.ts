@@ -8,32 +8,10 @@ export interface SqrtProblem {
   answerDisplay: string;
 }
 
-/**
- * Simplify √n to a√b form where b has no perfect square factors.
- * Returns [a, b] such that √n = a√b.
- */
-function simplifyRoot(n: number): [number, number] {
-  let outer = 1;
-  let inner = n;
-  for (let d = 2; d * d <= inner; d++) {
-    while (inner % (d * d) === 0) {
-      outer *= d;
-      inner /= d * d;
-    }
-  }
-  return [outer, inner];
-}
-
-function fmtRoot(outer: number, inner: number): string {
-  if (inner === 1) return `${outer}`;
-  if (outer === 1) return `√${inner}`;
-  return `${outer}√${inner}`;
-}
-
-export function generateSqrt(
+export const generateSqrt = (
   seed: number,
   mode: SqrtMode = "mixed",
-): SqrtProblem[] {
+): SqrtProblem[] => {
   const rng = mulberry32(seed);
   const problems: SqrtProblem[] = [];
   const seen = new Set<string>();
@@ -164,11 +142,33 @@ export function generateSqrt(
     }
   }
   return problems;
-}
+};
 
-function gcd(a: number, b: number): number {
+/**
+ * Simplify √n to a√b form where b has no perfect square factors.
+ * Returns [a, b] such that √n = a√b.
+ */
+const simplifyRoot = (n: number): [number, number] => {
+  let outer = 1;
+  let inner = n;
+  for (let d = 2; d * d <= inner; d++) {
+    while (inner % (d * d) === 0) {
+      outer *= d;
+      inner /= d * d;
+    }
+  }
+  return [outer, inner];
+};
+
+const fmtRoot = (outer: number, inner: number): string => {
+  if (inner === 1) return `${outer}`;
+  if (outer === 1) return `√${inner}`;
+  return `${outer}√${inner}`;
+};
+
+const gcd = (a: number, b: number): number => {
   a = Math.abs(a);
   b = Math.abs(b);
   while (b) { [a, b] = [b, a % b]; }
   return a;
-}
+};

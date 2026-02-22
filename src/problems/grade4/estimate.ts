@@ -1,10 +1,10 @@
 import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
-export function generateEstimate(
+export const generateEstimate = (
   seed: number,
   roundTo: number,
-): TextProblem[] {
+): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -37,4 +37,4 @@ export function generateEstimate(
     });
   }
   return problems;
-}
+};

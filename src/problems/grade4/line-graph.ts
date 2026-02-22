@@ -8,7 +8,7 @@ export interface LineGraphProblem {
   questions: { question: string; answer: string }[];
 }
 
-export function generateLineGraph(seed: number): LineGraphProblem[] {
+export const generateLineGraph = (seed: number): LineGraphProblem[] => {
   const rng = mulberry32(seed);
   const problems: LineGraphProblem[] = [];
 
@@ -57,4 +57,4 @@ export function generateLineGraph(seed: number): LineGraphProblem[] {
     problems.push({ title: theme.title, labels: theme.labels, values, unit: theme.unit, questions });
   }
   return problems;
-}
+};

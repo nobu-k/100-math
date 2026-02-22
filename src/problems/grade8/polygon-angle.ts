@@ -26,10 +26,10 @@ const polygonNames: Record<number, string> = {
   12: "十二角形",
 };
 
-export function generatePolygonAngle(
+export const generatePolygonAngle = (
   seed: number,
   mode: PolygonAngleMode = "mixed",
-): PolygonAngleProblem[] {
+): PolygonAngleProblem[] => {
   const rng = mulberry32(seed);
   const problems: PolygonAngleProblem[] = [];
   const seen = new Set<string>();
@@ -79,4 +79,4 @@ export function generatePolygonAngle(
     }
   }
   return problems;
-}
+};

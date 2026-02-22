@@ -1,10 +1,10 @@
 import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
-export function generateDecimalPlace(
+export const generateDecimalPlace = (
   seed: number,
   mode: "count" | "multiply" | "mixed",
-): TextProblem[] {
+): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -36,4 +36,4 @@ export function generateDecimalPlace(
     }
   }
   return problems;
-}
+};

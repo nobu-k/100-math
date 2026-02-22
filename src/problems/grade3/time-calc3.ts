@@ -1,10 +1,10 @@
 import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
-export function generateTimeCalc3(
+export const generateTimeCalc3 = (
   seed: number,
   mode: "after" | "duration" | "seconds" | "mixed",
-): TextProblem[] {
+): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -58,4 +58,4 @@ export function generateTimeCalc3(
     }
   }
   return problems;
-}
+};

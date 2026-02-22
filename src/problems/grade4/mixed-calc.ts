@@ -5,10 +5,10 @@ export interface MixedCalcProblem {
   answer: number;
 }
 
-export function generateMixedCalc(
+export const generateMixedCalc = (
   seed: number,
   withParen: boolean,
-): MixedCalcProblem[] {
+): MixedCalcProblem[] => {
   const rng = mulberry32(seed);
   const problems: MixedCalcProblem[] = [];
 
@@ -118,4 +118,4 @@ export function generateMixedCalc(
     problems.push({ display: `${a} × ${b} ＋ ${c}`, answer: a * b + c });
   }
   return problems.slice(0, 12);
-}
+};

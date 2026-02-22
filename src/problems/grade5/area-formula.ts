@@ -1,10 +1,10 @@
 import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
-export function generateAreaFormula(
+export const generateAreaFormula = (
   seed: number,
   shape: "triangle" | "parallelogram" | "trapezoid" | "mixed",
-): TextProblem[] {
+): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -42,4 +42,4 @@ export function generateAreaFormula(
     }
   }
   return problems;
-}
+};

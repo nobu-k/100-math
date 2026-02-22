@@ -6,10 +6,10 @@ export interface DecimalCompProblem {
   answer: "＞" | "＜" | "＝";
 }
 
-export function generateDecimalComp(
+export const generateDecimalComp = (
   seed: number,
   maxVal: number,
-): DecimalCompProblem[] {
+): DecimalCompProblem[] => {
   const rng = mulberry32(seed);
   const problems: DecimalCompProblem[] = [];
 
@@ -26,4 +26,4 @@ export function generateDecimalComp(
     problems.push({ left: a.toFixed(1), right: b.toFixed(1), answer });
   }
   return problems;
-}
+};

@@ -8,10 +8,10 @@ export interface KukuBlankProblem {
   answer: number;
 }
 
-export function generateKukuBlank(
+export const generateKukuBlank = (
   seed: number,
   blankMode: "any" | "product" | "factor",
-): KukuBlankProblem[] {
+): KukuBlankProblem[] => {
   const rng = mulberry32(seed);
   const problems: KukuBlankProblem[] = [];
   const seen = new Set<string>();
@@ -39,4 +39,4 @@ export function generateKukuBlank(
     }
   }
   return problems;
-}
+};

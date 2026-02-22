@@ -1,7 +1,7 @@
 import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
-export function generateLiteralExpr(seed: number): TextProblem[] {
+export const generateLiteralExpr = (seed: number): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -52,4 +52,4 @@ export function generateLiteralExpr(seed: number): TextProblem[] {
     }
   }
   return problems;
-}
+};

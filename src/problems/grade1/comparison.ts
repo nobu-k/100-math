@@ -6,10 +6,10 @@ export interface ComparisonProblem {
   answer: "＞" | "＜" | "＝";
 }
 
-export function generateComparison(
+export const generateComparison = (
   seed: number,
   max: number,
-): ComparisonProblem[] {
+): ComparisonProblem[] => {
   const rng = mulberry32(seed);
   const problems: ComparisonProblem[] = [];
 
@@ -45,4 +45,4 @@ export function generateComparison(
     problems.push({ left, right, answer });
   }
   return problems;
-}
+};

@@ -1,10 +1,10 @@
 import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
-export function generateAverage(
+export const generateAverage = (
   seed: number,
   count: number,
-): TextProblem[] {
+): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -31,4 +31,4 @@ export function generateAverage(
     problems.push({ question: `${values.join("、")} の平均は？`, answer: `${avg}` });
   }
   return problems;
-}
+};

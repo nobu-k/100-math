@@ -7,11 +7,11 @@ export interface PosNegAddSubProblem {
   answer: number;
 }
 
-export function generatePosNegAddSub(
+export const generatePosNegAddSub = (
   seed: number,
   termCount: 2 | 3 = 2,
   includeDecimals: boolean = false,
-): PosNegAddSubProblem[] {
+): PosNegAddSubProblem[] => {
   const rng = mulberry32(seed);
   const problems: PosNegAddSubProblem[] = [];
   const seen = new Set<string>();
@@ -44,4 +44,4 @@ export function generatePosNegAddSub(
     }
   }
   return problems;
-}
+};

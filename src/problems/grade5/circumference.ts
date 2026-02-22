@@ -2,10 +2,10 @@ import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
 /* ---- circumference ---- */
-export function generateCircumference(
+export const generateCircumference = (
   seed: number,
   mode: "forward" | "reverse" | "mixed",
-): TextProblem[] {
+): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -32,4 +32,4 @@ export function generateCircumference(
     }
   }
   return problems;
-}
+};

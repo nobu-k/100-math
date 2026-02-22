@@ -3,7 +3,7 @@ import { numberToDigits, decimalDisplayWidth } from "./common";
 import { computeDivDetails } from "./div";
 import { cx } from "./render-utils";
 
-export function HissanDivProblem({
+export const HissanDivProblem = ({
   index,
   problem,
   showAnswers,
@@ -15,7 +15,7 @@ export function HissanDivProblem({
   showAnswers: boolean;
   dps: number[];
   extraDigits?: number;
-}) {
+}) => {
   const [dividend, divisor] = problem;
   const divisorDigits = numberToDigits(divisor);
 
@@ -260,4 +260,4 @@ export function HissanDivProblem({
       </table>
     </div>
   );
-}
+};

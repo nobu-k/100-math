@@ -7,10 +7,10 @@ export interface EvenOddProblem {
 }
 
 /* ---- even-odd ---- */
-export function generateEvenOdd(
+export const generateEvenOdd = (
   seed: number,
   range: number,
-): EvenOddProblem[] {
+): EvenOddProblem[] => {
   const rng = mulberry32(seed);
   const problems: EvenOddProblem[] = [];
 
@@ -25,4 +25,4 @@ export function generateEvenOdd(
     problems.push({ numbers, evenAnswers, oddAnswers });
   }
   return problems;
-}
+};

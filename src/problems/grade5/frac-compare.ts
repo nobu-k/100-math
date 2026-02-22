@@ -7,7 +7,7 @@ export interface FracCompareProblem {
 }
 
 /* ---- frac-compare ---- */
-export function generateFracCompare(seed: number): FracCompareProblem[] {
+export const generateFracCompare = (seed: number): FracCompareProblem[] => {
   const rng = mulberry32(seed);
   const problems: FracCompareProblem[] = [];
 
@@ -58,4 +58,4 @@ export function generateFracCompare(seed: number): FracCompareProblem[] {
     problems.push({ aNum, aDen, bNum, bDen, answer });
   }
   return problems;
-}
+};

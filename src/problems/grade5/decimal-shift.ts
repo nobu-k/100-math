@@ -2,7 +2,7 @@ import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
 /* ---- decimal-shift ---- */
-export function generateDecimalShift(seed: number): TextProblem[] {
+export const generateDecimalShift = (seed: number): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -29,4 +29,4 @@ export function generateDecimalShift(seed: number): TextProblem[] {
     }
   }
   return problems;
-}
+};

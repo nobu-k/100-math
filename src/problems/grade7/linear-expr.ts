@@ -13,43 +13,10 @@ export interface LinearExprProblem {
   answerExpr: string;
 }
 
-function formatLinear(coeff: number, constant: number): string {
-  let result = "";
-  if (coeff === 0) {
-    return `${constant}`;
-  }
-  if (coeff === 1) result = "x";
-  else if (coeff === -1) result = "−x";
-  else if (coeff < 0) result = `−${Math.abs(coeff)}x`;
-  else result = `${coeff}x`;
-
-  if (constant === 0) return result;
-  if (constant > 0) return `${result} + ${constant}`;
-  return `${result} − ${Math.abs(constant)}`;
-}
-
-function fmtTerm(coeff: number, isFirst: boolean): string {
-  if (isFirst) {
-    if (coeff === 1) return "x";
-    if (coeff === -1) return "−x";
-    return `${coeff}x`;
-  }
-  if (coeff === 1) return "+ x";
-  if (coeff === -1) return "− x";
-  if (coeff > 0) return `+ ${coeff}x`;
-  return `− ${Math.abs(coeff)}x`;
-}
-
-function fmtConst(n: number, isFirst: boolean): string {
-  if (isFirst) return `${n}`;
-  if (n > 0) return `+ ${n}`;
-  return `− ${Math.abs(n)}`;
-}
-
-export function generateLinearExpr(
+export const generateLinearExpr = (
   seed: number,
   mode: LinearExprMode = "mixed",
-): LinearExprProblem[] {
+): LinearExprProblem[] => {
   const rng = mulberry32(seed);
   const problems: LinearExprProblem[] = [];
   const seen = new Set<string>();
@@ -137,4 +104,39 @@ export function generateLinearExpr(
     }
   }
   return problems;
-}
+};
+
+/* ---- helpers ---- */
+
+const formatLinear = (coeff: number, constant: number): string => {
+  let result = "";
+  if (coeff === 0) {
+    return `${constant}`;
+  }
+  if (coeff === 1) result = "x";
+  else if (coeff === -1) result = "−x";
+  else if (coeff < 0) result = `−${Math.abs(coeff)}x`;
+  else result = `${coeff}x`;
+
+  if (constant === 0) return result;
+  if (constant > 0) return `${result} + ${constant}`;
+  return `${result} − ${Math.abs(constant)}`;
+};
+
+const fmtTerm = (coeff: number, isFirst: boolean): string => {
+  if (isFirst) {
+    if (coeff === 1) return "x";
+    if (coeff === -1) return "−x";
+    return `${coeff}x`;
+  }
+  if (coeff === 1) return "+ x";
+  if (coeff === -1) return "− x";
+  if (coeff > 0) return `+ ${coeff}x`;
+  return `− ${Math.abs(coeff)}x`;
+};
+
+const fmtConst = (n: number, isFirst: boolean): string => {
+  if (isFirst) return `${n}`;
+  if (n > 0) return `+ ${n}`;
+  return `− ${Math.abs(n)}`;
+};

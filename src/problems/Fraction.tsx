@@ -201,7 +201,7 @@ const updateUrl = (
   window.history.replaceState(null, "", url.toString());
 };
 
-function Fraction({ operator }: { operator: string }) {
+const Fraction = ({ operator }: { operator: string }) => {
   const op: FractionOperator = operator === "reduction" ? "reduction" : operator === "common-denominator" ? "commonDenom" : "addition";
   const defaults = DEFAULTS[op];
 
@@ -413,7 +413,7 @@ function Fraction({ operator }: { operator: string }) {
       </div>
     </>
   );
-}
+};
 
 export const fraction: ProblemGroup = {
   id: "fraction",

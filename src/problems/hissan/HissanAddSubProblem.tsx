@@ -2,7 +2,7 @@ import type { Problem, HissanOperator } from "./common";
 import { toDigitCells, toDecimalDigitCells, computeIndicators } from "./common";
 import { cx } from "./render-utils";
 
-export function HissanAddSubProblem({
+export const HissanAddSubProblem = ({
   index,
   problem,
   showAnswers,
@@ -16,7 +16,7 @@ export function HissanAddSubProblem({
   maxDigits: number;
   operator: HissanOperator;
   dps: number[];
-}) {
+}) => {
   const maxDP = Math.max(...dps);
   const isSub = operator === "sub";
   const operatorSymbol = isSub ? "\u2212" : "+";
@@ -200,4 +200,4 @@ export function HissanAddSubProblem({
       </table>
     </div>
   );
-}
+};

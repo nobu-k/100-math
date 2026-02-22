@@ -15,17 +15,10 @@ export interface LinearFuncProblem {
   singleAnswer?: number;
 }
 
-function formatLinearFunc(a: number, b: number): string {
-  const aStr = a === 1 ? "" : a === -1 ? "−" : `${a}`;
-  if (b === 0) return `y = ${aStr}x`;
-  if (b > 0) return `y = ${aStr}x + ${b}`;
-  return `y = ${aStr}x − ${Math.abs(b)}`;
-}
-
-export function generateLinearFunc(
+export const generateLinearFunc = (
   seed: number,
   mode: LinearFuncMode = "mixed",
-): LinearFuncProblem[] {
+): LinearFuncProblem[] => {
   const rng = mulberry32(seed);
   const problems: LinearFuncProblem[] = [];
   const seen = new Set<string>();
@@ -63,7 +56,7 @@ export function generateLinearFunc(
         }
         answerDisplay = formatLinearFunc(answerA, answerB);
       } else if (type === "two-points") {
-        // Two points → find equation
+        // Two points -> find equation
         const x1 = Math.floor(rng() * 7) - 3;
         let x2 = Math.floor(rng() * 7) - 3;
         if (x1 === x2) x2 = x1 + 1 + Math.floor(rng() * 3);
@@ -111,4 +104,11 @@ export function generateLinearFunc(
     }
   }
   return problems;
-}
+};
+
+const formatLinearFunc = (a: number, b: number): string => {
+  const aStr = a === 1 ? "" : a === -1 ? "−" : `${a}`;
+  if (b === 0) return `y = ${aStr}x`;
+  if (b > 0) return `y = ${aStr}x + ${b}`;
+  return `y = ${aStr}x − ${Math.abs(b)}`;
+};

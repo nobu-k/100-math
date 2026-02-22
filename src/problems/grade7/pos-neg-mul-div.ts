@@ -9,15 +9,10 @@ export interface PosNegMulDivProblem {
   answer: number;
 }
 
-function formatSigned(n: number): string {
-  if (n >= 0) return `(+${n})`;
-  return `(${n})`;
-}
-
-export function generatePosNegMulDiv(
+export const generatePosNegMulDiv = (
   seed: number,
   mode: PosNegMulDivMode = "mixed",
-): PosNegMulDivProblem[] {
+): PosNegMulDivProblem[] => {
   const rng = mulberry32(seed);
   const problems: PosNegMulDivProblem[] = [];
   const seen = new Set<string>();
@@ -72,4 +67,11 @@ export function generatePosNegMulDiv(
     }
   }
   return problems;
-}
+};
+
+/* ---- helpers ---- */
+
+const formatSigned = (n: number): string => {
+  if (n >= 0) return `(+${n})`;
+  return `(${n})`;
+};

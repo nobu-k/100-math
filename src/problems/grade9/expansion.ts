@@ -7,53 +7,10 @@ export interface ExpansionProblem {
   answerExpr: string;
 }
 
-function formatQuadratic(a: number, b: number, c: number, varName: string = "x"): string {
-  const parts: string[] = [];
-  if (a !== 0) {
-    if (a === 1) parts.push(`${varName}²`);
-    else if (a === -1) parts.push(`−${varName}²`);
-    else parts.push(`${a}${varName}²`);
-  }
-  if (b !== 0) {
-    if (parts.length === 0) {
-      if (b === 1) parts.push(varName);
-      else if (b === -1) parts.push(`−${varName}`);
-      else parts.push(`${b}${varName}`);
-    } else {
-      if (b === 1) parts.push(`+ ${varName}`);
-      else if (b === -1) parts.push(`− ${varName}`);
-      else if (b > 0) parts.push(`+ ${b}${varName}`);
-      else parts.push(`− ${Math.abs(b)}${varName}`);
-    }
-  }
-  if (c !== 0) {
-    if (parts.length === 0) {
-      parts.push(`${c}`);
-    } else if (c > 0) {
-      parts.push(`+ ${c}`);
-    } else {
-      parts.push(`− ${Math.abs(c)}`);
-    }
-  }
-  if (parts.length === 0) return "0";
-  return parts.join(" ");
-}
-
-function fmtBinomial(coeff: number, constant: number): string {
-  const parts: string[] = [];
-  if (coeff === 1) parts.push("x");
-  else if (coeff === -1) parts.push("−x");
-  else parts.push(`${coeff}x`);
-
-  if (constant > 0) parts.push(`+ ${constant}`);
-  else if (constant < 0) parts.push(`− ${Math.abs(constant)}`);
-  return parts.join(" ");
-}
-
-export function generateExpansion(
+export const generateExpansion = (
   seed: number,
   mode: ExpansionMode = "mixed",
-): ExpansionProblem[] {
+): ExpansionProblem[] => {
   const rng = mulberry32(seed);
   const problems: ExpansionProblem[] = [];
   const seen = new Set<string>();
@@ -134,4 +91,47 @@ export function generateExpansion(
     }
   }
   return problems;
-}
+};
+
+const formatQuadratic = (a: number, b: number, c: number, varName: string = "x"): string => {
+  const parts: string[] = [];
+  if (a !== 0) {
+    if (a === 1) parts.push(`${varName}²`);
+    else if (a === -1) parts.push(`−${varName}²`);
+    else parts.push(`${a}${varName}²`);
+  }
+  if (b !== 0) {
+    if (parts.length === 0) {
+      if (b === 1) parts.push(varName);
+      else if (b === -1) parts.push(`−${varName}`);
+      else parts.push(`${b}${varName}`);
+    } else {
+      if (b === 1) parts.push(`+ ${varName}`);
+      else if (b === -1) parts.push(`− ${varName}`);
+      else if (b > 0) parts.push(`+ ${b}${varName}`);
+      else parts.push(`− ${Math.abs(b)}${varName}`);
+    }
+  }
+  if (c !== 0) {
+    if (parts.length === 0) {
+      parts.push(`${c}`);
+    } else if (c > 0) {
+      parts.push(`+ ${c}`);
+    } else {
+      parts.push(`− ${Math.abs(c)}`);
+    }
+  }
+  if (parts.length === 0) return "0";
+  return parts.join(" ");
+};
+
+const fmtBinomial = (coeff: number, constant: number): string => {
+  const parts: string[] = [];
+  if (coeff === 1) parts.push("x");
+  else if (coeff === -1) parts.push("−x");
+  else parts.push(`${coeff}x`);
+
+  if (constant > 0) parts.push(`+ ${constant}`);
+  else if (constant < 0) parts.push(`− ${Math.abs(constant)}`);
+  return parts.join(" ");
+};

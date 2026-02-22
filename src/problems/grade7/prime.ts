@@ -18,40 +18,10 @@ export interface PrimeProblem {
 
 const PRIMES_UNDER_50 = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
 
-function isPrime(n: number): boolean {
-  if (n < 2) return false;
-  for (let i = 2; i * i <= n; i++) {
-    if (n % i === 0) return false;
-  }
-  return true;
-}
-
-function primeFactorize(n: number): number[] {
-  const factors: number[] = [];
-  let remaining = n;
-  for (let d = 2; d * d <= remaining; d++) {
-    while (remaining % d === 0) {
-      factors.push(d);
-      remaining /= d;
-    }
-  }
-  if (remaining > 1) factors.push(remaining);
-  return factors;
-}
-
-function shuffle(arr: number[], rng: () => number): number[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-export function generatePrime(
+export const generatePrime = (
   seed: number,
   mode: PrimeMode = "identify",
-): PrimeProblem[] {
+): PrimeProblem[] => {
   const rng = mulberry32(seed);
   const problems: PrimeProblem[] = [];
 
@@ -99,4 +69,36 @@ export function generatePrime(
     }
   }
   return problems;
-}
+};
+
+/* ---- helpers ---- */
+
+const isPrime = (n: number): boolean => {
+  if (n < 2) return false;
+  for (let i = 2; i * i <= n; i++) {
+    if (n % i === 0) return false;
+  }
+  return true;
+};
+
+const primeFactorize = (n: number): number[] => {
+  const factors: number[] = [];
+  let remaining = n;
+  for (let d = 2; d * d <= remaining; d++) {
+    while (remaining % d === 0) {
+      factors.push(d);
+      remaining /= d;
+    }
+  }
+  if (remaining > 1) factors.push(remaining);
+  return factors;
+};
+
+const shuffle = (arr: number[], rng: () => number): number[] => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};

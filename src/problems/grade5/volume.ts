@@ -2,10 +2,10 @@ import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
 /* ---- volume ---- */
-export function generateVolume(
+export const generateVolume = (
   seed: number,
   shape: "cube" | "rect" | "mixed",
-): TextProblem[] {
+): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -31,4 +31,4 @@ export function generateVolume(
     }
   }
   return problems;
-}
+};

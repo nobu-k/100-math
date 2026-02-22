@@ -9,11 +9,11 @@ export interface FillBlankProblem {
   answer: number;
 }
 
-export function generateFillBlank(
+export const generateFillBlank = (
   seed: number,
   max: number,
   mode: "add" | "sub" | "mixed",
-): FillBlankProblem[] {
+): FillBlankProblem[] => {
   const rng = mulberry32(seed);
   const problems: FillBlankProblem[] = [];
   for (let i = 0; i < 12; i++) {
@@ -40,4 +40,4 @@ export function generateFillBlank(
     }
   }
   return problems;
-}
+};

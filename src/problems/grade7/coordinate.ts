@@ -18,10 +18,10 @@ export interface CoordinateProblem {
   answerDisplay: string;
 }
 
-export function generateCoordinate(
+export const generateCoordinate = (
   seed: number,
   mode: CoordinateMode = "mixed",
-): CoordinateProblem[] {
+): CoordinateProblem[] => {
   const rng = mulberry32(seed);
   const problems: CoordinateProblem[] = [];
   const seen = new Set<string>();
@@ -103,4 +103,4 @@ export function generateCoordinate(
     }
   }
   return problems;
-}
+};

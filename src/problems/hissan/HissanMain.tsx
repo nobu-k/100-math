@@ -36,7 +36,7 @@ const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
   window.history.replaceState(null, "", url.toString());
 };
 
-function Hissan({ operator: operatorPath }: { operator: string }) {
+const Hissan = ({ operator: operatorPath }: { operator: string }) => {
   const hissanOperator = operatorFromPath(operatorPath);
 
   const getInitialConfig = (): HissanConfig => {
@@ -283,7 +283,7 @@ function Hissan({ operator: operatorPath }: { operator: string }) {
       </div>
     </>
   );
-}
+};
 
 export const hissan: ProblemGroup = {
   id: "hissan",

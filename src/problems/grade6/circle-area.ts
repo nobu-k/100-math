@@ -1,10 +1,10 @@
 import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
-export function generateCircleArea(
+export const generateCircleArea = (
   seed: number,
   type: "basic" | "half" | "mixed",
-): TextProblem[] {
+): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -34,4 +34,4 @@ export function generateCircleArea(
     }
   }
   return problems;
-}
+};

@@ -13,10 +13,10 @@ const SPORT_NAMES = ["サッカー", "野球", "水泳", "バスケ", "テニス
 const CATEGORY_SETS = [FRUIT_NAMES, ANIMAL_NAMES, SPORT_NAMES];
 const CATEGORY_TITLES = ["好きな果物しらべ", "好きな動物しらべ", "好きなスポーツしらべ"];
 
-export function generateTableRead(
+export const generateTableRead = (
   seed: number,
   categories: number,
-): TableReadProblem[] {
+): TableReadProblem[] => {
   const rng = mulberry32(seed);
   const problems: TableReadProblem[] = [];
 
@@ -65,4 +65,4 @@ export function generateTableRead(
     problems.push({ title, categories: cats, values, questions });
   }
   return problems;
-}
+};

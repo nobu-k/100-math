@@ -83,26 +83,10 @@ const twoVarTemplates: ExprTemplate[] = [
   },
 ];
 
-function fmtCoeff(n: number): string {
-  if (n === 1) return "";
-  if (n === -1) return "−";
-  if (n < 0) return `${n}`;
-  return `${n}`;
-}
-
-function fmtNum(n: number): string {
-  if (n < 0) return `(${n})`;
-  return `${n}`;
-}
-
-function fmtVar(name: string, val: number): string {
-  return `${name} = ${val}`;
-}
-
-export function generateExprValue(
+export const generateExprValue = (
   seed: number,
   vars: ExprValueVars = "one",
-): ExprValueProblem[] {
+): ExprValueProblem[] => {
   const rng = mulberry32(seed);
   const problems: ExprValueProblem[] = [];
   const seen = new Set<string>();
@@ -141,4 +125,22 @@ export function generateExprValue(
     }
   }
   return problems;
-}
+};
+
+/* ---- helpers ---- */
+
+const fmtCoeff = (n: number): string => {
+  if (n === 1) return "";
+  if (n === -1) return "−";
+  if (n < 0) return `${n}`;
+  return `${n}`;
+};
+
+const fmtNum = (n: number): string => {
+  if (n < 0) return `(${n})`;
+  return `${n}`;
+};
+
+const fmtVar = (name: string, val: number): string => {
+  return `${name} = ${val}`;
+};

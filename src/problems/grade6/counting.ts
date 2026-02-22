@@ -1,7 +1,7 @@
 import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
-export function generateCounting(seed: number): TextProblem[] {
+export const generateCounting = (seed: number): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -51,14 +51,14 @@ export function generateCounting(seed: number): TextProblem[] {
     }
   }
   return problems;
-}
+};
 
-function factorial(n: number): number {
+const factorial = (n: number): number => {
   let r = 1;
   for (let i = 2; i <= n; i++) r *= i;
   return r;
-}
+};
 
-function comb(n: number, r: number): number {
+const comb = (n: number, r: number): number => {
   return factorial(n) / (factorial(r) * factorial(n - r));
-}
+};

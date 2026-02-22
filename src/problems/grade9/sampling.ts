@@ -52,10 +52,10 @@ const conceptQuestions = [
   },
 ];
 
-export function generateSampling(
+export const generateSampling = (
   seed: number,
   mode: SamplingMode = "mixed",
-): SamplingProblem[] {
+): SamplingProblem[] => {
   const rng = mulberry32(seed);
   const problems: SamplingProblem[] = [];
   const seen = new Set<string>();
@@ -149,4 +149,4 @@ export function generateSampling(
     }
   }
   return problems;
-}
+};

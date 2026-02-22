@@ -5,10 +5,10 @@ export interface AreaProblem {
   answer: string;
 }
 
-export function generateArea(
+export const generateArea = (
   seed: number,
   shape: "square" | "rect" | "mixed",
-): AreaProblem[] {
+): AreaProblem[] => {
   const rng = mulberry32(seed);
   const problems: AreaProblem[] = [];
 
@@ -48,4 +48,4 @@ export function generateArea(
     }
   }
   return problems;
-}
+};

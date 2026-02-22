@@ -1,10 +1,10 @@
 import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
-export function generatePercent(
+export const generatePercent = (
   seed: number,
   find: "ratio" | "compared" | "base" | "mixed",
-): TextProblem[] {
+): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -35,4 +35,4 @@ export function generatePercent(
     }
   }
   return problems;
-}
+};

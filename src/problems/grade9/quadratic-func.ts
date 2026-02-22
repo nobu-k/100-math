@@ -9,10 +9,10 @@ export interface QuadFuncProblem {
   answerDisplay: string;
 }
 
-export function generateQuadFunc(
+export const generateQuadFunc = (
   seed: number,
   mode: QuadFuncMode = "mixed",
-): QuadFuncProblem[] {
+): QuadFuncProblem[] => {
   const rng = mulberry32(seed);
   const problems: QuadFuncProblem[] = [];
   const seen = new Set<string>();
@@ -116,4 +116,4 @@ export function generateQuadFunc(
     }
   }
   return problems;
-}
+};

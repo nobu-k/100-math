@@ -2,10 +2,10 @@ import { mulberry32 } from "../random";
 import { numberToKanji } from "../shared/math-utils";
 import type { TextProblem } from "../shared/types";
 
-export function generateLargeNum4(
+export const generateLargeNum4 = (
   seed: number,
   mode: "read" | "position" | "mixed",
-): TextProblem[] {
+): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -39,4 +39,4 @@ export function generateLargeNum4(
     }
   }
   return problems;
-}
+};

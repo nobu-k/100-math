@@ -2,10 +2,10 @@ import { mulberry32 } from "../random";
 import { gcd } from "../shared/math-utils";
 import type { TextProblem } from "../shared/types";
 
-export function generateRatio(
+export const generateRatio = (
   seed: number,
   type: "simplify" | "fill" | "mixed",
-): TextProblem[] {
+): TextProblem[] => {
   const rng = mulberry32(seed);
   const problems: TextProblem[] = [];
 
@@ -47,4 +47,4 @@ export function generateRatio(
     }
   }
   return problems;
-}
+};
