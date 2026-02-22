@@ -27,7 +27,7 @@ export const generateSector = (
   const angles = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 360];
   const radii = [2, 3, 4, 5, 6, 8, 9, 10, 12, 15];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 6; i++) {
     for (let attempt = 0; attempt < 30; attempt++) {
       const type: "arc" | "area" =
         mode === "mixed" ? (rng() < 0.5 ? "arc" : "area") : mode;

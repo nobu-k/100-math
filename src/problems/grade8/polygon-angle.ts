@@ -38,7 +38,7 @@ export const generatePolygonAngle = (
       ? ["interior-sum", "regular", "exterior", "find-n"]
       : [mode];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 6; i++) {
     for (let attempt = 0; attempt < 30; attempt++) {
       const type = types[Math.floor(rng() * types.length)];
       const ns = [3, 4, 5, 6, 7, 8, 9, 10, 12];

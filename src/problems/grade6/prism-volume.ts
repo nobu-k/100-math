@@ -22,7 +22,7 @@ export const generatePrismVolume = (
   const rng = mulberry32(seed);
   const problems: PrismVolumeProblem[] = [];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 6; i++) {
     const useCylinder = shape === "cylinder" ? true : shape === "prism" ? false : rng() < 0.5;
 
     if (useCylinder) {

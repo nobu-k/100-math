@@ -16,7 +16,7 @@ export const generateAngle = (seed: number): AngleProblem[] => {
   const problems: AngleProblem[] = [];
   const baseAngles = [30, 45, 60, 90, 120, 135, 150];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 6; i++) {
     const type = Math.floor(rng() * 3);
     switch (type) {
       case 0: {

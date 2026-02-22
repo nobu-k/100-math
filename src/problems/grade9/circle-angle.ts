@@ -35,7 +35,7 @@ export const generateCircleAngle = (
     "inscribed-quadrilateral",
   ];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 6; i++) {
     for (let attempt = 0; attempt < 30; attempt++) {
       const type = mode === "inscribed"
         ? (["inscribed-quadrilateral", "semicircle"] as const)[Math.floor(rng() * 2)]

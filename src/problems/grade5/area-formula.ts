@@ -20,7 +20,7 @@ export const generateAreaFormula = (
   const rng = mulberry32(seed);
   const problems: AreaFormulaProblem[] = [];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 6; i++) {
     const type = shape === "mixed"
       ? (["triangle", "parallelogram", "trapezoid"] as const)[Math.floor(rng() * 3)]
       : shape;

@@ -16,7 +16,7 @@ export const generateCircleRD = (seed: number): CircleRDProblem[] => {
   const rng = mulberry32(seed);
   const problems: CircleRDProblem[] = [];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 6; i++) {
     const type = Math.floor(rng() * 3);
     switch (type) {
       case 0: {

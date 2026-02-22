@@ -18,7 +18,7 @@ export const generateCircleArea = (
   const rng = mulberry32(seed);
   const problems: CircleAreaProblem[] = [];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 6; i++) {
     const t = type === "mixed"
       ? (rng() < 0.6 ? "basic" : "half")
       : type;

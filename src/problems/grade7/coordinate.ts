@@ -26,7 +26,7 @@ export const generateCoordinate = (
   const problems: CoordinateProblem[] = [];
   const seen = new Set<string>();
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 6; i++) {
     for (let attempt = 0; attempt < 30; attempt++) {
       const type: "quadrant" | "on-graph" =
         mode === "mixed"

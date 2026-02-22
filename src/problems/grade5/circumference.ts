@@ -18,7 +18,7 @@ export const generateCircumference = (
   const rng = mulberry32(seed);
   const problems: CircumferenceProblem[] = [];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 6; i++) {
     const sub = mode === "mixed" ? (rng() < 0.6 ? "forward" : "reverse") : mode;
 
     if (sub === "forward") {

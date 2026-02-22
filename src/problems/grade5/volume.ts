@@ -20,7 +20,7 @@ export const generateVolume = (
   const rng = mulberry32(seed);
   const problems: VolumeProblem[] = [];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 6; i++) {
     const useCube = shape === "cube" ? true : shape === "rect" ? false : rng() < 0.4;
 
     if (useCube) {

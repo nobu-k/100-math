@@ -20,7 +20,7 @@ export const generateArea = (
   const rng = mulberry32(seed);
   const problems: AreaProblem[] = [];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 6; i++) {
     const useSquare = shape === "square" ? true : shape === "rect" ? false : rng() < 0.4;
     const reverse = rng() < 0.3;
 

@@ -34,7 +34,7 @@ export const generateSimilarity = (
       ? ["ratio", "parallel-line", "midpoint"]
       : [mode];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 6; i++) {
     for (let attempt = 0; attempt < 30; attempt++) {
       const type = types[Math.floor(rng() * types.length)];
 

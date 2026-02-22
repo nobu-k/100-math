@@ -22,7 +22,7 @@ export const generateParallelAngle = (
       ? ["vertical", "corresponding", "alternate"]
       : [mode as "vertical" | "corresponding" | "alternate"];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 6; i++) {
     for (let attempt = 0; attempt < 30; attempt++) {
       const type = types[Math.floor(rng() * types.length)];
       const angle = 30 + Math.floor(rng() * 121); // 30-150

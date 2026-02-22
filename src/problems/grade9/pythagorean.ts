@@ -41,7 +41,7 @@ export const generatePythagorean = (
   const types: PythagoreanMode[] =
     mode === "mixed" ? ["basic", "special", "applied"] : [mode];
 
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 6; i++) {
     for (let attempt = 0; attempt < 40; attempt++) {
       const type = types[Math.floor(rng() * types.length)];
 
