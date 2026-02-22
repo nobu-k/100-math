@@ -18,9 +18,13 @@ import type {
   MonoMulDivMode,
   SimEqMode,
   PolygonAngleMode,
+  PolygonAngleProblem,
   TriAngleMode,
+  TriAngleProblem,
   ParallelAngleMode,
+  ParallelAngleProblem,
   ParallelogramMode,
+  ParallelogramProblem,
   LinearFuncMode,
   ProbabilityMode,
 } from "./generators";
@@ -389,6 +393,212 @@ const Grade8 = ({ operator }: { operator: string }) => {
     }
   };
 
+  /* ---- render triangle angle SVG ---- */
+
+  const renderTriAngleFigure = (p: TriAngleProblem) => {
+    const W = 200;
+    const H = 140;
+    const pad = 20;
+    // Draw a triangle that roughly matches the angles
+    const a1 = p.knownAngles[0];
+    const a2 = p.knownAngles[1];
+    const toRad = (d: number) => (d * Math.PI) / 180;
+    const bx = W - pad;
+    const by = H - pad;
+    const ax = pad;
+    const ay = H - pad;
+    const baseLen = bx - ax;
+    // Apex from angle at A (a1) using sin rule approximation
+    const apexX = ax + baseLen * 0.4;
+    const h = Math.min(H - pad * 2, baseLen * 0.6);
+    const apexY = ay - h;
+
+    const arcPath = (vx: number, vy: number, startDeg: number, endDeg: number, r: number) => {
+      const s = { x: vx + r * Math.cos(toRad(startDeg)), y: vy - r * Math.sin(toRad(startDeg)) };
+      const e = { x: vx + r * Math.cos(toRad(endDeg)), y: vy - r * Math.sin(toRad(endDeg)) };
+      return `M ${s.x} ${s.y} A ${r} ${r} 0 0 0 ${e.x} ${e.y}`;
+    };
+
+    return (
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: "block", margin: "8px 0" }}>
+        <polygon points={`${ax},${ay} ${bx},${by} ${apexX},${apexY}`}
+          fill="#e3f2fd" stroke="#333" strokeWidth={1.5} />
+        {/* Angle at A */}
+        <path d={arcPath(ax, ay, 0, Math.atan2(ay - apexY, apexX - ax) * 180 / Math.PI, 18)}
+          fill="none" stroke="#1976d2" strokeWidth={1.2} />
+        <text x={ax + 25} y={ay - 8} fontSize={9} fill="#1976d2" fontWeight="bold">{a1}°</text>
+        {/* Angle at B */}
+        <path d={arcPath(bx, by, 180 - Math.atan2(by - apexY, bx - apexX) * 180 / Math.PI, 180, 18)}
+          fill="none" stroke="#1976d2" strokeWidth={1.2} />
+        <text x={bx - 30} y={by - 8} fontSize={9} fill="#1976d2" fontWeight="bold">{a2}°</text>
+        {/* Unknown at apex */}
+        <text x={apexX} y={apexY - 6} textAnchor="middle" fontSize={9} fill="#d32f2f" fontWeight="bold">?</text>
+        {/* Vertex labels */}
+        <text x={ax - 4} y={ay + 14} textAnchor="middle" fontSize={9} fill="#666">A</text>
+        <text x={bx + 4} y={by + 14} textAnchor="middle" fontSize={9} fill="#666">B</text>
+        <text x={apexX} y={apexY - 14} textAnchor="middle" fontSize={9} fill="#666">C</text>
+        {/* Exterior angle extension if needed */}
+        {p.type === "exterior" && (
+          <>
+            <line x1={bx} y1={by} x2={bx + 40} y2={by} stroke="#333" strokeWidth={1} />
+            <path d={arcPath(bx, by, 0, Math.atan2(by - apexY, bx - apexX) * 180 / Math.PI, 22)}
+              fill="none" stroke="#d32f2f" strokeWidth={1.5} strokeDasharray="3 2" />
+          </>
+        )}
+      </svg>
+    );
+  };
+
+  /* ---- render parallel angle SVG ---- */
+
+  const renderParallelAngleFigure = (p: ParallelAngleProblem) => {
+    const W = 200;
+    const H = 150;
+    const lineLen = 180;
+    const lineY1 = 35;
+    const lineY2 = 115;
+    const transAngle = 65; // degrees from horizontal
+    const toRad = (d: number) => (d * Math.PI) / 180;
+
+    if (p.type === "vertical") {
+      const cx = W / 2;
+      const cy = H / 2;
+      const len = 60;
+      const ang = 50;
+      const r1 = { x: cx + len * Math.cos(toRad(ang)), y: cy - len * Math.sin(toRad(ang)) };
+      const r2 = { x: cx - len * Math.cos(toRad(ang)), y: cy + len * Math.sin(toRad(ang)) };
+      const r3 = { x: cx + len * Math.cos(toRad(180 - ang)), y: cy - len * Math.sin(toRad(180 - ang)) };
+      const r4 = { x: cx - len * Math.cos(toRad(180 - ang)), y: cy + len * Math.sin(toRad(180 - ang)) };
+      return (
+        <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: "block", margin: "8px 0" }}>
+          <line x1={r1.x} y1={r1.y} x2={r2.x} y2={r2.y} stroke="#333" strokeWidth={1.5} />
+          <line x1={r3.x} y1={r3.y} x2={r4.x} y2={r4.y} stroke="#333" strokeWidth={1.5} />
+          <circle cx={cx} cy={cy} r={2} fill="#333" />
+          <text x={cx + 20} y={cy - 8} fontSize={10} fill="#1976d2" fontWeight="bold">∠a={p.givenAngle}°</text>
+          <text x={cx - 45} y={cy + 16} fontSize={10} fill="#d32f2f" fontWeight="bold">∠b=?</text>
+        </svg>
+      );
+    }
+
+    // Parallel lines + transversal
+    const ox = 10;
+    // Intersection points
+    const ix1 = ox + (H / 2 - lineY1) / Math.tan(toRad(transAngle)) + 30;
+    const ix2 = ox + (H / 2 - lineY1 + (lineY2 - lineY1)) / Math.tan(toRad(transAngle)) + 30;
+    return (
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: "block", margin: "8px 0" }}>
+        {/* Parallel lines */}
+        <line x1={ox} y1={lineY1} x2={ox + lineLen} y2={lineY1} stroke="#333" strokeWidth={1.5} />
+        <line x1={ox} y1={lineY2} x2={ox + lineLen} y2={lineY2} stroke="#333" strokeWidth={1.5} />
+        {/* Parallel markers */}
+        <text x={ox + lineLen - 20} y={lineY1 - 4} fontSize={8} fill="#333">▸</text>
+        <text x={ox + lineLen - 20} y={lineY2 - 4} fontSize={8} fill="#333">▸</text>
+        {/* Transversal */}
+        <line x1={ix1 - 25} y1={lineY1 - 20} x2={ix2 + 25} y2={lineY2 + 20}
+          stroke="#333" strokeWidth={1.2} />
+        {/* Angle labels */}
+        <text x={ix1 + 8} y={lineY1 + 14} fontSize={9} fill="#1976d2" fontWeight="bold">∠a={p.givenAngle}°</text>
+        {p.type === "corresponding" ? (
+          <text x={ix2 + 8} y={lineY2 + 14} fontSize={9} fill="#d32f2f" fontWeight="bold">∠b=?</text>
+        ) : (
+          <text x={ix2 - 50} y={lineY2 - 4} fontSize={9} fill="#d32f2f" fontWeight="bold">∠b=?</text>
+        )}
+      </svg>
+    );
+  };
+
+  /* ---- render polygon angle SVG ---- */
+
+  const renderPolygonAngleFigure = (p: PolygonAngleProblem) => {
+    const W = 160;
+    const H = 140;
+    const cx = W / 2;
+    const cy = H / 2 + 5;
+    const r = 50;
+    const n = p.n ?? 5;
+    const offset = -Math.PI / 2 + Math.PI / n; // rotate so bottom is flat
+    const pts = Array.from({ length: n }, (_, i) => {
+      const angle = offset + (2 * Math.PI * i) / n;
+      return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+    });
+    const pointsStr = pts.map((p) => `${p.x},${p.y}`).join(" ");
+
+    return (
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: "block", margin: "8px 0" }}>
+        <polygon points={pointsStr} fill="#e3f2fd" stroke="#333" strokeWidth={1.5} />
+        {p.type === "regular" && pts.map((pt, i) => {
+          const next = pts[(i + 1) % n];
+          const mx = (pt.x + next.x) / 2;
+          const my = (pt.y + next.y) / 2;
+          const dx = next.x - pt.x;
+          const dy = next.y - pt.y;
+          const len = Math.sqrt(dx * dx + dy * dy);
+          const nx = -dy / len * 4;
+          const ny = dx / len * 4;
+          return <line key={i} x1={mx + nx - 3 * dy / len} y1={my + ny + 3 * dx / len}
+            x2={mx + nx + 3 * dy / len} y2={my + ny - 3 * dx / len}
+            stroke="#333" strokeWidth={0.8} />;
+        })}
+        <text x={cx} y={cy + 4} textAnchor="middle" fontSize={10} fill="#1976d2" fontWeight="bold">
+          {n}角形
+        </text>
+      </svg>
+    );
+  };
+
+  /* ---- render parallelogram SVG ---- */
+
+  const renderParallelogramFigure = (p: ParallelogramProblem) => {
+    const W = 220;
+    const H = 140;
+    const slant = 25;
+    const bw = 120;
+    const bh = 60;
+    const ox = 20;
+    const oy = H - 25;
+    // A=top-left, B=bottom-left, C=bottom-right, D=top-right
+    const B = { x: ox, y: oy };
+    const C = { x: ox + bw, y: oy };
+    const D = { x: ox + bw + slant, y: oy - bh };
+    const A = { x: ox + slant, y: oy - bh };
+    const pts = `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y} ${D.x},${D.y}`;
+
+    const hasAngle = p.type === "angles";
+    const hasDiag = p.type === "diagonals";
+
+    // Diagonals intersection
+    const O = { x: (A.x + C.x) / 2, y: (A.y + C.y) / 2 };
+
+    return (
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: "block", margin: "8px 0" }}>
+        <polygon points={pts} fill="#e3f2fd" stroke="#333" strokeWidth={1.5} />
+        {/* Parallel marks */}
+        <text x={(A.x + D.x) / 2} y={(A.y + D.y) / 2 - 4} textAnchor="middle" fontSize={7} fill="#333">▸▸</text>
+        <text x={(B.x + C.x) / 2} y={(B.y + C.y) / 2 + 10} textAnchor="middle" fontSize={7} fill="#333">▸▸</text>
+        {/* Vertex labels */}
+        <text x={A.x - 2} y={A.y - 6} textAnchor="middle" fontSize={9} fill="#333">A</text>
+        <text x={B.x - 6} y={B.y + 4} textAnchor="end" fontSize={9} fill="#333">B</text>
+        <text x={C.x + 6} y={C.y + 4} textAnchor="start" fontSize={9} fill="#333">C</text>
+        <text x={D.x + 2} y={D.y - 6} textAnchor="middle" fontSize={9} fill="#333">D</text>
+        {/* Diagonals */}
+        {hasDiag && (
+          <>
+            <line x1={A.x} y1={A.y} x2={C.x} y2={C.y} stroke="#1976d2" strokeWidth={1} />
+            <line x1={B.x} y1={B.y} x2={D.x} y2={D.y} stroke="#1976d2" strokeWidth={1} />
+            <circle cx={O.x} cy={O.y} r={2.5} fill="#333" />
+            <text x={O.x + 6} y={O.y - 4} fontSize={9} fill="#333">O</text>
+          </>
+        )}
+        {/* Angle arc at A if angles type */}
+        {hasAngle && (
+          <text x={A.x + 14} y={A.y + 14} fontSize={9} fill="#1976d2" fontWeight="bold">
+            ∠A
+          </text>
+        )}
+      </svg>
+    );
+  };
+
   /* ---- render problems ---- */
 
   const renderProblems = () => {
@@ -451,12 +661,13 @@ const Grade8 = ({ operator }: { operator: string }) => {
         return (
           <div className="dev-text-page">
             {polyAngleProblems.map((p, i) => (
-              <div key={i} className="dev-text-row">
-                <span className="g1-num">({i + 1})</span>
-                <span className="dev-text-q">{p.question}</span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+              <div key={i} className="dev-prop-block">
+                <div className="dev-prop-label">({i + 1})</div>
+                {renderPolygonAngleFigure(p)}
+                <div className="dev-text-q">{p.question}</div>
+                <div className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
                   {p.answerDisplay}
-                </span>
+                </div>
               </div>
             ))}
           </div>
@@ -466,12 +677,13 @@ const Grade8 = ({ operator }: { operator: string }) => {
         return (
           <div className="dev-text-page">
             {triAngleProblems.map((p, i) => (
-              <div key={i} className="dev-text-row">
-                <span className="g1-num">({i + 1})</span>
-                <span className="dev-text-q">{p.question}</span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+              <div key={i} className="dev-prop-block">
+                <div className="dev-prop-label">({i + 1})</div>
+                {renderTriAngleFigure(p)}
+                <div className="dev-text-q">{p.question}</div>
+                <div className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
                   {p.answerDisplay}
-                </span>
+                </div>
               </div>
             ))}
           </div>
@@ -481,12 +693,13 @@ const Grade8 = ({ operator }: { operator: string }) => {
         return (
           <div className="dev-text-page">
             {parallelProblems.map((p, i) => (
-              <div key={i} className="dev-text-row">
-                <span className="g1-num">({i + 1})</span>
-                <span className="dev-text-q">{p.question}</span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+              <div key={i} className="dev-prop-block">
+                <div className="dev-prop-label">({i + 1})</div>
+                {renderParallelAngleFigure(p)}
+                <div className="dev-text-q">{p.question}</div>
+                <div className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
                   {p.answerDisplay}
-                </span>
+                </div>
               </div>
             ))}
           </div>
@@ -496,12 +709,13 @@ const Grade8 = ({ operator }: { operator: string }) => {
         return (
           <div className="dev-text-page">
             {pgramProblems.map((p, i) => (
-              <div key={i} className="dev-text-row">
-                <span className="g1-num">({i + 1})</span>
-                <span className="dev-text-q">{p.question}</span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+              <div key={i} className="dev-prop-block">
+                <div className="dev-prop-label">({i + 1})</div>
+                {renderParallelogramFigure(p)}
+                <div className="dev-text-q">{p.question}</div>
+                <div className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
                   {p.answerDisplay}
-                </span>
+                </div>
               </div>
             ))}
           </div>
