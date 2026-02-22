@@ -1316,7 +1316,7 @@
 .dev-text-page {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
   width: 100%;
 }
 
@@ -1327,7 +1327,7 @@
 }
 
 .dev-text-q {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: bold;
 }
 
@@ -1384,13 +1384,22 @@
    ============================================================ */
 
 .dev-prop-block {
-  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0;
+}
+
+.dev-prop-block svg {
+  flex-shrink: 0;
+  height: 80px;
+  width: auto;
 }
 
 .dev-prop-label {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
-  margin-bottom: 6px;
+  flex-shrink: 0;
 }
 
 .dev-prop-table {
@@ -1418,21 +1427,33 @@
 }
 
 @media print {
+  .dev-text-page {
+    gap: 2px;
+  }
+
   .dev-text-q {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .dev-text-a {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .dev-text-arrow {
-    font-size: 18px;
+    font-size: 16px;
+  }
+
+  .dev-prop-block svg {
+    height: 60px;
+  }
+
+  .dev-prop-label {
+    font-size: 13px;
   }
 
   .dev-prop-table th,
   .dev-prop-table td {
-    font-size: 16px;
-    padding: 4px 12px;
+    font-size: 14px;
+    padding: 3px 10px;
   }
 }
