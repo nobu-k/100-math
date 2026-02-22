@@ -11,24 +11,43 @@ Follow existing SVG figure patterns in the codebase. Reference implementations:
 
 ### Data flow
 1. **Generator** returns pure data objects (not SVG). Add a `figure` field to the problem interface with shape-specific properties (dimensions, labels, type variant).
-2. **React component** renders inline `<svg>` elements using a helper function (e.g., `renderBarChart(bp)`).
+2. **React component** renders inline `<svg>` elements via a helper function (e.g., `renderFigure(p)`).
 
-### Rendering structure
+### Current state → target state
+Currently all 18 geometry problems render as flat text rows:
 ```tsx
-// In the component's renderProblems() switch case:
-case "problem-type":
+// BEFORE: flat text-only rows (current pattern for all geometry problems)
+case "parallel-angle":
   return (
     <div className="dev-text-page">
-      {problems.map((p, idx) => (
-        <div key={idx} className="dev-prop-block">
-          <div className="dev-prop-label">({idx + 1}) ...</div>
-          {renderFigure(p)}              {/* SVG goes here */}
+      {problems.map((p, i) => (
+        <div key={i} className="dev-text-row">
+          <span className="g1-num">({i + 1})</span>
+          <span className="dev-text-q">{p.question}</span>
+          <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+            {p.answerDisplay}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+```
+
+Each problem gets its own figure (1 figure per problem, not grouped). Change the rendering to use `dev-prop-block` with an SVG before the question:
+```tsx
+// AFTER: figure + question block (target pattern)
+case "parallel-angle":
+  return (
+    <div className="dev-text-page">
+      {problems.map((p, i) => (
+        <div key={i} className="dev-prop-block">
+          <div className="dev-prop-label">({i + 1})</div>
+          {renderFigure(p)}
           <div style={{ marginTop: 8 }}>
-            {/* question + answer rows */}
             <div className="dev-text-row">
               <span className="dev-text-q">{p.question}</span>
               <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
-                {p.answer}
+                {p.answerDisplay}
               </span>
             </div>
           </div>
@@ -37,6 +56,11 @@ case "problem-type":
     </div>
   );
 ```
+
+### Key differences from bar-graph/line-graph
+- Bar-graph and line-graph have a `questions: []` array (multiple questions per figure).
+- Geometry problems have a single `question: string` + `answerDisplay: string` per problem. Each problem gets its own figure — no grouping.
+- The generator interface gains a `figure` field (see each plan's "Data Changes" section for its shape).
 
 ### SVG conventions
 - Use `<svg width={W} height={H} viewBox="0 0 W H" style={{ display: "block", margin: "8px 0" }}>`
