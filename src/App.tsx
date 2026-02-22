@@ -17,6 +17,17 @@ const GRADE_LABELS: Record<number, string> = {
   1: "1年", 2: "2年", 3: "3年", 4: "4年", 5: "5年", 6: "6年",
 };
 
+const CATEGORY_LABELS: [string, string][] = [
+  ["computation", "計算"],
+  ["numbers", "数の性質"],
+  ["fractions", "分数・小数"],
+  ["equations", "式・方程式"],
+  ["geometry", "図形"],
+  ["measurement", "測定"],
+  ["relations", "変化と関係"],
+  ["data", "データ・統計"],
+];
+
 const DEFAULT_PATH = `${BASE}grid100/addition`;
 
 const App = () => {
@@ -27,6 +38,7 @@ const App = () => {
   const [viewMode, setViewMode] = useState<ViewMode>(getInitialViewMode);
 
   const gradeView = useMemo(buildGradeView, []);
+  const categoryView = useMemo(buildCategoryView, []);
 
   useEffect(() => {
     const onPopState = () => {
@@ -76,35 +88,42 @@ const App = () => {
 
   const renderCategoryView = () => (
     <ul className="sidebar-menu">
-      {problemGroups.filter((g) => !g.id.startsWith("dev")).map((group) => (
-        <li key={group.id} className="sidebar-group">
-          <div
-            className="sidebar-group-header"
-            onClick={() => toggleGroup(group.id)}
-          >
-            <span>{group.label}</span>
-            <span className="sidebar-group-toggle">
-              {collapsed.has(group.id) ? "▸" : "▾"}
-            </span>
-          </div>
-          {!collapsed.has(group.id) && (
-            <ul className="sidebar-group-items">
-              {group.operators.map((op) => (
-                <li
-                  key={op.operator}
-                  className={`sidebar-item${group.id === route.groupId && op.operator === route.operator ? " active" : ""}`}
-                  onClick={() => navigate(group.id, op.operator)}
-                >
-                  <span className="sidebar-item-label">
-                    {op.label}
-                    {renderGradeBadges(op)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </li>
-      ))}
+      {categoryView.map(([catKey, catLabel, entries]) => {
+        const key = `cat-${catKey}`;
+        return (
+          <li key={key} className="sidebar-group">
+            <div
+              className="sidebar-group-header"
+              onClick={() => toggleGroup(key)}
+            >
+              <span>{catLabel}</span>
+              <span className="sidebar-group-toggle">
+                {collapsed.has(key) ? "▸" : "▾"}
+              </span>
+            </div>
+            {!collapsed.has(key) && (
+              <ul className="sidebar-group-items">
+                {entries.map(({ groupId, groupLabel, op }) => {
+                  const isActive = groupId === route.groupId && op.operator === route.operator;
+                  const needsPrefix = !groupId.startsWith("dev");
+                  return (
+                    <li
+                      key={`${groupId}-${op.operator}`}
+                      className={`sidebar-item${isActive ? " active" : ""}`}
+                      onClick={() => navigate(groupId, op.operator)}
+                    >
+                      <span className="sidebar-item-label">
+                        {needsPrefix ? `${groupLabel}（${op.label}）` : op.label}
+                        {renderGradeBadges(op)}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 
@@ -224,6 +243,21 @@ const buildGradeView = (): Map<number, GradeEntry[]> => {
     }
   }
   return new Map([...map.entries()].sort((a, b) => a[0] - b[0]));
+};
+
+const buildCategoryView = (): [string, string, GradeEntry[]][] => {
+  const map = new Map<string, GradeEntry[]>();
+  for (const group of problemGroups) {
+    for (const op of group.operators) {
+      const cat = op.category;
+      if (!cat) continue;
+      if (!map.has(cat)) map.set(cat, []);
+      map.get(cat)!.push({ groupId: group.id, groupLabel: group.label, op });
+    }
+  }
+  return CATEGORY_LABELS
+    .filter(([key]) => map.has(key))
+    .map(([key, label]) => [key, label, map.get(key)!]);
 };
 
 const getInitialViewMode = (): ViewMode => {

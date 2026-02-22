@@ -535,12 +535,12 @@ export const devGrade2: ProblemGroup = {
   id: "dev2",
   label: "2年（開発中）",
   operators: [
-    { operator: "kuku-blank", label: "九九の穴埋め", grades: [2] },
-    { operator: "mushikui", label: "虫食い算", grades: [2] },
-    { operator: "unit-conv", label: "単位の換算", grades: [2] },
-    { operator: "time-calc", label: "時刻と時間", grades: [2] },
-    { operator: "large-num", label: "大きな数", grades: [2] },
-    { operator: "table-read", label: "表の読み取り", grades: [2] },
+    { operator: "kuku-blank", label: "九九の穴埋め", grades: [2], category: "computation" },
+    { operator: "mushikui", label: "虫食い算", grades: [2], category: "computation" },
+    { operator: "unit-conv", label: "単位の換算", grades: [2], category: "measurement" },
+    { operator: "time-calc", label: "時刻と時間", grades: [2], category: "measurement" },
+    { operator: "large-num", label: "大きな数", grades: [2], category: "numbers" },
+    { operator: "table-read", label: "表の読み取り", grades: [2], category: "data" },
   ],
   Component: Grade2,
 };

@@ -4,6 +4,7 @@ export interface OperatorRoute {
   operator: string;      // "addition", "subtraction", etc.
   label: string;         // "たし算", "ひき算", etc.
   grades?: number[];     // which grades this operator is appropriate for
+  category?: string;     // mathematical topic: "computation", "numbers", etc.
 }
 
 export interface ProblemGroup {
