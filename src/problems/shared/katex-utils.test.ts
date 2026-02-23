@@ -74,6 +74,7 @@ describe("latexToText", () => {
 
   it("converts frac", () => {
     expect(latexToText("\\frac{3}{5}")).toBe("3/5");
+    expect(latexToText("\\dfrac{3}{5}")).toBe("3/5");
   });
 
   it("converts boxed", () => {

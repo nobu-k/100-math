@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import type { ProblemGroup } from "./types";
 import { mulberry32, randomSeed, seedToHex, hexToSeed } from "./random";
+import { M, texRed } from "./shared/M";
 import "../App.css";
 
 type FractionOperator = "addition" | "reduction" | "commonDenom";
@@ -174,12 +175,8 @@ const DEFAULTS: Record<FractionOperator, { dmin: number; dmax: number }> = {
   commonDenom: { dmin: 2, dmax: 12 },
 };
 
-const Frac = ({ n, d, className }: { n: number; d: number; className?: string }) => (
-  <div className={`fraction-frac${className ? ` ${className}` : ""}`}>
-    <span className="fraction-numerator">{n}</span>
-    <span className="fraction-denominator">{d}</span>
-  </div>
-);
+const frac = (n: number, d: number): string =>
+  d === 1 ? String(n) : `\\dfrac{${n}}{${d}}`;
 
 const PARAM_KEYS = ["q", "answers", "dmin", "dmax"];
 
@@ -347,42 +344,17 @@ const Fraction = ({ operator }: { operator: string }) => {
             <div key={i} className="fraction-cd-item">
               <div className="fraction-problem">
                 <span className="fraction-number">({i + 1})</span>
-                <span className="fraction-symbol">(</span>
-                {p.fractions[0].d === 1
-                  ? <span className="fraction-int">{p.fractions[0].n}</span>
-                  : <Frac n={p.fractions[0].n} d={p.fractions[0].d} />}
-                <span className="fraction-symbol">,</span>
-                {p.fractions[1].d === 1
-                  ? <span className="fraction-int">{p.fractions[1].n}</span>
-                  : <Frac n={p.fractions[1].n} d={p.fractions[1].d} />}
-                <span className="fraction-symbol">)</span>
-                <span className="fraction-equals">=</span>
-                <div className={`fraction-cd-answers fraction-answer${showAnswers ? "" : " fraction-hidden"}`}>
-                  <span>(</span>
-                  <Frac n={p.answerNumerators[0]} d={p.commonDenom} />
-                  <span>,</span>
-                  <Frac n={p.answerNumerators[1]} d={p.commonDenom} />
-                  <span>)</span>
-                </div>
+                <M tex={`\\left( ${frac(p.fractions[0].n, p.fractions[0].d)} ,\\, ${frac(p.fractions[1].n, p.fractions[1].d)} \\right) = `} />
+                <span className={showAnswers ? "" : "fraction-hidden"}>
+                  <M tex={texRed(`\\left( ${frac(p.answerNumerators[0], p.commonDenom)} ,\\, ${frac(p.answerNumerators[1], p.commonDenom)} \\right)`)} />
+                </span>
               </div>
-              <div className={`fraction-guide fraction-answer${showAnswers ? "" : " fraction-hidden"}`}>
+              <div className={`fraction-guide${showAnswers ? "" : " fraction-hidden"}`}>
                 {[0, 1].map((j) => {
                   const f = p.fractions[j];
                   return (
                     <div key={j} className="fraction-guide-row">
-                      {f.d === 1 ? (
-                        <>
-                          <span className="fraction-int">{f.n}</span>
-                          <span className="fraction-guide-sym">=</span>
-                          <Frac n={f.n} d={1} />
-                        </>
-                      ) : (
-                        <Frac n={f.n} d={f.d} />
-                      )}
-                      <span className="fraction-guide-sym">&times;</span>
-                      <Frac n={p.multipliers[j]} d={p.multipliers[j]} />
-                      <span className="fraction-guide-sym">=</span>
-                      <Frac n={p.answerNumerators[j]} d={p.commonDenom} />
+                      <M tex={texRed(`${frac(f.n, f.d)} \\times ${frac(p.multipliers[j], p.multipliers[j])} = ${frac(p.answerNumerators[j], p.commonDenom)}`)} />
                     </div>
                   );
                 })}
@@ -392,17 +364,13 @@ const Fraction = ({ operator }: { operator: string }) => {
             <div key={i} className="fraction-problem">
               <span className="fraction-number">({i + 1})</span>
               {p.kind === "addition" ? (
-                <>
-                  <Frac n={p.numerators[0]} d={p.denominator} />
-                  <span className="fraction-operator">+</span>
-                  <Frac n={p.numerators[1]} d={p.denominator} />
-                </>
+                <M tex={`${frac(p.numerators[0], p.denominator)} + ${frac(p.numerators[1], p.denominator)} = `} />
               ) : (
-                <Frac n={p.numerator} d={p.denominator} />
+                <M tex={`${frac(p.numerator, p.denominator)} = `} />
               )}
-              <span className="fraction-equals">=</span>
-              <Frac n={p.answerNumerator} d={p.answerDenominator}
-                className={`fraction-answer${showAnswers ? "" : " fraction-hidden"}`} />
+              <span className={showAnswers ? "" : "fraction-hidden"}>
+                <M tex={texRed(frac(p.answerNumerator, p.answerDenominator))} />
+              </span>
             </div>
           ),
         )}

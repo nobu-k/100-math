@@ -63,8 +63,8 @@ export const latexToText = (latex: string): string => {
   // \text{...} → content
   s = s.replace(/\\text\{([^}]*)\}/g, "$1");
 
-  // \frac{a}{b} → a/b
-  s = s.replace(/\\frac\{([^}]*)\}\{([^}]*)\}/g, (_, num, den) =>
+  // \dfrac{a}{b} or \frac{a}{b} → a/b
+  s = s.replace(/\\d?frac\{([^}]*)\}\{([^}]*)\}/g, (_, num, den) =>
     `${latexToText(num)}/${latexToText(den)}`);
 
   // \sqrt{N} → √N

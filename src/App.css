@@ -1480,6 +1480,24 @@
   font-size: 22px;
 }
 
+/* Fraction page */
+.fraction-problem .katex {
+  font-size: 26px;
+}
+
+.fraction-page .katex .frac-line {
+  border-bottom-width: 0.08em !important;
+}
+
+.fraction-page .katex .mfrac > .vlist-t2 > .vlist-r > .vlist > span:first-child,
+.fraction-page .katex .mfrac > .vlist-t2 > .vlist-r > .vlist > span:last-child {
+  padding: 0 0.15em;
+}
+
+.fraction-guide .katex {
+  font-size: 22px;
+}
+
 /* Boxed answer styling */
 .katex .boxed {
   border: 2px solid #000;
@@ -1497,6 +1515,14 @@
   }
 
   .dev-prop-block .katex {
+    font-size: 18px;
+  }
+
+  .fraction-problem .katex {
+    font-size: 22px;
+  }
+
+  .fraction-guide .katex {
     font-size: 18px;
   }
 }
