@@ -159,6 +159,10 @@ const App = () => {
     <ul className="sidebar-menu">
       {[...gradeView.entries()].map(([grade, entries]) => {
         const key = `grade-${grade}`;
+        const dupLabels = new Set(
+          entries.map((e) => e.op.label)
+            .filter((l, i, a) => a.indexOf(l) !== i),
+        );
         return (
           <li key={key} className="sidebar-group">
             <div
@@ -172,8 +176,13 @@ const App = () => {
             </div>
             {!collapsed.has(key) && (
               <ul className="sidebar-group-items">
-                {entries.map(({ groupId, op }) => {
+                {entries.map(({ groupId, groupLabel, op }) => {
                   const isActive = groupId === route.groupId && op.operator === route.operator;
+                  const needsPrefix = dupLabels.has(op.label)
+                    || groupId === "grid100" || groupId === "hissan";
+                  const label = needsPrefix
+                    ? `${op.label}（${groupLabel}）`
+                    : op.label;
                   return (
                     <li
                       key={`${groupId}-${op.operator}`}
@@ -181,7 +190,7 @@ const App = () => {
                       onClick={() => navigate(groupId, op.operator)}
                     >
                       <span className="sidebar-item-label">
-                        {op.label}
+                        {label}
                       </span>
                     </li>
                   );
