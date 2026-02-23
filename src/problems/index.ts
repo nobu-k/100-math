@@ -3,29 +3,31 @@ export { grid100 } from "./Grid100";
 export { hissan } from "./Hissan";
 export { fraction } from "./Fraction";
 export { integer } from "./Integer";
-export { underDevelopment } from "./UnderDevelopment";
-export { devGrade2 } from "./Grade2";
-export { devGrade3 } from "./Grade3";
-export { devGrade4 } from "./Grade4";
-export { devGrade5 } from "./Grade5";
-export { devGrade6 } from "./Grade6";
-export { devGrade7 } from "./Grade7";
-export { devGrade8 } from "./Grade8";
-export { devGrade9 } from "./Grade9";
+export { computation } from "./Computation";
+export { numbers } from "./Numbers";
+export { fractions } from "./Fractions";
+export { equations } from "./Equations";
+export { geometry } from "./Geometry";
+export { measurement } from "./Measurement";
+export { relations } from "./Relations";
+export { data } from "./Data";
 
 import { grid100 } from "./Grid100";
 import { hissan } from "./Hissan";
 import { fraction } from "./Fraction";
 import { integer } from "./Integer";
-import { underDevelopment } from "./UnderDevelopment";
-import { devGrade2 } from "./Grade2";
-import { devGrade3 } from "./Grade3";
-import { devGrade4 } from "./Grade4";
-import { devGrade5 } from "./Grade5";
-import { devGrade6 } from "./Grade6";
-import { devGrade7 } from "./Grade7";
-import { devGrade8 } from "./Grade8";
-import { devGrade9 } from "./Grade9";
+import { computation } from "./Computation";
+import { numbers } from "./Numbers";
+import { fractions } from "./Fractions";
+import { equations } from "./Equations";
+import { geometry } from "./Geometry";
+import { measurement } from "./Measurement";
+import { relations } from "./Relations";
+import { data } from "./Data";
 import type { ProblemGroup } from "./types";
 
-export const problemGroups: ProblemGroup[] = [grid100, hissan, fraction, integer, underDevelopment, devGrade2, devGrade3, devGrade4, devGrade5, devGrade6, devGrade7, devGrade8, devGrade9];
+export const problemGroups: ProblemGroup[] = [
+  grid100, hissan, fraction, integer,
+  computation, numbers, fractions, equations,
+  geometry, measurement, relations, data,
+];

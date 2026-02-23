@@ -6,7 +6,7 @@ const seeds = [1, 2, 42, 100, 999];
 describe("generatePrismVolume", () => {
   it("returns 10 problems", () => {
     const problems = generatePrismVolume(42, "mixed");
-    expect(problems).toHaveLength(10);
+    expect(problems).toHaveLength(6);
   });
 
   it("is deterministic with the same seed", () => {

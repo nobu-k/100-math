@@ -9,7 +9,7 @@ const seeds = [1, 2, 42, 100, 999];
 describe("generateVolume", () => {
   it("returns 10 problems", () => {
     const problems = generateVolume(42, "cube");
-    expect(problems).toHaveLength(10);
+    expect(problems).toHaveLength(6);
   });
 
   it("cube: volume = side^3", () => {

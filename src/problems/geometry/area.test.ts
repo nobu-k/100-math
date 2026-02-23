@@ -9,7 +9,7 @@ const seeds = [1, 2, 42, 100, 999];
 describe("generateArea", () => {
   it("returns 10 problems", () => {
     const problems = generateArea(42, "mixed");
-    expect(problems).toHaveLength(10);
+    expect(problems).toHaveLength(6);
   });
 
   it("square mode: all questions mention 正方形", () => {

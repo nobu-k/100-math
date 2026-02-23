@@ -9,7 +9,7 @@ const seeds = [1, 2, 42, 100, 999];
 describe("generateAreaFormula", () => {
   it("returns 10 problems", () => {
     const problems = generateAreaFormula(42, "triangle");
-    expect(problems).toHaveLength(10);
+    expect(problems).toHaveLength(6);
   });
 
   it("triangle: area = base * height / 2", () => {

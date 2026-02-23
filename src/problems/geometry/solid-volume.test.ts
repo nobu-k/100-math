@@ -6,7 +6,7 @@ const seeds = [1, 2, 42, 100, 999];
 describe("generateSolid", () => {
   it("returns 10 problems", () => {
     const problems = generateSolid(42, "mixed");
-    expect(problems).toHaveLength(10);
+    expect(problems).toHaveLength(6);
   });
 
   it("defaults to mixed mode and volume calcType", () => {

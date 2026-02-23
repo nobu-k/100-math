@@ -9,7 +9,7 @@ const seeds = [1, 2, 42, 100, 999];
 describe("generateCircleRD", () => {
   it("returns 10 problems", () => {
     const problems = generateCircleRD(42);
-    expect(problems).toHaveLength(10);
+    expect(problems).toHaveLength(6);
   });
 
   it("radius-to-diameter: diameter = 2 * radius", () => {

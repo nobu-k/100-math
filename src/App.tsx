@@ -106,7 +106,7 @@ const App = () => {
               <ul className="sidebar-group-items">
                 {entries.map(({ groupId, groupLabel, op }) => {
                   const isActive = groupId === route.groupId && op.operator === route.operator;
-                  const needsPrefix = !groupId.startsWith("dev");
+                  const needsPrefix = groupId !== catKey;
                   return (
                     <li
                       key={`${groupId}-${op.operator}`}
@@ -145,10 +145,8 @@ const App = () => {
             </div>
             {!collapsed.has(key) && (
               <ul className="sidebar-group-items">
-                {entries.map(({ groupId, groupLabel, op }) => {
+                {entries.map(({ groupId, op }) => {
                   const isActive = groupId === route.groupId && op.operator === route.operator;
-                  // Show source group label for cross-grade items (items from category-based groups)
-                  const needsPrefix = !groupId.startsWith("dev");
                   return (
                     <li
                       key={`${groupId}-${op.operator}`}
@@ -156,7 +154,7 @@ const App = () => {
                       onClick={() => navigate(groupId, op.operator)}
                     >
                       <span className="sidebar-item-label">
-                        {needsPrefix ? `${groupLabel}（${op.label}）` : op.label}
+                        {op.label}
                       </span>
                     </li>
                   );

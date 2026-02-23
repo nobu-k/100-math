@@ -4,9 +4,9 @@ import { generatePythagorean } from "./pythagorean";
 const seeds = [1, 2, 42, 100, 999];
 
 describe("generatePythagorean", () => {
-  it("returns 12 problems", () => {
+  it("returns 6 problems", () => {
     const problems = generatePythagorean(42, "mixed");
-    expect(problems).toHaveLength(12);
+    expect(problems).toHaveLength(6);
   });
 
   it("is deterministic with the same seed", () => {

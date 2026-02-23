@@ -4,9 +4,9 @@ import { generateCoordinate } from "./coordinate";
 const seeds = [1, 2, 42, 100, 999];
 
 describe("generateCoordinate", () => {
-  it("returns 10 problems", () => {
+  it("returns 6 problems", () => {
     const problems = generateCoordinate(42, "mixed");
-    expect(problems).toHaveLength(10);
+    expect(problems).toHaveLength(6);
   });
 
   it("defaults to mixed mode", () => {

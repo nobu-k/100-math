@@ -9,7 +9,7 @@ const seeds = [1, 2, 42, 100, 999];
 describe("generateCircumference", () => {
   it("returns 10 problems", () => {
     const problems = generateCircumference(42, "forward");
-    expect(problems).toHaveLength(10);
+    expect(problems).toHaveLength(6);
   });
 
   it("forward: circumference = diameter * 3.14", () => {

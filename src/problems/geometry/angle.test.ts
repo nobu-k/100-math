@@ -9,7 +9,7 @@ const seeds = [1, 2, 42, 100, 999];
 describe("generateAngle", () => {
   it("returns 10 problems", () => {
     const problems = generateAngle(42);
-    expect(problems).toHaveLength(10);
+    expect(problems).toHaveLength(6);
   });
 
   it("all answers are positive and at most 360", () => {

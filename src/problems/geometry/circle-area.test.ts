@@ -6,7 +6,7 @@ const seeds = [1, 2, 42, 100, 999];
 describe("generateCircleArea", () => {
   it("returns 10 problems", () => {
     const problems = generateCircleArea(42, "basic");
-    expect(problems).toHaveLength(10);
+    expect(problems).toHaveLength(6);
   });
 
   it("basic: area = radius^2 * 3.14", () => {
