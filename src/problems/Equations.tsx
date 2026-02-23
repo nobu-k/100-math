@@ -41,7 +41,7 @@ const EXPRVAL_DEF = { evvars: "one" as ExprValueVars };
 const LINEXPR_DEF = { lemode: "mixed" as LinearExprMode };
 const LINEQ_DEF = { eqmode: "mixed" as LinearEqMode };
 const SIMEQ_DEF = { seqmode: "mixed" as SimEqMode };
-const EXP_DEF = { exmode: "mixed" as ExpansionMode };
+const EXP_DEF = { exmode: "mixed" as ExpansionMode, exformula: false };
 const FAC_DEF = { fcmode: "mixed" as FactoringMode };
 const QUADEQ_DEF = { qemode: "mixed" as QuadEqMode };
 
@@ -49,7 +49,7 @@ const QUADEQ_DEF = { qemode: "mixed" as QuadEqMode };
    URL param keys
    ================================================================ */
 
-const PARAM_KEYS = ["ops", "evvars", "lemode", "eqmode", "seqmode", "exmode", "fcmode", "qemode"];
+const PARAM_KEYS = ["ops", "evvars", "lemode", "eqmode", "seqmode", "exmode", "exformula", "fcmode", "qemode"];
 
 /* ================================================================
    Main component
@@ -94,7 +94,9 @@ const Equations = ({ operator }: { operator: string }) => {
     const qemode = (["factoring", "formula", "mixed"] as const).includes(qemodeRaw as any)
       ? (qemodeRaw as QuadEqMode) : QUADEQ_DEF.qemode;
 
-    return { ops, evvars, lemode, eqmode, seqmode, exmode, fcmode, qemode };
+    const exformula = p.get("exformula") === "1";
+
+    return { ops, evvars, lemode, eqmode, seqmode, exmode, exformula, fcmode, qemode };
   });
 
   const [ops, setOps] = useState(initialSettings.ops);
@@ -103,6 +105,7 @@ const Equations = ({ operator }: { operator: string }) => {
   const [eqmode, setEqmode] = useState(initialSettings.eqmode);
   const [seqmode, setSeqmode] = useState(initialSettings.seqmode);
   const [exmode, setExmode] = useState(initialSettings.exmode);
+  const [exformula, setExformula] = useState(initialSettings.exformula);
   const [fcmode, setFcmode] = useState(initialSettings.fcmode);
   const [qemode, setQemode] = useState(initialSettings.qemode);
 
@@ -128,6 +131,7 @@ const Equations = ({ operator }: { operator: string }) => {
         break;
       case "expansion":
         if (exmode !== EXP_DEF.exmode) m.exmode = exmode;
+        if (exformula) m.exformula = "1";
         break;
       case "factoring":
         if (fcmode !== FAC_DEF.fcmode) m.fcmode = fcmode;
@@ -286,6 +290,20 @@ const Equations = ({ operator }: { operator: string }) => {
                 <option value="distribute">分配法則</option>
                 <option value="formula">乗法公式</option>
               </select>
+            </label>
+            <label>
+              <input type="checkbox" checked={exformula}
+                onChange={() => {
+                  setExformula((prev) => {
+                    const next = !prev;
+                    const url = new URL(window.location.href);
+                    if (next) url.searchParams.set("exformula", "1");
+                    else url.searchParams.delete("exformula");
+                    window.history.replaceState(null, "", url.toString());
+                    return next;
+                  });
+                }} />
+              {" "}乗法公式を表示
             </label>
           </div>
         );
@@ -452,7 +470,19 @@ const Equations = ({ operator }: { operator: string }) => {
         );
 
       case "expansion":
-        return renderExprProblems(expProblems);
+        return (
+          <>
+            {exformula && (
+              <div className="formula-box">
+                <M tex={"(x+y)^2 = x^2 + 2xy + y^2"} />
+                <M tex={"(x-y)^2 = x^2 - 2xy + y^2"} />
+                <M tex={"(x+y)(x-y) = x^2 - y^2"} />
+                <M tex={"(x+a)(x+b) = x^2 + (a+b)x + ab"} />
+              </div>
+            )}
+            {renderExprProblems(expProblems)}
+          </>
+        );
 
       case "factoring":
         return renderExprProblems(facProblems);

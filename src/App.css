@@ -187,6 +187,17 @@
   max-width: 480px;
 }
 
+.formula-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  background: #f9f9f0;
+}
+
 .settings-panel label {
   display: flex;
   gap: 8px;
