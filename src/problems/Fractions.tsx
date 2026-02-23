@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import type { ProblemGroup } from "./types";
 import type { FracProblem } from "./fractions/types";
 import type { TextProblem } from "./shared/types";
-import { M, texBox, texFrac } from "./shared/M";
+import { M, texBox, texAns, texFrac, texRed } from "./shared/M";
 import { unicodeToLatex } from "./shared/katex-utils";
 import useProblemPage from "./shared/useProblemPage";
 import ProblemPageLayout from "./shared/ProblemPageLayout";
@@ -269,7 +269,7 @@ const FractionsComponent = ({ operator }: { operator: string }) => {
       {problems.map((p, i) => (
         <div key={i} className="g1-problem">
           <span className="g1-num">({i + 1})</span>
-          <M tex={`\\frac{${p.aNum}}{${p.aDen}} ${unicodeToLatex(opSymbol)} \\frac{${p.bNum}}{${p.bDen}} = ${showAnswers ? texFrac(p.ansNum, p.ansDen, p.ansWhole, p.ansPartNum) : texBox("?", false)}`} />
+          <M tex={`\\frac{${p.aNum}}{${p.aDen}} ${unicodeToLatex(opSymbol)} \\frac{${p.bNum}}{${p.bDen}} = ${showAnswers ? texRed(texFrac(p.ansNum, p.ansDen, p.ansWhole, p.ansPartNum)) : texAns("?", false)}`} />
         </div>
       ))}
     </div>
@@ -299,10 +299,10 @@ const FractionsComponent = ({ operator }: { operator: string }) => {
               let toTex: string;
               if (p.direction === "to-mixed") {
                 fromTex = `\\frac{${p.fromNum}}{${p.fromDen}}`;
-                toTex = showAnswers ? `${p.toWhole}\\frac{${p.toNum}}{${p.toDen}}` : texBox("?", false);
+                toTex = showAnswers ? texRed(`${p.toWhole}\\frac{${p.toNum}}{${p.toDen}}`) : texAns("?", false);
               } else {
                 fromTex = `${p.fromWhole}\\frac{${p.fromNum}}{${p.fromDen}}`;
-                toTex = showAnswers ? `\\frac{${p.toNum}}{${p.toDen}}` : texBox("?", false);
+                toTex = showAnswers ? texRed(`\\frac{${p.toNum}}{${p.toDen}}`) : texAns("?", false);
               }
               return (
                 <div key={i} className="dev-text-row dev-frac-row">
@@ -323,7 +323,7 @@ const FractionsComponent = ({ operator }: { operator: string }) => {
             {diffFracProblems.map((p, i) => (
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
-                <M tex={`\\frac{${p.aNum}}{${p.aDen}} ${p.op === "+" ? "+" : "-"} \\frac{${p.bNum}}{${p.bDen}} = ${showAnswers ? texFrac(p.ansNum, p.ansDen, p.ansWhole, p.ansPartNum) : texBox("?", false)}`} />
+                <M tex={`\\frac{${p.aNum}}{${p.aDen}} ${p.op === "+" ? "+" : "-"} \\frac{${p.bNum}}{${p.bDen}} = ${showAnswers ? texRed(texFrac(p.ansNum, p.ansDen, p.ansWhole, p.ansPartNum)) : texAns("?", false)}`} />
               </div>
             ))}
           </div>
@@ -335,7 +335,7 @@ const FractionsComponent = ({ operator }: { operator: string }) => {
             {fcProblems.map((p, i) => (
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
-                <M tex={`\\frac{${p.aNum}}{${p.aDen}} ${texBox(p.answer, showAnswers)} \\frac{${p.bNum}}{${p.bDen}}`} />
+                <M tex={`\\frac{${p.aNum}}{${p.aDen}} ${texAns(p.answer, showAnswers)} \\frac{${p.bNum}}{${p.bDen}}`} />
               </div>
             ))}
           </div>

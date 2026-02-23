@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import type { ProblemGroup } from "./types";
 import type { TextProblem } from "./shared/types";
-import { M, texBox } from "./shared/M";
+import { M, texBox, texAns, texRed } from "./shared/M";
 import { unicodeToLatex } from "./shared/katex-utils";
 import ProblemPageLayout from "./shared/ProblemPageLayout";
 import useProblemPage from "./shared/useProblemPage";
@@ -347,7 +347,7 @@ const Equations = ({ operator }: { operator: string }) => {
           <span className="g1-expr">
             <M tex={`${unicodeToLatex(p.expr)} =`} />
             <span className={showAnswers ? "" : "g1-hidden"}>
-              <M tex={unicodeToLatex(p.answerExpr)} />
+              <M tex={texRed(unicodeToLatex(p.answerExpr))} />
             </span>
           </span>
         </div>
@@ -416,7 +416,7 @@ const Equations = ({ operator }: { operator: string }) => {
                 <span className="g1-expr">
                   <M tex={`${unicodeToLatex(p.expr)} =`} />
                   <span className={showAnswers ? "" : "g1-hidden"}>
-                    <M tex={unicodeToLatex(p.answerExpr)} />
+                    <M tex={texRed(unicodeToLatex(p.answerExpr))} />
                   </span>
                 </span>
               </div>
@@ -430,7 +430,7 @@ const Equations = ({ operator }: { operator: string }) => {
             {linEqProblems.map((p, i) => (
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
-                <M tex={`${unicodeToLatex(p.equation)} \\quad x = ${texBox(p.answer, showAnswers)}`} />
+                <M tex={`${unicodeToLatex(p.equation)} \\quad x = ${texAns(p.answer, showAnswers)}`} />
               </div>
             ))}
           </div>
@@ -444,7 +444,7 @@ const Equations = ({ operator }: { operator: string }) => {
                 <div className="dev-prop-label">({i + 1})</div>
                 <M tex={`\\begin{cases} ${unicodeToLatex(p.eq1)} \\\\ ${unicodeToLatex(p.eq2)} \\end{cases}`} />
                 <div className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
-                  <M tex={`x = ${p.answerX},\\, y = ${p.answerY}`} />
+                  <M tex={texRed(`x = ${p.answerX},\\, y = ${p.answerY}`)} />
                 </div>
               </div>
             ))}
@@ -466,7 +466,7 @@ const Equations = ({ operator }: { operator: string }) => {
                 <span className="g1-expr">
                   <M tex={unicodeToLatex(p.equation)} />
                   <span className={`${showAnswers ? "" : "g1-hidden"}`} style={{ marginLeft: "1em" }}>
-                    <M tex={unicodeToLatex(p.answerDisplay)} />
+                    <M tex={texRed(unicodeToLatex(p.answerDisplay))} />
                   </span>
                 </span>
               </div>

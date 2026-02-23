@@ -4,7 +4,7 @@ import type { TextProblem } from "./shared/types";
 import type { FracProblem } from "./fractions/types";
 import type { PosNegMulDivMode } from "./computation/pos-neg-mul-div";
 import type { MonoMulDivMode } from "./computation/mono-mul-div";
-import { M, texBox, texFrac } from "./shared/M";
+import { M, texBox, texAns, texFrac, texRed } from "./shared/M";
 import { unicodeToLatex } from "./shared/katex-utils";
 import useProblemPage from "./shared/useProblemPage";
 import ProblemPageLayout from "./shared/ProblemPageLayout";
@@ -533,7 +533,7 @@ const Computation = ({ operator }: { operator: string }) => {
       {problems.map((p, i) => (
         <div key={i} className="g1-problem">
           <span className="g1-num">({i + 1})</span>
-          <M tex={`\\frac{${p.aNum}}{${p.aDen}} ${unicodeToLatex(opSymbol)} \\frac{${p.bNum}}{${p.bDen}} = ${showAnswers ? texFrac(p.ansNum, p.ansDen, p.ansWhole, p.ansPartNum) : texBox("?", false)}`} />
+          <M tex={`\\frac{${p.aNum}}{${p.aDen}} ${unicodeToLatex(opSymbol)} \\frac{${p.bNum}}{${p.bDen}} = ${showAnswers ? texRed(texFrac(p.ansNum, p.ansDen, p.ansWhole, p.ansPartNum)) : texAns("?", false)}`} />
         </div>
       ))}
     </div>
@@ -628,7 +628,7 @@ const Computation = ({ operator }: { operator: string }) => {
             {mixedCalcProblems.map((p, i) => (
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
-                <M tex={`${unicodeToLatex(p.display)} = ${texBox(p.answer, showAnswers)}`} />
+                <M tex={`${unicodeToLatex(p.display)} = ${texAns(p.answer, showAnswers)}`} />
               </div>
             ))}
           </div>
@@ -660,7 +660,7 @@ const Computation = ({ operator }: { operator: string }) => {
               return (
                 <div key={i} className="g1-problem">
                   <span className="g1-num">({i + 1})</span>
-                  <M tex={`${parts} = ${texBox(p.answer, showAnswers)}`} />
+                  <M tex={`${parts} = ${texAns(p.answer, showAnswers)}`} />
                 </div>
               );
             })}
@@ -673,7 +673,7 @@ const Computation = ({ operator }: { operator: string }) => {
             {mulDivProblems.map((p, i) => (
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
-                <M tex={`${unicodeToLatex(p.expr)} = ${texBox(p.answer, showAnswers)}`} />
+                <M tex={`${unicodeToLatex(p.expr)} = ${texAns(p.answer, showAnswers)}`} />
               </div>
             ))}
           </div>
@@ -685,7 +685,7 @@ const Computation = ({ operator }: { operator: string }) => {
             {posNegMixedProblems.map((p, i) => (
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
-                <M tex={`${unicodeToLatex(p.expr)} = ${texBox(p.answer, showAnswers)}`} />
+                <M tex={`${unicodeToLatex(p.expr)} = ${texAns(p.answer, showAnswers)}`} />
               </div>
             ))}
           </div>
@@ -700,7 +700,7 @@ const Computation = ({ operator }: { operator: string }) => {
                 <span className="g1-expr">
                   <M tex={`${unicodeToLatex(p.expr)} =`} />
                   <span className={showAnswers ? "" : "g1-hidden"}>
-                    <M tex={unicodeToLatex(p.answerExpr)} />
+                    <M tex={texRed(unicodeToLatex(p.answerExpr))} />
                   </span>
                 </span>
               </div>
@@ -717,7 +717,7 @@ const Computation = ({ operator }: { operator: string }) => {
                 <span className="g1-expr">
                   <M tex={`${unicodeToLatex(p.expr)} =`} />
                   <span className={showAnswers ? "" : "g1-hidden"}>
-                    <M tex={unicodeToLatex(p.answerExpr)} />
+                    <M tex={texRed(unicodeToLatex(p.answerExpr))} />
                   </span>
                 </span>
               </div>

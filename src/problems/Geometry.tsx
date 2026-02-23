@@ -18,7 +18,7 @@ import type { ParallelogramMode } from "./geometry/parallelogram";
 import type { SimilarityMode } from "./geometry/similarity";
 import type { CircleAngleMode } from "./geometry/circle-angle";
 import type { PythagoreanMode } from "./geometry/pythagorean";
-import { M, texBox } from "./shared/M";
+import { M, texAns, texRed } from "./shared/M";
 import { unicodeToLatex } from "./shared/katex-utils";
 import useProblemPage from "./shared/useProblemPage";
 import ProblemPageLayout from "./shared/ProblemPageLayout";
@@ -657,7 +657,7 @@ const Geometry = ({ operator }: { operator: string }) => {
             <div className="dev-text-row">
               <span className="dev-text-q">{p.question}</span>
               <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
-                <M tex={unicodeToLatex(p.answer)} />
+                <M tex={texRed(unicodeToLatex(p.answer))} />
               </span>
             </div>
           </div>
@@ -677,7 +677,7 @@ const Geometry = ({ operator }: { operator: string }) => {
           <FigComponent problem={p} />
           <div className="dev-text-q">{p.question}</div>
           <div className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
-            <M tex={unicodeToLatex(p.answerDisplay)} />
+            <M tex={texRed(unicodeToLatex(p.answerDisplay))} />
           </div>
         </div>
       ))}
@@ -703,7 +703,7 @@ const Geometry = ({ operator }: { operator: string }) => {
                 <AngleFig problem={p} />
                 <div style={{ marginTop: 8 }}>
                   <div className="dev-text-row">
-                    <M tex={`${unicodeToLatex(p.display)} = ${texBox(p.answer + "^{\\circ}", showAnswers)}`} />
+                    <M tex={`${unicodeToLatex(p.display)} = ${texAns(p.answer + "^{\\circ}", showAnswers)}`} />
                   </div>
                 </div>
               </div>
@@ -746,7 +746,7 @@ const Geometry = ({ operator }: { operator: string }) => {
                       {p.type === "arc" ? "弧の長さ" : "面積"}{"は？"}
                     </span>
                     <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
-                      <M tex={`${p.answerCoefficient === 1 ? "" : p.answerCoefficient}\\pi \\text{ ${p.unit}}`} />
+                      <M tex={texRed(`${p.answerCoefficient === 1 ? "" : p.answerCoefficient}\\pi \\text{ ${p.unit}}`)} />
                     </span>
                   </div>
                 </div>
@@ -781,7 +781,7 @@ const Geometry = ({ operator }: { operator: string }) => {
                     <div className="dev-text-row">
                       <span className="dev-text-q">{question}</span>
                       <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
-                        <M tex={unicodeToLatex(p.answerDisplay)} />
+                        <M tex={texRed(unicodeToLatex(p.answerDisplay))} />
                       </span>
                     </div>
                   </div>

@@ -7,7 +7,7 @@ import type { QuadFuncMode } from "./relations/quadratic-func";
 import type { ProportionMode } from "./relations/proportion-eq";
 import useProblemPage from "./shared/useProblemPage";
 import ProblemPageLayout from "./shared/ProblemPageLayout";
-import { M } from "./shared/M";
+import { M, texRed } from "./shared/M";
 import { unicodeToLatex } from "./shared/katex-utils";
 import { generatePatternTable } from "./relations/pattern-table";
 import { generatePercent } from "./relations/percent";
@@ -429,7 +429,7 @@ const Relations = ({ operator }: { operator: string }) => {
                 <span className="g1-num">({i + 1})</span>
                 <span className="dev-text-q">{p.question}</span>
                 <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
-                  <M tex={unicodeToLatex(p.answerDisplay)} />
+                  <M tex={texRed(unicodeToLatex(p.answerDisplay))} />
                 </span>
               </div>
             ))}
@@ -464,7 +464,7 @@ const Relations = ({ operator }: { operator: string }) => {
                 <span className="g1-num">({i + 1})</span>
                 <span className="dev-text-q">{p.question}</span>
                 <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
-                  <M tex={unicodeToLatex(p.answerDisplay)} />
+                  <M tex={texRed(unicodeToLatex(p.answerDisplay))} />
                 </span>
               </div>
             ))}
@@ -479,7 +479,7 @@ const Relations = ({ operator }: { operator: string }) => {
                 <span className="g1-num">({i + 1})</span>
                 <span className="dev-text-q">{p.question}</span>
                 <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
-                  <M tex={unicodeToLatex(p.answerDisplay)} />
+                  <M tex={texRed(unicodeToLatex(p.answerDisplay))} />
                 </span>
               </div>
             ))}

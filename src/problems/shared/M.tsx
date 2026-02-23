@@ -22,12 +22,23 @@ export const M = ({ tex, text, className }: {
 };
 
 /**
- * LaTeX for an answer box: visible boxed value or hidden phantom.
+ * LaTeX for a boxed answer (grade ≤ 3): visible boxed value or hidden phantom.
  */
 export const texBox = (val: number | string, show: boolean): string =>
   show
-    ? `\\boxed{${val}}`
+    ? `\\boxed{\\textcolor{red}{${val}}}`
     : `\\boxed{\\phantom{${val}}}`;
+
+/**
+ * LaTeX for a plain answer (grade > 3): red value or underline placeholder.
+ */
+export const texAns = (val: number | string, show: boolean): string =>
+  show
+    ? `\\textcolor{red}{${val}}`
+    : `\\underline{\\phantom{${val}}}`;
+
+/** Wrap LaTeX in red. */
+export const texRed = (tex: string): string => `\\textcolor{red}{${tex}}`;
 
 /**
  * LaTeX for a fraction answer, handling integer, mixed, and simple fraction forms.

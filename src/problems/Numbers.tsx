@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import type { ProblemGroup } from "./types";
 import type { TextProblem } from "./shared/types";
-import { M, texBox } from "./shared/M";
+import { M, texBox, texAns, texRed } from "./shared/M";
 import { unicodeToLatex } from "./shared/katex-utils";
 import useProblemPage from "./shared/useProblemPage";
 import ProblemPageLayout from "./shared/ProblemPageLayout";
@@ -662,7 +662,7 @@ const Numbers = ({ operator }: { operator: string }) => {
                 return (
                   <div key={i} className="g1-problem">
                     <span className="g1-num">({i + 1})</span>
-                    <M tex={`\\lvert ${p.number} \\rvert = ${texBox(p.answer!, showAnswers)}`} />
+                    <M tex={`\\lvert ${p.number} \\rvert = ${texAns(p.answer!, showAnswers)}`} />
                   </div>
                 );
               }
@@ -716,7 +716,7 @@ const Numbers = ({ operator }: { operator: string }) => {
                   <span className="g1-num">({i + 1})</span>
                   <span className="dev-text-q">{p.target} を素因数分解しなさい</span>
                   <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
-                    <M tex={unicodeToLatex(p.factorExpr!)} />
+                    <M tex={texRed(unicodeToLatex(p.factorExpr!))} />
                   </span>
                 </div>
               );
@@ -733,7 +733,7 @@ const Numbers = ({ operator }: { operator: string }) => {
                 <span className="g1-expr">
                   <M tex={`${unicodeToLatex(p.expr)} =`} />
                   <span className={showAnswers ? "" : "g1-hidden"}>
-                    <M tex={unicodeToLatex(p.answerDisplay)} />
+                    <M tex={texRed(unicodeToLatex(p.answerDisplay))} />
                   </span>
                 </span>
               </div>
