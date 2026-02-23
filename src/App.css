@@ -267,10 +267,10 @@
 }
 
 .hissan-number {
-  font-size: 14px;
+  font-size: 18px;
   color: #555;
   margin-top: 4px;
-  width: 24px;
+  width: 36px;
   text-align: right;
   flex-shrink: 0;
 }
@@ -1139,10 +1139,6 @@
   align-items: flex-start;
 }
 
-.g1-problem-expr .g1-num {
-  font-size: 18px;
-  width: 36px;
-}
 
 .g1-expr-page {
   grid-template-columns: 1fr 1fr;
@@ -1153,10 +1149,10 @@
 }
 
 .g1-num {
-  font-size: 14px;
+  font-size: 18px;
   color: #555;
   flex-shrink: 0;
-  width: 28px;
+  width: 36px;
   text-align: right;
 }
 
