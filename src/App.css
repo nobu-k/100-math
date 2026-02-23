@@ -1135,6 +1135,23 @@
   gap: 6px;
 }
 
+.g1-problem-expr {
+  align-items: flex-start;
+}
+
+.g1-problem-expr .g1-num {
+  font-size: 18px;
+  width: 36px;
+}
+
+.g1-expr-page {
+  grid-template-columns: 1fr 1fr;
+  gap: 24px 32px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
 .g1-num {
   font-size: 14px;
   color: #555;
@@ -1148,6 +1165,19 @@
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.g1-expr-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.g1-eq-answer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 48px;
 }
 
 .g1-val {
@@ -1518,8 +1548,10 @@
 
 @media print {
   .g1-problem .katex {
-    font-size: 26px;
+    font-size: 24px;
+    white-space: nowrap;
   }
+
 
   .dev-text-row .katex {
     font-size: 18px;

@@ -10,12 +10,13 @@ export interface ExpansionProblem {
 export const generateExpansion = (
   seed: number,
   mode: ExpansionMode = "mixed",
+  count = 12,
 ): ExpansionProblem[] => {
   const rng = mulberry32(seed);
   const problems: ExpansionProblem[] = [];
   const seen = new Set<string>();
 
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < count; i++) {
     for (let attempt = 0; attempt < 40; attempt++) {
       const pick =
         mode === "mixed"
