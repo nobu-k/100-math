@@ -2,8 +2,8 @@ import { useState, useCallback, useMemo } from "react";
 import type { ProblemGroup } from "./types";
 import type { FracProblem } from "./fractions/types";
 import type { TextProblem } from "./shared/types";
-import { Box } from "./shared/Box";
-import { Frac } from "./shared/Frac";
+import { M, texBox, texFrac } from "./shared/M";
+import { unicodeToLatex } from "./shared/katex-utils";
 import useProblemPage from "./shared/useProblemPage";
 import ProblemPageLayout from "./shared/ProblemPageLayout";
 import { generateDecimalComp } from "./fractions/decimal-comp";
@@ -269,24 +269,7 @@ const FractionsComponent = ({ operator }: { operator: string }) => {
       {problems.map((p, i) => (
         <div key={i} className="g1-problem">
           <span className="g1-num">({i + 1})</span>
-          <span className="g1-expr" style={{ alignItems: "center" }}>
-            <Frac num={p.aNum} den={p.aDen} />
-            <span className="g1-op">{opSymbol}</span>
-            <Frac num={p.bNum} den={p.bDen} />
-            <span className="g1-op">=</span>
-            <span className={showAnswers ? "" : "g1-hidden"}>
-              {p.ansWhole !== undefined && p.ansPartNum !== undefined ? (
-                <>
-                  <span className="dev-frac-ans">{p.ansWhole}</span>
-                  <Frac num={p.ansPartNum} den={p.ansDen} cls="dev-frac-ans" />
-                </>
-              ) : p.ansNum % p.ansDen === 0 ? (
-                <span className="dev-frac-ans">{p.ansNum / p.ansDen}</span>
-              ) : (
-                <Frac num={p.ansNum} den={p.ansDen} cls="dev-frac-ans" />
-              )}
-            </span>
-          </span>
+          <M tex={`\\frac{${p.aNum}}{${p.aDen}} ${unicodeToLatex(opSymbol)} \\frac{${p.bNum}}{${p.bDen}} = ${showAnswers ? texFrac(p.ansNum, p.ansDen, p.ansWhole, p.ansPartNum) : texBox("?", false)}`} />
         </div>
       ))}
     </div>
@@ -302,11 +285,7 @@ const FractionsComponent = ({ operator }: { operator: string }) => {
             {decimalProblems.map((p, i) => (
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
-                <span className="g1-expr">
-                  <span className="g1-val">{p.left}</span>
-                  <Box answer={p.answer} show={showAnswers} />
-                  <span className="g1-val">{p.right}</span>
-                </span>
+                <M tex={`${p.left} ${texBox(p.answer, showAnswers)} ${p.right}`} />
               </div>
             ))}
           </div>
@@ -315,30 +294,23 @@ const FractionsComponent = ({ operator }: { operator: string }) => {
       case "frac-conv":
         return (
           <div className="dev-text-page">
-            {fracConvProblems.map((p, i) => (
-              <div key={i} className="dev-text-row dev-frac-row">
-                <span className="g1-num">({i + 1})</span>
-                {p.direction === "to-mixed" ? (
-                  <>
-                    <Frac num={p.fromNum!} den={p.fromDen!} />
-                    <span className="dev-text-arrow">&rarr;</span>
-                    <span className={showAnswers ? "" : "g1-hidden"}>
-                      <span className="dev-frac-ans">{p.toWhole}</span>
-                      <Frac num={p.toNum!} den={p.toDen!} cls="dev-frac-ans" />
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <span>{p.fromWhole}</span>
-                    <Frac num={p.fromNum!} den={p.fromDen!} />
-                    <span className="dev-text-arrow">&rarr;</span>
-                    <span className={showAnswers ? "" : "g1-hidden"}>
-                      <Frac num={p.toNum!} den={p.toDen!} cls="dev-frac-ans" />
-                    </span>
-                  </>
-                )}
-              </div>
-            ))}
+            {fracConvProblems.map((p, i) => {
+              let fromTex: string;
+              let toTex: string;
+              if (p.direction === "to-mixed") {
+                fromTex = `\\frac{${p.fromNum}}{${p.fromDen}}`;
+                toTex = showAnswers ? `${p.toWhole}\\frac{${p.toNum}}{${p.toDen}}` : texBox("?", false);
+              } else {
+                fromTex = `${p.fromWhole}\\frac{${p.fromNum}}{${p.fromDen}}`;
+                toTex = showAnswers ? `\\frac{${p.toNum}}{${p.toDen}}` : texBox("?", false);
+              }
+              return (
+                <div key={i} className="dev-text-row dev-frac-row">
+                  <span className="g1-num">({i + 1})</span>
+                  <M tex={`${fromTex} \\rightarrow ${toTex}`} />
+                </div>
+              );
+            })}
           </div>
         );
 
@@ -351,24 +323,7 @@ const FractionsComponent = ({ operator }: { operator: string }) => {
             {diffFracProblems.map((p, i) => (
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
-                <span className="g1-expr" style={{ alignItems: "center" }}>
-                  <Frac num={p.aNum} den={p.aDen} />
-                  <span className="g1-op">{p.op}</span>
-                  <Frac num={p.bNum} den={p.bDen} />
-                  <span className="g1-op">=</span>
-                  <span className={showAnswers ? "" : "g1-hidden"}>
-                    {p.ansWhole !== undefined && p.ansPartNum !== undefined ? (
-                      <>
-                        <span className="dev-frac-ans">{p.ansWhole}</span>
-                        <Frac num={p.ansPartNum} den={p.ansDen} cls="dev-frac-ans" />
-                      </>
-                    ) : p.ansNum % p.ansDen === 0 ? (
-                      <span className="dev-frac-ans">{p.ansNum / p.ansDen}</span>
-                    ) : (
-                      <Frac num={p.ansNum} den={p.ansDen} cls="dev-frac-ans" />
-                    )}
-                  </span>
-                </span>
+                <M tex={`\\frac{${p.aNum}}{${p.aDen}} ${p.op === "+" ? "+" : "-"} \\frac{${p.bNum}}{${p.bDen}} = ${showAnswers ? texFrac(p.ansNum, p.ansDen, p.ansWhole, p.ansPartNum) : texBox("?", false)}`} />
               </div>
             ))}
           </div>
@@ -380,11 +335,7 @@ const FractionsComponent = ({ operator }: { operator: string }) => {
             {fcProblems.map((p, i) => (
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
-                <span className="g1-expr" style={{ alignItems: "center" }}>
-                  <Frac num={p.aNum} den={p.aDen} />
-                  <Box answer={p.answer} show={showAnswers} />
-                  <Frac num={p.bNum} den={p.bDen} />
-                </span>
+                <M tex={`\\frac{${p.aNum}}{${p.aDen}} ${texBox(p.answer, showAnswers)} \\frac{${p.bNum}}{${p.bDen}}`} />
               </div>
             ))}
           </div>

@@ -1460,3 +1460,44 @@
     padding: 3px 10px;
   }
 }
+
+/* ============================================================
+   KaTeX overrides
+   ============================================================ */
+
+/* Grid problems: match g1-val 28px bold */
+.g1-problem .katex {
+  font-size: 28px;
+}
+
+/* Text-row problems: match dev-text-q 20px */
+.dev-text-row .katex {
+  font-size: 20px;
+}
+
+/* Answer colour for KaTeX inside answer spans */
+.dev-text-a .katex,
+.dev-frac-ans .katex {
+  color: red;
+}
+
+/* Boxed answer styling */
+.katex .boxed {
+  border: 2px solid #000;
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+.katex .boxed .mord {
+  color: red;
+}
+
+@media print {
+  .g1-problem .katex {
+    font-size: 22px;
+  }
+
+  .dev-text-row .katex {
+    font-size: 16px;
+  }
+}

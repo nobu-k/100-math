@@ -50,6 +50,33 @@ const App = () => {
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
+  /* ---- copy handler: replace KaTeX with plain-text from data-text ---- */
+  useEffect(() => {
+    const onCopy = (e: ClipboardEvent) => {
+      const sel = document.getSelection();
+      if (!sel || sel.isCollapsed) return;
+      const range = sel.getRangeAt(0);
+      const fragment = range.cloneContents();
+      const walk = (node: Node) => {
+        if (node instanceof HTMLElement && node.dataset.text !== undefined) {
+          const text = document.createTextNode(node.dataset.text);
+          node.replaceWith(text);
+          return;
+        }
+        // walk children (copy to array first since replaceWith mutates)
+        const children = Array.from(node.childNodes);
+        for (const child of children) walk(child);
+      };
+      walk(fragment);
+      const div = document.createElement("div");
+      div.appendChild(fragment);
+      e.clipboardData?.setData("text/plain", div.textContent ?? "");
+      e.preventDefault();
+    };
+    document.addEventListener("copy", onCopy);
+    return () => document.removeEventListener("copy", onCopy);
+  }, []);
+
   const navigate = useCallback((groupId: string, operator: string) => {
     const path = `${BASE}${groupId}/${operator}`;
     window.history.pushState(null, "", path);

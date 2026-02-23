@@ -5,7 +5,7 @@ import type { BarGraphProblem } from "./data/bar-graph";
 import type { DataAnalysisProblem, DataAnalysisMode } from "./data/data-analysis";
 import type { ProbabilityMode } from "./data/probability";
 import type { SamplingMode } from "./data/sampling";
-import { Frac } from "./shared/Frac";
+import { M } from "./shared/M";
 import useProblemPage from "./shared/useProblemPage";
 import ProblemPageLayout from "./shared/ProblemPageLayout";
 import { generateTableRead } from "./data/table-read";
@@ -655,7 +655,7 @@ const Data = ({ operator }: { operator: string }) => {
                 <span className="g1-num">({i + 1})</span>
                 <span className="dev-text-q">{p.question}</span>
                 <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`} style={{ alignItems: "center" }}>
-                  {p.ansDen === 1 ? p.ansNum : <Frac num={p.ansNum} den={p.ansDen} />}
+                  <M tex={p.ansDen === 1 ? String(p.ansNum) : `\\frac{${p.ansNum}}{${p.ansDen}}`} />
                 </span>
               </div>
             ))}

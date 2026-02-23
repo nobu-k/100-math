@@ -1,7 +1,8 @@
 import { useState, useCallback, useMemo } from "react";
 import type { ProblemGroup } from "./types";
 import type { TextProblem } from "./shared/types";
-import { Box } from "./shared/Box";
+import { M, texBox } from "./shared/M";
+import { unicodeToLatex } from "./shared/katex-utils";
 import useProblemPage from "./shared/useProblemPage";
 import ProblemPageLayout from "./shared/ProblemPageLayout";
 import { generateDecomposition } from "./numbers/decomposition";
@@ -568,28 +569,17 @@ const Numbers = ({ operator }: { operator: string }) => {
       case "decomposition":
         return (
           <div className="g1-page g1-cols-2">
-            {decompProblems.map((p, i) => (
-              <div key={i} className="g1-problem">
-                <span className="g1-num">({i + 1})</span>
-                <span className="g1-expr">
-                  <span className="g1-val">{p.target}</span>
-                  <span className="g1-op">=</span>
-                  {p.position === "left" ? (
-                    <>
-                      <span className="g1-val">{p.given}</span>
-                      <span className="g1-op">+</span>
-                      <Box answer={p.answer} show={showAnswers} />
-                    </>
-                  ) : (
-                    <>
-                      <Box answer={p.answer} show={showAnswers} />
-                      <span className="g1-op">+</span>
-                      <span className="g1-val">{p.given}</span>
-                    </>
-                  )}
-                </span>
-              </div>
-            ))}
+            {decompProblems.map((p, i) => {
+              const tex = p.position === "left"
+                ? `${p.target} = ${p.given} + ${texBox(p.answer, showAnswers)}`
+                : `${p.target} = ${texBox(p.answer, showAnswers)} + ${p.given}`;
+              return (
+                <div key={i} className="g1-problem">
+                  <span className="g1-num">({i + 1})</span>
+                  <M tex={tex} />
+                </div>
+              );
+            })}
           </div>
         );
 
@@ -599,11 +589,7 @@ const Numbers = ({ operator }: { operator: string }) => {
             {compProblems.map((p, i) => (
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
-                <span className="g1-expr">
-                  <span className="g1-val">{p.left}</span>
-                  <Box answer={p.answer} show={showAnswers} />
-                  <span className="g1-val">{p.right}</span>
-                </span>
+                <M tex={`${p.left} ${texBox(p.answer, showAnswers)} ${p.right}`} />
               </div>
             ))}
           </div>
@@ -627,7 +613,7 @@ const Numbers = ({ operator }: { operator: string }) => {
                         {c !== null ? (
                           <span className="g1-seq-cell">{c}</span>
                         ) : (
-                          <Box answer={p.answers[blankIdx]} show={showAnswers} />
+                          <M tex={texBox(p.answers[blankIdx], showAnswers)} />
                         )}
                       </span>
                     );
@@ -676,11 +662,7 @@ const Numbers = ({ operator }: { operator: string }) => {
                 return (
                   <div key={i} className="g1-problem">
                     <span className="g1-num">({i + 1})</span>
-                    <span className="g1-expr">
-                      <span className="g1-val">|{p.number}|</span>
-                      <span className="g1-op">=</span>
-                      <Box answer={p.answer!} show={showAnswers} />
-                    </span>
+                    <M tex={`\\lvert ${p.number} \\rvert = ${texBox(p.answer!, showAnswers)}`} />
                   </div>
                 );
               }
@@ -734,7 +716,7 @@ const Numbers = ({ operator }: { operator: string }) => {
                   <span className="g1-num">({i + 1})</span>
                   <span className="dev-text-q">{p.target} を素因数分解しなさい</span>
                   <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
-                    {p.factorExpr}
+                    <M tex={unicodeToLatex(p.factorExpr!)} />
                   </span>
                 </div>
               );
@@ -749,10 +731,9 @@ const Numbers = ({ operator }: { operator: string }) => {
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
                 <span className="g1-expr">
-                  <span className="g1-val">{p.expr}</span>
-                  <span className="g1-op">=</span>
+                  <M tex={`${unicodeToLatex(p.expr)} =`} />
                   <span className={showAnswers ? "" : "g1-hidden"}>
-                    <span className="g1-val">{p.answerDisplay}</span>
+                    <M tex={unicodeToLatex(p.answerDisplay)} />
                   </span>
                 </span>
               </div>

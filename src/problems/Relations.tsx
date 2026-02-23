@@ -7,6 +7,8 @@ import type { QuadFuncMode } from "./relations/quadratic-func";
 import type { ProportionMode } from "./relations/proportion-eq";
 import useProblemPage from "./shared/useProblemPage";
 import ProblemPageLayout from "./shared/ProblemPageLayout";
+import { M } from "./shared/M";
+import { unicodeToLatex } from "./shared/katex-utils";
 import { generatePatternTable } from "./relations/pattern-table";
 import { generatePercent } from "./relations/percent";
 import { generateRatio } from "./relations/ratio";
@@ -426,7 +428,9 @@ const Relations = ({ operator }: { operator: string }) => {
               <div key={i} className="dev-text-row">
                 <span className="g1-num">({i + 1})</span>
                 <span className="dev-text-q">{p.question}</span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{p.answerDisplay}</span>
+                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                  <M tex={unicodeToLatex(p.answerDisplay)} />
+                </span>
               </div>
             ))}
           </div>
@@ -442,7 +446,7 @@ const Relations = ({ operator }: { operator: string }) => {
                 <div style={{ marginTop: 8 }}>
                   <div className="dev-text-row">
                     <span className="dev-text-q">
-                      {p.type === "quadrant" ? `点 (${p.x}, ${p.y}) は第何象限？` : `${p.formula} のグラフは点 (${p.x}, ${p.y}) を通るか？`}
+                      {p.type === "quadrant" ? `点 (${p.x}, ${p.y}) は第何象限？` : <><M tex={unicodeToLatex(p.formula!)} /> のグラフは点 ({p.x}, {p.y}) を通るか？</>}
                     </span>
                     <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{p.answerDisplay}</span>
                   </div>
@@ -459,7 +463,9 @@ const Relations = ({ operator }: { operator: string }) => {
               <div key={i} className="dev-text-row">
                 <span className="g1-num">({i + 1})</span>
                 <span className="dev-text-q">{p.question}</span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{p.answerDisplay}</span>
+                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                  <M tex={unicodeToLatex(p.answerDisplay)} />
+                </span>
               </div>
             ))}
           </div>
@@ -472,7 +478,9 @@ const Relations = ({ operator }: { operator: string }) => {
               <div key={i} className="dev-text-row">
                 <span className="g1-num">({i + 1})</span>
                 <span className="dev-text-q">{p.question}</span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{p.answerDisplay}</span>
+                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                  <M tex={unicodeToLatex(p.answerDisplay)} />
+                </span>
               </div>
             ))}
           </div>

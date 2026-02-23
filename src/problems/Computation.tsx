@@ -4,8 +4,8 @@ import type { TextProblem } from "./shared/types";
 import type { FracProblem } from "./fractions/types";
 import type { PosNegMulDivMode } from "./computation/pos-neg-mul-div";
 import type { MonoMulDivMode } from "./computation/mono-mul-div";
-import { Box } from "./shared/Box";
-import { Frac } from "./shared/Frac";
+import { M, texBox, texFrac } from "./shared/M";
+import { unicodeToLatex } from "./shared/katex-utils";
 import useProblemPage from "./shared/useProblemPage";
 import ProblemPageLayout from "./shared/ProblemPageLayout";
 import { generateFillBlank } from "./computation/fill-blank";
@@ -533,24 +533,7 @@ const Computation = ({ operator }: { operator: string }) => {
       {problems.map((p, i) => (
         <div key={i} className="g1-problem">
           <span className="g1-num">({i + 1})</span>
-          <span className="g1-expr" style={{ alignItems: "center" }}>
-            <Frac num={p.aNum} den={p.aDen} />
-            <span className="g1-op">{opSymbol}</span>
-            <Frac num={p.bNum} den={p.bDen} />
-            <span className="g1-op">=</span>
-            <span className={showAnswers ? "" : "g1-hidden"}>
-              {p.ansWhole !== undefined && p.ansPartNum !== undefined ? (
-                <>
-                  <span className="dev-frac-ans">{p.ansWhole}</span>
-                  <Frac num={p.ansPartNum} den={p.ansDen} cls="dev-frac-ans" />
-                </>
-              ) : p.ansNum % p.ansDen === 0 ? (
-                <span className="dev-frac-ans">{p.ansNum / p.ansDen}</span>
-              ) : (
-                <Frac num={p.ansNum} den={p.ansDen} cls="dev-frac-ans" />
-              )}
-            </span>
-          </span>
+          <M tex={`\\frac{${p.aNum}}{${p.aDen}} ${unicodeToLatex(opSymbol)} \\frac{${p.bNum}}{${p.bDen}} = ${showAnswers ? texFrac(p.ansNum, p.ansDen, p.ansWhole, p.ansPartNum) : texBox("?", false)}`} />
         </div>
       ))}
     </div>
@@ -563,110 +546,67 @@ const Computation = ({ operator }: { operator: string }) => {
       case "fill-blank":
         return (
           <div className="g1-page g1-cols-2">
-            {fillProblems.map((p, i) => (
-              <div key={i} className="g1-problem">
-                <span className="g1-num">({i + 1})</span>
-                <span className="g1-expr">
-                  {p.left !== null ? (
-                    <span className="g1-val">{p.left}</span>
-                  ) : (
-                    <Box answer={p.answer} show={showAnswers} />
-                  )}
-                  <span className="g1-op">{p.op}</span>
-                  {p.right !== null ? (
-                    <span className="g1-val">{p.right}</span>
-                  ) : (
-                    <Box answer={p.answer} show={showAnswers} />
-                  )}
-                  <span className="g1-op">=</span>
-                  <span className="g1-val">{p.result}</span>
-                </span>
-              </div>
-            ))}
+            {fillProblems.map((p, i) => {
+              const left = p.left !== null ? String(p.left) : texBox(p.answer, showAnswers);
+              const right = p.right !== null ? String(p.right) : texBox(p.answer, showAnswers);
+              return (
+                <div key={i} className="g1-problem">
+                  <span className="g1-num">({i + 1})</span>
+                  <M tex={`${left} ${p.op === "+" ? "+" : "-"} ${right} = ${p.result}`} />
+                </div>
+              );
+            })}
           </div>
         );
 
       case "kuku-blank":
         return (
           <div className="g1-page g1-cols-3">
-            {kukuProblems.map((p, i) => (
-              <div key={i} className="g1-problem">
-                <span className="g1-num">({i + 1})</span>
-                <span className="g1-expr">
-                  {p.blankPos === "a" ? (
-                    <Box answer={p.a} show={showAnswers} />
-                  ) : (
-                    <span className="g1-val">{p.a}</span>
-                  )}
-                  <span className="g1-op">&times;</span>
-                  {p.blankPos === "b" ? (
-                    <Box answer={p.b} show={showAnswers} />
-                  ) : (
-                    <span className="g1-val">{p.b}</span>
-                  )}
-                  <span className="g1-op">=</span>
-                  {p.blankPos === "product" ? (
-                    <Box answer={p.product} show={showAnswers} />
-                  ) : (
-                    <span className="g1-val">{p.product}</span>
-                  )}
-                </span>
-              </div>
-            ))}
+            {kukuProblems.map((p, i) => {
+              const a = p.blankPos === "a" ? texBox(p.a, showAnswers) : String(p.a);
+              const b = p.blankPos === "b" ? texBox(p.b, showAnswers) : String(p.b);
+              const prod = p.blankPos === "product" ? texBox(p.product, showAnswers) : String(p.product);
+              return (
+                <div key={i} className="g1-problem">
+                  <span className="g1-num">({i + 1})</span>
+                  <M tex={`${a} \\times ${b} = ${prod}`} />
+                </div>
+              );
+            })}
           </div>
         );
 
       case "mushikui":
         return (
           <div className="g1-page g1-cols-2">
-            {mushikuiProblems.map((p, i) => (
-              <div key={i} className="g1-problem">
-                <span className="g1-num">({i + 1})</span>
-                <span className="g1-expr">
-                  {p.left !== null ? (
-                    <span className="g1-val">{p.left}</span>
-                  ) : (
-                    <Box answer={p.answer} show={showAnswers} />
-                  )}
-                  <span className="g1-op">{p.op}</span>
-                  {p.right !== null ? (
-                    <span className="g1-val">{p.right}</span>
-                  ) : (
-                    <Box answer={p.answer} show={showAnswers} />
-                  )}
-                  <span className="g1-op">=</span>
-                  {p.result !== null ? (
-                    <span className="g1-val">{p.result}</span>
-                  ) : (
-                    <Box answer={p.answer} show={showAnswers} />
-                  )}
-                </span>
-              </div>
-            ))}
+            {mushikuiProblems.map((p, i) => {
+              const left = p.left !== null ? String(p.left) : texBox(p.answer, showAnswers);
+              const right = p.right !== null ? String(p.right) : texBox(p.answer, showAnswers);
+              const result = p.result !== null ? String(p.result) : texBox(p.answer, showAnswers);
+              return (
+                <div key={i} className="g1-problem">
+                  <span className="g1-num">({i + 1})</span>
+                  <M tex={`${left} ${p.op === "+" ? "+" : "-"} ${right} = ${result}`} />
+                </div>
+              );
+            })}
           </div>
         );
 
       case "division":
         return (
           <div className="g1-page g1-cols-3">
-            {divProblems.map((p, i) => (
-              <div key={i} className="g1-problem">
-                <span className="g1-num">({i + 1})</span>
-                <span className="g1-expr">
-                  <span className="g1-val">{p.dividend}</span>
-                  <span className="g1-op">&divide;</span>
-                  <span className="g1-val">{p.divisor}</span>
-                  <span className="g1-op">=</span>
-                  <Box answer={p.quotient} show={showAnswers} />
-                  {p.remainder > 0 && (
-                    <>
-                      <span className="g1-op" style={{ fontSize: 18 }}>あまり</span>
-                      <Box answer={p.remainder} show={showAnswers} />
-                    </>
-                  )}
-                </span>
-              </div>
-            ))}
+            {divProblems.map((p, i) => {
+              const rem = p.remainder > 0
+                ? `\\text{ あまり }${texBox(p.remainder, showAnswers)}`
+                : "";
+              return (
+                <div key={i} className="g1-problem">
+                  <span className="g1-num">({i + 1})</span>
+                  <M tex={`${p.dividend} \\div ${p.divisor} = ${texBox(p.quotient, showAnswers)}${rem}`} />
+                </div>
+              );
+            })}
           </div>
         );
 
@@ -676,13 +616,7 @@ const Computation = ({ operator }: { operator: string }) => {
             {mentalProblems.map((p, i) => (
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
-                <span className="g1-expr">
-                  <span className="g1-val">{p.left}</span>
-                  <span className="g1-op">{p.op}</span>
-                  <span className="g1-val">{p.right}</span>
-                  <span className="g1-op">=</span>
-                  <Box answer={p.answer} show={showAnswers} />
-                </span>
+                <M tex={`${p.left} ${p.op === "+" ? "+" : "-"} ${p.right} = ${texBox(p.answer, showAnswers)}`} />
               </div>
             ))}
           </div>
@@ -694,11 +628,7 @@ const Computation = ({ operator }: { operator: string }) => {
             {mixedCalcProblems.map((p, i) => (
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
-                <span className="g1-expr">
-                  <span className="dev-text-q">{p.display}</span>
-                  <span className="g1-op">=</span>
-                  <Box answer={p.answer} show={showAnswers} />
-                </span>
+                <M tex={`${unicodeToLatex(p.display)} = ${texBox(p.answer, showAnswers)}`} />
               </div>
             ))}
           </div>
@@ -719,23 +649,21 @@ const Computation = ({ operator }: { operator: string }) => {
       case "pos-neg-add-sub":
         return (
           <div className="g1-page g1-cols-2">
-            {addSubProblems.map((p, i) => (
-              <div key={i} className="g1-problem">
-                <span className="g1-num">({i + 1})</span>
-                <span className="g1-expr">
-                  {p.terms.map((t, j) => (
-                    <span key={j}>
-                      {j > 0 && <span className="g1-op">{t >= 0 ? "+" : "−"}</span>}
-                      <span className="g1-val">
-                        {j === 0 ? `(${t >= 0 ? "+" : ""}${t})` : `(${t >= 0 ? "+" : ""}${Math.abs(t)})`}
-                      </span>
-                    </span>
-                  ))}
-                  <span className="g1-op">=</span>
-                  <Box answer={p.answer} show={showAnswers} />
-                </span>
-              </div>
-            ))}
+            {addSubProblems.map((p, i) => {
+              const parts = p.terms.map((t, j) => {
+                const sign = j === 0 ? "" : (t >= 0 ? "+" : "-");
+                const val = j === 0
+                  ? `(${t >= 0 ? "+" : ""}${t})`
+                  : `(${t >= 0 ? "+" : ""}${Math.abs(t)})`;
+                return `${sign} ${val}`;
+              }).join(" ");
+              return (
+                <div key={i} className="g1-problem">
+                  <span className="g1-num">({i + 1})</span>
+                  <M tex={`${parts} = ${texBox(p.answer, showAnswers)}`} />
+                </div>
+              );
+            })}
           </div>
         );
 
@@ -745,11 +673,7 @@ const Computation = ({ operator }: { operator: string }) => {
             {mulDivProblems.map((p, i) => (
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
-                <span className="g1-expr">
-                  <span className="g1-val">{p.expr}</span>
-                  <span className="g1-op">=</span>
-                  <Box answer={p.answer} show={showAnswers} />
-                </span>
+                <M tex={`${unicodeToLatex(p.expr)} = ${texBox(p.answer, showAnswers)}`} />
               </div>
             ))}
           </div>
@@ -761,11 +685,7 @@ const Computation = ({ operator }: { operator: string }) => {
             {posNegMixedProblems.map((p, i) => (
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
-                <span className="g1-expr">
-                  <span className="g1-val">{p.expr}</span>
-                  <span className="g1-op">=</span>
-                  <Box answer={p.answer} show={showAnswers} />
-                </span>
+                <M tex={`${unicodeToLatex(p.expr)} = ${texBox(p.answer, showAnswers)}`} />
               </div>
             ))}
           </div>
@@ -778,10 +698,9 @@ const Computation = ({ operator }: { operator: string }) => {
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
                 <span className="g1-expr">
-                  <span className="g1-val">{p.expr}</span>
-                  <span className="g1-op">=</span>
+                  <M tex={`${unicodeToLatex(p.expr)} =`} />
                   <span className={showAnswers ? "" : "g1-hidden"}>
-                    <span className="g1-val">{p.answerExpr}</span>
+                    <M tex={unicodeToLatex(p.answerExpr)} />
                   </span>
                 </span>
               </div>
@@ -796,10 +715,9 @@ const Computation = ({ operator }: { operator: string }) => {
               <div key={i} className="g1-problem">
                 <span className="g1-num">({i + 1})</span>
                 <span className="g1-expr">
-                  <span className="g1-val">{p.expr}</span>
-                  <span className="g1-op">=</span>
+                  <M tex={`${unicodeToLatex(p.expr)} =`} />
                   <span className={showAnswers ? "" : "g1-hidden"}>
-                    <span className="g1-val">{p.answerExpr}</span>
+                    <M tex={unicodeToLatex(p.answerExpr)} />
                   </span>
                 </span>
               </div>
