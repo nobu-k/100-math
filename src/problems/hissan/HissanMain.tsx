@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import type { ProblemGroup } from "../types";
 import { randomSeed, hexToSeed } from "../random";
 import {
   type HissanConfig,
@@ -36,7 +35,7 @@ const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
   window.history.replaceState(null, "", url.toString());
 };
 
-const Hissan = ({ operator: operatorPath }: { operator: string }) => {
+export const Hissan = ({ operator: operatorPath }: { operator: string }) => {
   const hissanOperator = operatorFromPath(operatorPath);
 
   const getInitialConfig = (): HissanConfig => {
@@ -283,16 +282,4 @@ const Hissan = ({ operator: operatorPath }: { operator: string }) => {
       </div>
     </>
   );
-};
-
-export const hissan: ProblemGroup = {
-  id: "hissan",
-  label: "ひっ算",
-  operators: [
-    { operator: "addition", label: "たし算", grades: [2, 3], category: "computation" },
-    { operator: "subtraction", label: "ひき算", grades: [2, 3], category: "computation" },
-    { operator: "multiplication", label: "かけ算", grades: [3, 4], category: "computation" },
-    { operator: "division", label: "わり算", grades: [3, 4], category: "computation" },
-  ],
-  Component: Hissan,
 };

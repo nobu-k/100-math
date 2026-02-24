@@ -101,7 +101,6 @@ const App = () => {
 
   const currentGroup = problemGroups.find((g) => g.id === route.groupId)!;
   const currentOp = currentGroup.operators.find((o) => o.operator === route.operator)!;
-  const { Component } = currentGroup;
 
   const renderGradeBadges = (op: OperatorRoute) => {
     if (!op.grades?.length) return null;
@@ -240,7 +239,7 @@ const App = () => {
         <h1 className="print-title">
           {currentGroup.label} {currentOp.label}
         </h1>
-        <Component key={route.groupId + route.operator} operator={route.operator} />
+        <currentOp.Component key={route.groupId + route.operator} />
       </div>
     </div>
   );
