@@ -10,9 +10,6 @@ const PREC_DEF: Prec = "half";
 const PREC_VALUES: readonly Prec[] = ["hour", "half", "5min", "1min"];
 const PARAM_KEYS = ["prec"];
 
-const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
-  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
-
 const Clock = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
@@ -82,5 +79,8 @@ const renderClockProblems = (items: ClockProblem[], showAnswers: boolean) => (
     ))}
   </div>
 );
+
+const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
+  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
 
 export default Clock;

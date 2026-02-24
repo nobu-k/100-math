@@ -8,9 +8,6 @@ const SPMODE_DEF: SamplingMode = "mixed";
 const SPMODE_VALUES: readonly SamplingMode[] = ["mixed", "concept", "estimation"];
 const PARAM_KEYS = ["spmode"];
 
-const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
-  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
-
 const Sampling = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
@@ -77,5 +74,8 @@ const Sampling = () => {
     </ProblemPageLayout>
   );
 };
+
+const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
+  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
 
 export default Sampling;

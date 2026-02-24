@@ -10,9 +10,6 @@ const TTYPE_DEF: TimeType = "mixed";
 const TTYPE_VALUES: readonly TimeType[] = ["mixed", "after", "duration"];
 const PARAM_KEYS = ["ttype"];
 
-const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
-  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
-
 const TimeCalc = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
@@ -67,5 +64,8 @@ const TimeCalc = () => {
     </ProblemPageLayout>
   );
 };
+
+const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
+  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
 
 export default TimeCalc;

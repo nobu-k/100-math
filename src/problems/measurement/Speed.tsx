@@ -10,9 +10,6 @@ const SFIND_DEF: SpeedFind = "mixed";
 const SFIND_VALUES: readonly SpeedFind[] = ["mixed", "distance", "time", "speed"];
 const PARAM_KEYS = ["sfind"];
 
-const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
-  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
-
 const Speed = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
@@ -68,5 +65,8 @@ const Speed = () => {
     </ProblemPageLayout>
   );
 };
+
+const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
+  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
 
 export default Speed;

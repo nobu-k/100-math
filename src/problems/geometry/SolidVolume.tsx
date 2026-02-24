@@ -10,22 +10,6 @@ import SolidVolumeFig from "./figures/solid-volume-fig";
 const DEF = { solmode: "mixed" as SolidMode };
 const PARAM_KEYS = ["solmode"];
 
-const buildQuestion = (p: SolidProblem): string => {
-  if (p.solidType === "cylinder") {
-    return `底面の半径 ${p.radius}cm、高さ ${p.height}cm の円柱の${p.calcType === "volume" ? "体積" : "表面積"}は？`;
-  }
-  if (p.solidType === "cone") {
-    if (p.calcType === "volume") {
-      return `底面の半径 ${p.radius}cm、高さ ${p.height}cm の円錐の体積は？`;
-    }
-    return `底面の半径 ${p.radius}cm、母線の長さ ${p.slantHeight}cm の円錐の表面積は？`;
-  }
-  if (p.solidType === "sphere") {
-    return `半径 ${p.radius}cm の球の${p.calcType === "volume" ? "体積" : "表面積"}は？`;
-  }
-  return `底面の一辺 ${p.baseEdge}cm の${p.baseSides === 4 ? "正四" : "三"}角柱（高さ ${p.height}cm）の体積は？`;
-};
-
 const SolidVolume = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
@@ -99,6 +83,22 @@ const SolidVolume = () => {
       </div>
     </ProblemPageLayout>
   );
+};
+
+const buildQuestion = (p: SolidProblem): string => {
+  if (p.solidType === "cylinder") {
+    return `底面の半径 ${p.radius}cm、高さ ${p.height}cm の円柱の${p.calcType === "volume" ? "体積" : "表面積"}は？`;
+  }
+  if (p.solidType === "cone") {
+    if (p.calcType === "volume") {
+      return `底面の半径 ${p.radius}cm、高さ ${p.height}cm の円錐の体積は？`;
+    }
+    return `底面の半径 ${p.radius}cm、母線の長さ ${p.slantHeight}cm の円錐の表面積は？`;
+  }
+  if (p.solidType === "sphere") {
+    return `半径 ${p.radius}cm の球の${p.calcType === "volume" ? "体積" : "表面積"}は？`;
+  }
+  return `底面の一辺 ${p.baseEdge}cm の${p.baseSides === 4 ? "正四" : "三"}角柱（高さ ${p.height}cm）の体積は？`;
 };
 
 export default SolidVolume;

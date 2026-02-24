@@ -10,9 +10,6 @@ const T3MODE_DEF: Time3Mode = "mixed";
 const T3MODE_VALUES: readonly Time3Mode[] = ["mixed", "after", "duration", "seconds"];
 const PARAM_KEYS = ["t3mode"];
 
-const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
-  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
-
 const TimeCalc3 = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
@@ -68,5 +65,8 @@ const TimeCalc3 = () => {
     </ProblemPageLayout>
   );
 };
+
+const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
+  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
 
 export default TimeCalc3;

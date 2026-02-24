@@ -9,9 +9,6 @@ const REPFIND_DEF: RepFind = "mixed";
 const REPFIND_VALUES: readonly RepFind[] = ["mixed", "mean", "median", "mode"];
 const PARAM_KEYS = ["repfind"];
 
-const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
-  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
-
 const Representative = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
@@ -95,5 +92,8 @@ const Representative = () => {
     </ProblemPageLayout>
   );
 };
+
+const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
+  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
 
 export default Representative;

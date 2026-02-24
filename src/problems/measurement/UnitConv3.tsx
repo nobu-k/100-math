@@ -10,9 +10,6 @@ const UNIT3_DEF: Unit3Type = "mixed";
 const UNIT3_VALUES: readonly Unit3Type[] = ["mixed", "length", "weight"];
 const PARAM_KEYS = ["unit3"];
 
-const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
-  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
-
 const UnitConv3 = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
@@ -67,5 +64,8 @@ const UnitConv3 = () => {
     </ProblemPageLayout>
   );
 };
+
+const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
+  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
 
 export default UnitConv3;

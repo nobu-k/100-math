@@ -9,9 +9,6 @@ const PBMODE_DEF: ProbabilityMode = "mixed";
 const PBMODE_VALUES: readonly ProbabilityMode[] = ["mixed", "basic", "two-dice"];
 const PARAM_KEYS = ["pbmode"];
 
-const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
-  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
-
 const Probability = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
@@ -80,5 +77,8 @@ const Probability = () => {
     </ProblemPageLayout>
   );
 };
+
+const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
+  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
 
 export default Probability;
