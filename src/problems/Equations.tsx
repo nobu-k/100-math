@@ -42,14 +42,14 @@ const LINEXPR_DEF = { lemode: "mixed" as LinearExprMode };
 const LINEQ_DEF = { eqmode: "mixed" as LinearEqMode };
 const SIMEQ_DEF = { seqmode: "mixed" as SimEqMode };
 const EXP_DEF = { exmode: "mixed" as ExpansionMode, exformula: false };
-const FAC_DEF = { fcmode: "mixed" as FactoringMode };
-const QUADEQ_DEF = { qemode: "mixed" as QuadEqMode };
+const FAC_DEF = { fcmode: "mixed" as FactoringMode, fcformula: false };
+const QUADEQ_DEF = { qemode: "mixed" as QuadEqMode, qeformula: false };
 
 /* ================================================================
    URL param keys
    ================================================================ */
 
-const PARAM_KEYS = ["ops", "evvars", "lemode", "eqmode", "seqmode", "exmode", "exformula", "fcmode", "qemode"];
+const PARAM_KEYS = ["ops", "evvars", "lemode", "eqmode", "seqmode", "exmode", "exformula", "fcmode", "fcformula", "qemode", "qeformula"];
 
 /* ================================================================
    Main component
@@ -95,8 +95,10 @@ const Equations = ({ operator }: { operator: string }) => {
       ? (qemodeRaw as QuadEqMode) : QUADEQ_DEF.qemode;
 
     const exformula = p.get("exformula") === "1";
+    const fcformula = p.get("fcformula") === "1";
+    const qeformula = p.get("qeformula") === "1";
 
-    return { ops, evvars, lemode, eqmode, seqmode, exmode, exformula, fcmode, qemode };
+    return { ops, evvars, lemode, eqmode, seqmode, exmode, exformula, fcmode, fcformula, qemode, qeformula };
   });
 
   const [ops, setOps] = useState(initialSettings.ops);
@@ -107,7 +109,9 @@ const Equations = ({ operator }: { operator: string }) => {
   const [exmode, setExmode] = useState(initialSettings.exmode);
   const [exformula, setExformula] = useState(initialSettings.exformula);
   const [fcmode, setFcmode] = useState(initialSettings.fcmode);
+  const [fcformula, setFcformula] = useState(initialSettings.fcformula);
   const [qemode, setQemode] = useState(initialSettings.qemode);
+  const [qeformula, setQeformula] = useState(initialSettings.qeformula);
 
   /* ---- shared hook ---- */
 
@@ -135,16 +139,18 @@ const Equations = ({ operator }: { operator: string }) => {
         break;
       case "factoring":
         if (fcmode !== FAC_DEF.fcmode) m.fcmode = fcmode;
+        if (fcformula) m.fcformula = "1";
         break;
       case "quadratic-eq":
         if (qemode !== QUADEQ_DEF.qemode) m.qemode = qemode;
+        if (qeformula) m.qeformula = "1";
         break;
       case "pattern-eq":
       case "literal-expr":
         break;
     }
     return m;
-  }, [op, ops, evvars, lemode, eqmode, seqmode, exmode, fcmode, qemode]);
+  }, [op, ops, evvars, lemode, eqmode, seqmode, exmode, fcmode, fcformula, qemode, qeformula]);
 
   const {
     seed, showAnswers, showSettings, setShowSettings,
@@ -199,12 +205,12 @@ const Equations = ({ operator }: { operator: string }) => {
     [op, seed, exmode, exformula],
   );
   const facProblems = useMemo(
-    () => op === "factoring" ? generateFactoring(seed, fcmode) : [],
-    [op, seed, fcmode],
+    () => op === "factoring" ? generateFactoring(seed, fcmode, fcformula ? 10 : 12) : [],
+    [op, seed, fcmode, fcformula],
   );
   const quadEqProblems = useMemo(
-    () => op === "quadratic-eq" ? generateQuadEq(seed, qemode) : [],
-    [op, seed, qemode],
+    () => op === "quadratic-eq" ? generateQuadEq(seed, qemode, qeformula ? 10 : 12) : [],
+    [op, seed, qemode, qeformula],
   );
 
   /* ---- settings panel ---- */
@@ -319,6 +325,20 @@ const Equations = ({ operator }: { operator: string }) => {
                 <option value="formula">乗法公式の逆</option>
               </select>
             </label>
+            <label>
+              <input type="checkbox" checked={fcformula}
+                onChange={() => {
+                  setFcformula((prev) => {
+                    const next = !prev;
+                    const url = new URL(window.location.href);
+                    if (next) url.searchParams.set("fcformula", "1");
+                    else url.searchParams.delete("fcformula");
+                    window.history.replaceState(null, "", url.toString());
+                    return next;
+                  });
+                }} />
+              {" "}乗法公式の逆を表示
+            </label>
           </div>
         );
       case "quadratic-eq":
@@ -332,6 +352,20 @@ const Equations = ({ operator }: { operator: string }) => {
                 <option value="factoring">因数分解</option>
                 <option value="formula">解の公式</option>
               </select>
+            </label>
+            <label>
+              <input type="checkbox" checked={qeformula}
+                onChange={() => {
+                  setQeformula((prev) => {
+                    const next = !prev;
+                    const url = new URL(window.location.href);
+                    if (next) url.searchParams.set("qeformula", "1");
+                    else url.searchParams.delete("qeformula");
+                    window.history.replaceState(null, "", url.toString());
+                    return next;
+                  });
+                }} />
+              {" "}公式を表示
             </label>
           </div>
         );
@@ -488,23 +522,46 @@ const Equations = ({ operator }: { operator: string }) => {
         );
 
       case "factoring":
-        return renderExprProblems(facProblems);
+        return (
+          <>
+            {fcformula && (
+              <div className="formula-box">
+                <M tex={"x^2 + 2ax + a^2 = (x+a)^2"} />
+                <M tex={"x^2 - 2ax + a^2 = (x-a)^2"} />
+                <M tex={"x^2 - a^2 = (x+a)(x-a)"} />
+                <M tex={"x^2 + (a+b)x + ab = (x+a)(x+b)"} />
+              </div>
+            )}
+            {renderExprProblems(facProblems)}
+          </>
+        );
 
       case "quadratic-eq":
         return (
-          <div className="g1-page g1-cols-2">
-            {quadEqProblems.map((p, i) => (
-              <div key={i} className="g1-problem">
-                <span className="g1-num">({i + 1})</span>
-                <span className="g1-expr">
-                  <M tex={unicodeToLatex(p.equation)} />
-                  <span className={`${showAnswers ? "" : "g1-hidden"}`} style={{ marginLeft: "1em" }}>
-                    <M tex={texRed(unicodeToLatex(p.answerDisplay))} />
-                  </span>
-                </span>
+          <>
+            {qeformula && (
+              <div className="formula-box">
+                <M tex={"x^2 + 2ax + a^2 = (x+a)^2"} />
+                <M tex={"x^2 - 2ax + a^2 = (x-a)^2"} />
+                <M tex={"x^2 - a^2 = (x+a)(x-a)"} />
+                <M tex={"x^2 + (a+b)x + ab = (x+a)(x+b)"} />
+                <M tex={"x = \\dfrac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}"} />
               </div>
-            ))}
-          </div>
+            )}
+            <div className="g1-page g1-cols-2">
+              {quadEqProblems.map((p, i) => (
+                <div key={i} className="g1-problem">
+                  <span className="g1-num">({i + 1})</span>
+                  <span className="g1-expr">
+                    <M tex={unicodeToLatex(p.equation)} />
+                    <span className={`${showAnswers ? "" : "g1-hidden"}`} style={{ marginLeft: "1em" }}>
+                      <M tex={texRed(unicodeToLatex(p.answerDisplay))} />
+                    </span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </>
         );
 
       default:

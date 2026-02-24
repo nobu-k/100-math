@@ -12,12 +12,13 @@ export interface FactoringProblem {
 export const generateFactoring = (
   seed: number,
   mode: FactoringMode = "mixed",
+  count = 12,
 ): FactoringProblem[] => {
   const rng = mulberry32(seed);
   const problems: FactoringProblem[] = [];
   const seen = new Set<string>();
 
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < count; i++) {
     for (let attempt = 0; attempt < 40; attempt++) {
       const pick = mode === "mixed"
         ? rng() < 0.25 ? "common" : "formula"
