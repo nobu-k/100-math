@@ -15,12 +15,13 @@ export interface QuadEqProblem {
 export const generateQuadEq = (
   seed: number,
   mode: QuadEqMode = "mixed",
+  count = 12,
 ): QuadEqProblem[] => {
   const rng = mulberry32(seed);
   const problems: QuadEqProblem[] = [];
   const seen = new Set<string>();
 
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < count; i++) {
     for (let attempt = 0; attempt < 40; attempt++) {
       const type =
         mode === "mixed"
