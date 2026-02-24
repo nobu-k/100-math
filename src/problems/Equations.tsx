@@ -526,9 +526,9 @@ const Equations = ({ operator }: { operator: string }) => {
           <>
             {fcformula && (
               <div className="formula-box">
-                <M tex={"x^2 + 2ax + a^2 = (x+a)^2"} />
-                <M tex={"x^2 - 2ax + a^2 = (x-a)^2"} />
-                <M tex={"x^2 - a^2 = (x+a)(x-a)"} />
+                <M tex={"x^2 + 2xy + y^2 = (x+y)^2"} />
+                <M tex={"x^2 - 2xy + y^2 = (x-y)^2"} />
+                <M tex={"x^2 - y^2 = (x+y)(x-y)"} />
                 <M tex={"x^2 + (a+b)x + ab = (x+a)(x+b)"} />
               </div>
             )}
