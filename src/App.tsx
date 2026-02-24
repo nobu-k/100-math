@@ -1,9 +1,8 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
+import { NavLink, Outlet, useMatches } from "react-router-dom";
 import { problemGroups } from "./problems";
 import type { OperatorRoute } from "./problems";
 import "./App.css";
-
-const BASE = import.meta.env.BASE_URL; // "/100-math/"
 
 type ViewMode = "category" | "grade";
 
@@ -29,10 +28,10 @@ const CATEGORY_LABELS: [string, string][] = [
   ["data", "データ・統計"],
 ];
 
-const DEFAULT_PATH = `${BASE}grid100/addition`;
-
 const App = () => {
-  const [route, setRoute] = useState(getInitialRoute);
+  const matches = useMatches();
+  const handle = matches[matches.length - 1]?.handle as
+    { groupLabel: string; opLabel: string } | undefined;
   const [menuOpen, setMenuOpen] = useState(false);
   const [controlsOpen, setControlsOpen] = useState(false);
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
@@ -40,15 +39,6 @@ const App = () => {
 
   const gradeView = useMemo(buildGradeView, []);
   const categoryView = useMemo(buildCategoryView, []);
-
-  useEffect(() => {
-    const onPopState = () => {
-      const parsed = parseRoute(window.location.pathname);
-      if (parsed) setRoute(parsed);
-    };
-    window.addEventListener("popstate", onPopState);
-    return () => window.removeEventListener("popstate", onPopState);
-  }, []);
 
   /* ---- copy handler: replace KaTeX with plain-text from data-text ---- */
   useEffect(() => {
@@ -77,13 +67,6 @@ const App = () => {
     return () => document.removeEventListener("copy", onCopy);
   }, []);
 
-  const navigate = useCallback((groupId: string, operator: string) => {
-    const path = `${BASE}${groupId}/${operator}`;
-    window.history.pushState(null, "", path);
-    setRoute({ groupId, operator });
-    setMenuOpen(false);
-  }, []);
-
   const toggleGroup = useCallback((groupId: string) => {
     setCollapsed((prev) => {
       const next = new Set(prev);
@@ -98,9 +81,6 @@ const App = () => {
     setCollapsed(new Set());
     try { localStorage.setItem("sidebar-view", mode); } catch { /* ignore */ }
   }, []);
-
-  const currentGroup = problemGroups.find((g) => g.id === route.groupId)!;
-  const currentOp = currentGroup.operators.find((o) => o.operator === route.operator)!;
 
   const renderGradeBadges = (op: OperatorRoute) => {
     if (!op.grades?.length) return null;
@@ -131,18 +111,18 @@ const App = () => {
             {!collapsed.has(key) && (
               <ul className="sidebar-group-items">
                 {entries.map(({ groupId, groupLabel, op }) => {
-                  const isActive = groupId === route.groupId && op.operator === route.operator;
                   const needsPrefix = groupId !== catKey;
                   return (
-                    <li
-                      key={`${groupId}-${op.operator}`}
-                      className={`sidebar-item${isActive ? " active" : ""}`}
-                      onClick={() => navigate(groupId, op.operator)}
-                    >
-                      <span className="sidebar-item-label">
-                        {needsPrefix ? `${groupLabel}（${op.label}）` : op.label}
-                        {renderGradeBadges(op)}
-                      </span>
+                    <li key={`${groupId}-${op.operator}`} className="sidebar-item">
+                      <NavLink
+                        to={`/${groupId}/${op.operator}`}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <span className="sidebar-item-label">
+                          {needsPrefix ? `${groupLabel}（${op.label}）` : op.label}
+                          {renderGradeBadges(op)}
+                        </span>
+                      </NavLink>
                     </li>
                   );
                 })}
@@ -176,21 +156,21 @@ const App = () => {
             {!collapsed.has(key) && (
               <ul className="sidebar-group-items">
                 {entries.map(({ groupId, groupLabel, op }) => {
-                  const isActive = groupId === route.groupId && op.operator === route.operator;
                   const needsPrefix = dupLabels.has(op.label)
                     || groupId === "grid100" || groupId === "hissan";
                   const label = needsPrefix
                     ? `${op.label}（${groupLabel}）`
                     : op.label;
                   return (
-                    <li
-                      key={`${groupId}-${op.operator}`}
-                      className={`sidebar-item${isActive ? " active" : ""}`}
-                      onClick={() => navigate(groupId, op.operator)}
-                    >
-                      <span className="sidebar-item-label">
-                        {label}
-                      </span>
+                    <li key={`${groupId}-${op.operator}`} className="sidebar-item">
+                      <NavLink
+                        to={`/${groupId}/${op.operator}`}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <span className="sidebar-item-label">
+                          {label}
+                        </span>
+                      </NavLink>
                     </li>
                   );
                 })}
@@ -236,10 +216,10 @@ const App = () => {
         {viewMode === "category" ? renderCategoryView() : renderGradeView()}
       </nav>
       <div className="app">
-        <h1 className="print-title">
-          {currentGroup.label} {currentOp.label}
-        </h1>
-        <currentOp.Component key={route.groupId + route.operator} />
+        {handle && (
+          <h1 className="print-title">{handle.groupLabel} {handle.opLabel}</h1>
+        )}
+        <Outlet />
       </div>
     </div>
   );
@@ -247,23 +227,6 @@ const App = () => {
 
 export default App;
 
-const getInitialRoute = (): { groupId: string; operator: string } => {
-  const parsed = parseRoute(window.location.pathname);
-  if (parsed) return parsed;
-  window.history.replaceState(null, "", DEFAULT_PATH + window.location.search);
-  return { groupId: "grid100", operator: "addition" };
-};
-
-const parseRoute = (pathname: string): { groupId: string; operator: string } | null => {
-  const rel = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname;
-  const parts = rel.replace(/\/$/, "").split("/");
-  if (parts.length !== 2 || !parts[0] || !parts[1]) return null;
-  const group = problemGroups.find((g) => g.id === parts[0]);
-  if (!group) return null;
-  const op = group.operators.find((o) => o.operator === parts[1]);
-  if (!op) return null;
-  return { groupId: group.id, operator: op.operator };
-};
 
 const buildGradeView = (): Map<number, GradeEntry[]> => {
   const map = new Map<number, GradeEntry[]>();
