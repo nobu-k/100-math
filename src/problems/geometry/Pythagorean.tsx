@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderFigProblemsQA } from "./renderHelpers";
@@ -12,9 +13,7 @@ const PARAM_KEYS = ["ptmode"];
 const Pythagorean = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const ptmodeRaw = p.get("ptmode") ?? DEF.ptmode;
-    const ptmode = (["basic", "special", "applied", "mixed"] as const).includes(ptmodeRaw as any)
-      ? (ptmodeRaw as PythagoreanMode) : DEF.ptmode;
+    const ptmode = parseEnum(p.get("ptmode"), ["basic", "special", "applied", "mixed"] as const, DEF.ptmode);
     return { ptmode };
   });
 

@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { M, texRed, texAns, texFrac } from "../shared/M";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { generateDiffFrac } from "./diff-frac";
@@ -10,10 +11,7 @@ const PARAM_KEYS = ["dfop"];
 const DiffFrac = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const raw = p.get("dfop") ?? DEF.dfop;
-    const dfop: "mixed" | "add" | "sub" =
-      (["mixed", "add", "sub"] as const).includes(raw as any)
-        ? (raw as any) : DEF.dfop;
+    const dfop = parseEnum(p.get("dfop"), ["mixed", "add", "sub"] as const, DEF.dfop);
     return { dfop };
   });
 

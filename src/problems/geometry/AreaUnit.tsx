@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderTextProblems } from "../shared/renderHelpers";
@@ -10,10 +11,7 @@ const PARAM_KEYS = ["aunit"];
 const AreaUnit = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const aunitRaw = p.get("aunit") ?? DEF.aunit;
-    const aunit: "cm-m" | "m-ha" | "mixed" =
-      (["cm-m", "m-ha", "mixed"] as const).includes(aunitRaw as any)
-        ? (aunitRaw as any) : DEF.aunit;
+    const aunit = parseEnum(p.get("aunit"), ["cm-m", "m-ha", "mixed"] as const, DEF.aunit);
     return { aunit };
   });
 

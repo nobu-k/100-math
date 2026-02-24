@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderFigProblems } from "./renderHelpers";
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["ashape"];
 const AreaFormula = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const ashapeRaw = p.get("ashape") ?? DEF.ashape;
-    const ashape: "triangle" | "parallelogram" | "trapezoid" | "mixed" =
-      (["triangle", "parallelogram", "trapezoid", "mixed"] as const).includes(ashapeRaw as any)
-        ? (ashapeRaw as any) : DEF.ashape;
+    const ashape = parseEnum(p.get("ashape"), ["triangle", "parallelogram", "trapezoid", "mixed"] as const, DEF.ashape);
     return { ashape };
   });
 

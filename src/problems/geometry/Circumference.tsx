@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderFigProblems } from "./renderHelpers";
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["cmode"];
 const Circumference = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const cmodeRaw = p.get("cmode") ?? DEF.cmode;
-    const cmode: "forward" | "reverse" | "mixed" =
-      (["forward", "reverse", "mixed"] as const).includes(cmodeRaw as any)
-        ? (cmodeRaw as any) : DEF.cmode;
+    const cmode = parseEnum(p.get("cmode"), ["forward", "reverse", "mixed"] as const, DEF.cmode);
     return { cmode };
   });
 

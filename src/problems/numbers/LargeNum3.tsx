@@ -3,18 +3,17 @@ import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderArrowTextProblems } from "../shared/renderHelpers";
 import { generateLargeNum3 } from "./large-num3";
+import { parseEnum } from "../shared/enum-utils";
 
 type Ln3Mode = "read" | "count" | "multiply" | "mixed";
 
 const DEF = { ln3mode: "mixed" as Ln3Mode };
 const PARAM_KEYS = ["ln3mode"];
-const LN3_VALID = ["read", "count", "multiply", "mixed"] as const;
 
 const LargeNum3 = () => {
   const [ln3mode, setLn3mode] = useState<Ln3Mode>(() => {
     const p = new URLSearchParams(window.location.search);
-    const raw = p.get("ln3mode") ?? DEF.ln3mode;
-    return LN3_VALID.includes(raw as Ln3Mode) ? (raw as Ln3Mode) : DEF.ln3mode;
+    return parseEnum(p.get("ln3mode"), ["read", "count", "multiply", "mixed"] as const, DEF.ln3mode);
   });
 
   const getSettingsParams = useCallback((): Record<string, string> => {

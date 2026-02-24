@@ -3,6 +3,7 @@ import { M, texAns } from "../shared/M";
 import { unicodeToLatex } from "../shared/katex-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
+import { parseEnum } from "../shared/enum-utils";
 import { type LinearEqMode, generateLinearEq } from "./linear-eq";
 
 const DEF = { eqmode: "mixed" as LinearEqMode };
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["eqmode"];
 const LinearEq = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const eqmodeRaw = p.get("eqmode") ?? DEF.eqmode;
-    const eqmode = (["basic", "advanced", "mixed"] as const).includes(eqmodeRaw as LinearEqMode)
-      ? (eqmodeRaw as LinearEqMode)
-      : DEF.eqmode;
+    const eqmode = parseEnum(p.get("eqmode"), ["basic", "advanced", "mixed"] as const, DEF.eqmode);
     return { eqmode };
   });
 

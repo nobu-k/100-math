@@ -3,6 +3,7 @@ import { M, texRed } from "../shared/M";
 import { unicodeToLatex } from "../shared/katex-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
+import { parseEnum } from "../shared/enum-utils";
 import { type LinearExprMode, generateLinearExpr } from "./linear-expr";
 
 const DEF = { lemode: "mixed" as LinearExprMode };
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["lemode"];
 const LinearExpr = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const lemodeRaw = p.get("lemode") ?? DEF.lemode;
-    const lemode = (["add-sub", "mul-div", "mixed"] as const).includes(lemodeRaw as LinearExprMode)
-      ? (lemodeRaw as LinearExprMode)
-      : DEF.lemode;
+    const lemode = parseEnum(p.get("lemode"), ["add-sub", "mul-div", "mixed"] as const, DEF.lemode);
     return { lemode };
   });
 

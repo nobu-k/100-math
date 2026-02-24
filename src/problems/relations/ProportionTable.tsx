@@ -3,6 +3,7 @@ import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { generateProportion } from "./proportion-table";
 import renderTableProblems from "./renderHelpers";
+import { parseEnum } from "../shared/enum-utils";
 
 const DEF = { ptype: "mixed" as const };
 const PARAM_KEYS = ["ptype"];
@@ -10,11 +11,7 @@ const PARAM_KEYS = ["ptype"];
 const ProportionTable = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const ptypeRaw = p.get("ptype") ?? DEF.ptype;
-    const ptype: "mixed" | "direct" | "inverse" =
-      (["mixed", "direct", "inverse"] as const).includes(ptypeRaw as any)
-        ? (ptypeRaw as any)
-        : DEF.ptype;
+    const ptype = parseEnum(p.get("ptype"), ["mixed", "direct", "inverse"] as const, DEF.ptype);
     return { ptype };
   });
 

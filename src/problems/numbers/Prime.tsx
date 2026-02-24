@@ -4,16 +4,15 @@ import { unicodeToLatex } from "../shared/katex-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { type PrimeMode, generatePrime } from "./prime";
+import { parseEnum } from "../shared/enum-utils";
 
 const DEF = { prmode: "identify" as PrimeMode };
 const PARAM_KEYS = ["prmode"];
-const PR_VALID = ["identify", "factorize"] as const;
 
 const Prime = () => {
   const [prmode, setPrmode] = useState<PrimeMode>(() => {
     const p = new URLSearchParams(window.location.search);
-    const raw = p.get("prmode") ?? DEF.prmode;
-    return PR_VALID.includes(raw as PrimeMode) ? (raw as PrimeMode) : DEF.prmode;
+    return parseEnum(p.get("prmode"), ["identify", "factorize"] as const, DEF.prmode);
   });
 
   const getSettingsParams = useCallback((): Record<string, string> => {

@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderFigProblemsQA } from "./renderHelpers";
@@ -12,9 +13,7 @@ const PARAM_KEYS = ["plmode"];
 const ParallelAngle = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const plmodeRaw = p.get("plmode") ?? DEF.plmode;
-    const plmode = (["vertical", "corresponding", "alternate", "mixed"] as const).includes(plmodeRaw as any)
-      ? (plmodeRaw as ParallelAngleMode) : DEF.plmode;
+    const plmode = parseEnum(p.get("plmode"), ["vertical", "corresponding", "alternate", "mixed"] as const, DEF.plmode);
     return { plmode };
   });
 

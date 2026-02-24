@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderFigProblems } from "./renderHelpers";
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["ctype"];
 const CircleArea = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const ctypeRaw = p.get("ctype") ?? DEF.ctype;
-    const ctype: "basic" | "half" | "mixed" =
-      (["basic", "half", "mixed"] as const).includes(ctypeRaw as any)
-        ? (ctypeRaw as any) : DEF.ctype;
+    const ctype = parseEnum(p.get("ctype"), ["basic", "half", "mixed"] as const, DEF.ctype);
     return { ctype };
   });
 

@@ -1,8 +1,9 @@
 import { useState, useCallback, useMemo } from "react";
-import { M, texRed } from "../shared/M";
+import { parseEnum } from "../shared/enum-utils";
 import { unicodeToLatex } from "../shared/katex-utils";
-import useProblemPage from "../shared/useProblemPage";
+import { M, texRed } from "../shared/M";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
+import useProblemPage from "../shared/useProblemPage";
 import type { MonoMulDivMode } from "./mono-mul-div";
 import { generateMonoMulDiv } from "./mono-mul-div";
 
@@ -12,9 +13,7 @@ const PARAM_KEYS = ["mmmode"];
 const MonoMulDiv = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const mmmodeRaw = p.get("mmmode") ?? DEF.mmmode;
-    const mmmode = (["mul", "div", "mixed"] as const).includes(mmmodeRaw as any)
-      ? (mmmodeRaw as MonoMulDivMode) : DEF.mmmode;
+    const mmmode = parseEnum(p.get("mmmode"), ["mul", "div", "mixed"] as const, DEF.mmmode);
     return { mmmode };
   });
 

@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderTextProblems } from "../shared/renderHelpers";
@@ -10,10 +11,7 @@ const PARAM_KEYS = ["fdir"];
 const FracDecimal = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const raw = p.get("fdir") ?? DEF.fdec;
-    const fdec: "mixed" | "to-decimal" | "to-fraction" =
-      (["mixed", "to-decimal", "to-fraction"] as const).includes(raw as any)
-        ? (raw as any) : DEF.fdec;
+    const fdec = parseEnum(p.get("fdir"), ["mixed", "to-decimal", "to-fraction"] as const, DEF.fdec);
     return { fdec };
   });
 

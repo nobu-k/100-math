@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderFigProblemsQA } from "./renderHelpers";
@@ -12,9 +13,7 @@ const PARAM_KEYS = ["pgmode"];
 const Parallelogram = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const pgmodeRaw = p.get("pgmode") ?? DEF.pgmode;
-    const pgmode = (["sides", "angles", "diagonals", "mixed"] as const).includes(pgmodeRaw as any)
-      ? (pgmodeRaw as ParallelogramMode) : DEF.pgmode;
+    const pgmode = parseEnum(p.get("pgmode"), ["sides", "angles", "diagonals", "mixed"] as const, DEF.pgmode);
     return { pgmode };
   });
 

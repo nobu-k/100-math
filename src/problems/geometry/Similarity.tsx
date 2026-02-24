@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderFigProblemsQA } from "./renderHelpers";
@@ -12,9 +13,7 @@ const PARAM_KEYS = ["smmode"];
 const Similarity = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const smmodeRaw = p.get("smmode") ?? DEF.smmode;
-    const smmode = (["ratio", "parallel-line", "midpoint", "mixed"] as const).includes(smmodeRaw as any)
-      ? (smmodeRaw as SimilarityMode) : DEF.smmode;
+    const smmode = parseEnum(p.get("smmode"), ["ratio", "parallel-line", "midpoint", "mixed"] as const, DEF.smmode);
     return { smmode };
   });
 

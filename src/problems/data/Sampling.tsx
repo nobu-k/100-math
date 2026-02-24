@@ -3,6 +3,7 @@ import type { SamplingMode } from "./sampling";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { generateSampling } from "./sampling";
+import { parseEnum } from "../shared/enum-utils";
 
 const SPMODE_DEF: SamplingMode = "mixed";
 const SPMODE_VALUES: readonly SamplingMode[] = ["mixed", "concept", "estimation"];
@@ -74,8 +75,5 @@ const Sampling = () => {
     </ProblemPageLayout>
   );
 };
-
-const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
-  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
 
 export default Sampling;

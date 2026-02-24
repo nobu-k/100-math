@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderFigProblems } from "./renderHelpers";
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["pvshape"];
 const PrismVolume = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const pvshapeRaw = p.get("pvshape") ?? DEF.pvshape;
-    const pvshape: "prism" | "cylinder" | "mixed" =
-      (["prism", "cylinder", "mixed"] as const).includes(pvshapeRaw as any)
-        ? (pvshapeRaw as any) : DEF.pvshape;
+    const pvshape = parseEnum(p.get("pvshape"), ["prism", "cylinder", "mixed"] as const, DEF.pvshape);
     return { pvshape };
   });
 

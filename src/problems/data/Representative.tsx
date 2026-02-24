@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { generateRepresentative } from "./representative";
+import { parseEnum } from "../shared/enum-utils";
 
 type RepFind = "mixed" | "mean" | "median" | "mode";
 
@@ -92,8 +93,5 @@ const Representative = () => {
     </ProblemPageLayout>
   );
 };
-
-const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
-  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
 
 export default Representative;

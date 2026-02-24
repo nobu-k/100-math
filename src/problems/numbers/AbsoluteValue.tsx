@@ -3,16 +3,15 @@ import { M, texAns } from "../shared/M";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { type AbsoluteValueMode, generateAbsoluteValue } from "./absolute-value";
+import { parseEnum } from "../shared/enum-utils";
 
 const DEF = { absmode: "find" as AbsoluteValueMode };
 const PARAM_KEYS = ["absmode"];
-const ABS_VALID = ["find", "list", "equation"] as const;
 
 const AbsoluteValue = () => {
   const [absmode, setAbsmode] = useState<AbsoluteValueMode>(() => {
     const p = new URLSearchParams(window.location.search);
-    const raw = p.get("absmode") ?? DEF.absmode;
-    return ABS_VALID.includes(raw as AbsoluteValueMode) ? (raw as AbsoluteValueMode) : DEF.absmode;
+    return parseEnum(p.get("absmode"), ["find", "list", "equation"] as const, DEF.absmode);
   });
 
   const getSettingsParams = useCallback((): Record<string, string> => {

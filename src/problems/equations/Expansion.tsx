@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { M } from "../shared/M";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
+import { parseEnum } from "../shared/enum-utils";
 import { type ExpansionMode, generateExpansion } from "./expansion";
 import { renderExprProblems } from "./renderExprProblems";
 
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["exmode", "exformula"];
 const Expansion = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const exmodeRaw = p.get("exmode") ?? DEF.exmode;
-    const exmode = (["distribute", "formula", "mixed"] as const).includes(exmodeRaw as ExpansionMode)
-      ? (exmodeRaw as ExpansionMode)
-      : DEF.exmode;
+    const exmode = parseEnum(p.get("exmode"), ["distribute", "formula", "mixed"] as const, DEF.exmode);
     const exformula = p.get("exformula") === "1";
     return { exmode, exformula };
   });

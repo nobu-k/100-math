@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderFigProblems } from "./renderHelpers";
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["shape"];
 const Area = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const shapeRaw = p.get("shape") ?? DEF.shape;
-    const shape: "square" | "rect" | "mixed" =
-      (["square", "rect", "mixed"] as const).includes(shapeRaw as any)
-        ? (shapeRaw as any) : DEF.shape;
+    const shape = parseEnum(p.get("shape"), ["square", "rect", "mixed"] as const, DEF.shape);
     return { shape };
   });
 

@@ -4,6 +4,7 @@ import { M, texRed } from "../shared/M";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { generateProbability } from "./probability";
+import { parseEnum } from "../shared/enum-utils";
 
 const PBMODE_DEF: ProbabilityMode = "mixed";
 const PBMODE_VALUES: readonly ProbabilityMode[] = ["mixed", "basic", "two-dice"];
@@ -77,8 +78,5 @@ const Probability = () => {
     </ProblemPageLayout>
   );
 };
-
-const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
-  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
 
 export default Probability;

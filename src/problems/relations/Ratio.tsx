@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { generateRatio } from "./ratio";
+import { parseEnum } from "../shared/enum-utils";
 
 const DEF = { rtype: "mixed" as const };
 const PARAM_KEYS = ["rtype"];
@@ -9,11 +10,7 @@ const PARAM_KEYS = ["rtype"];
 const Ratio = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const rtypeRaw = p.get("rtype") ?? DEF.rtype;
-    const rtype: "mixed" | "simplify" | "fill" =
-      (["mixed", "simplify", "fill"] as const).includes(rtypeRaw as any)
-        ? (rtypeRaw as any)
-        : DEF.rtype;
+    const rtype = parseEnum(p.get("rtype"), ["mixed", "simplify", "fill"] as const, DEF.rtype);
     return { rtype };
   });
 

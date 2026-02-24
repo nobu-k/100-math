@@ -4,6 +4,7 @@ import { unicodeToLatex } from "../shared/katex-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { type LinearFuncMode, generateLinearFunc } from "./linear-func";
+import { parseEnum } from "../shared/enum-utils";
 
 const DEF = { lfmode: "mixed" as LinearFuncMode };
 const PARAM_KEYS = ["lfmode"];
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["lfmode"];
 const LinearFunc = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const lfmodeRaw = p.get("lfmode") ?? DEF.lfmode;
-    const lfmode = (["mixed", "slope-intercept", "two-points", "rate-of-change"] as const).includes(lfmodeRaw as any)
-      ? (lfmodeRaw as LinearFuncMode)
-      : DEF.lfmode;
+    const lfmode = parseEnum(p.get("lfmode"), ["mixed", "slope-intercept", "two-points", "rate-of-change"] as const, DEF.lfmode);
     return { lfmode };
   });
 

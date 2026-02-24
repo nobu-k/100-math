@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderFigProblemsQA } from "./renderHelpers";
@@ -12,9 +13,7 @@ const PARAM_KEYS = ["tamode"];
 const TriangleAngle = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const tamodeRaw = p.get("tamode") ?? DEF.tamode;
-    const tamode = (["interior", "exterior", "mixed"] as const).includes(tamodeRaw as any)
-      ? (tamodeRaw as TriAngleMode) : DEF.tamode;
+    const tamode = parseEnum(p.get("tamode"), ["interior", "exterior", "mixed"] as const, DEF.tamode);
     return { tamode };
   });
 

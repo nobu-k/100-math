@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import { M, texRed } from "../shared/M";
 import { unicodeToLatex } from "../shared/katex-utils";
 import useProblemPage from "../shared/useProblemPage";
@@ -13,9 +14,7 @@ const PARAM_KEYS = ["solmode"];
 const SolidVolume = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const solmodeRaw = p.get("solmode") ?? DEF.solmode;
-    const solmode = (["cylinder", "cone", "sphere", "prism", "mixed"] as const).includes(solmodeRaw as any)
-      ? (solmodeRaw as SolidMode) : DEF.solmode;
+    const solmode = parseEnum(p.get("solmode"), ["cylinder", "cone", "sphere", "prism", "mixed"] as const, DEF.solmode);
     return { solmode };
   });
 

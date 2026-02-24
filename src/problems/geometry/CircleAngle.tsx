@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderFigProblemsQA } from "./renderHelpers";
@@ -12,9 +13,7 @@ const PARAM_KEYS = ["camode"];
 const CircleAngle = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const camodeRaw = p.get("camode") ?? DEF.camode;
-    const camode = (["basic", "inscribed", "mixed"] as const).includes(camodeRaw as any)
-      ? (camodeRaw as CircleAngleMode) : DEF.camode;
+    const camode = parseEnum(p.get("camode"), ["basic", "inscribed", "mixed"] as const, DEF.camode);
     return { camode };
   });
 

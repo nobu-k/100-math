@@ -3,6 +3,7 @@ import type { DataAnalysisProblem, DataAnalysisMode } from "./data-analysis";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { generateDataAnalysis } from "./data-analysis";
+import { parseEnum } from "../shared/enum-utils";
 
 const DAMODE_DEF: DataAnalysisMode = "mixed";
 const DAMODE_VALUES: readonly DataAnalysisMode[] = ["mixed", "representative", "frequency"];
@@ -104,8 +105,5 @@ const DataAnalysis = () => {
     </ProblemPageLayout>
   );
 };
-
-const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
-  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
 
 export default DataAnalysis;

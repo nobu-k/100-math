@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { M, texRed, texAns } from "../shared/M";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { generateFracConv } from "./frac-conv";
@@ -10,10 +11,7 @@ const PARAM_KEYS = ["fdir"];
 const FracConv = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const raw = p.get("fdir") ?? DEF.fconv;
-    const fconv: "both" | "to-mixed" | "to-improper" =
-      (["both", "to-mixed", "to-improper"] as const).includes(raw as any)
-        ? (raw as any) : DEF.fconv;
+    const fconv = parseEnum(p.get("fdir"), ["both", "to-mixed", "to-improper"] as const, DEF.fconv);
     return { fconv };
   });
 

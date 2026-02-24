@@ -3,18 +3,17 @@ import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderTextProblems } from "../shared/renderHelpers";
 import { generateLargeNum4 } from "./large-num4";
+import { parseEnum } from "../shared/enum-utils";
 
 type Ln4Mode = "read" | "position" | "mixed";
 
 const DEF = { ln4mode: "mixed" as Ln4Mode };
 const PARAM_KEYS = ["ln4mode"];
-const LN4_VALID = ["read", "position", "mixed"] as const;
 
 const LargeNum4 = () => {
   const [ln4mode, setLn4mode] = useState<Ln4Mode>(() => {
     const p = new URLSearchParams(window.location.search);
-    const raw = p.get("ln4mode") ?? DEF.ln4mode;
-    return LN4_VALID.includes(raw as Ln4Mode) ? (raw as Ln4Mode) : DEF.ln4mode;
+    return parseEnum(p.get("ln4mode"), ["read", "position", "mixed"] as const, DEF.ln4mode);
   });
 
   const getSettingsParams = useCallback((): Record<string, string> => {

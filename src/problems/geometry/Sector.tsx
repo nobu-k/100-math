@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import { M, texRed } from "../shared/M";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
@@ -12,9 +13,7 @@ const PARAM_KEYS = ["secmode"];
 const Sector = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const secmodeRaw = p.get("secmode") ?? DEF.secmode;
-    const secmode = (["arc", "area", "mixed"] as const).includes(secmodeRaw as any)
-      ? (secmodeRaw as SectorMode) : DEF.secmode;
+    const secmode = parseEnum(p.get("secmode"), ["arc", "area", "mixed"] as const, DEF.secmode);
     return { secmode };
   });
 

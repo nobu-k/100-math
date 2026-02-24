@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { M } from "../shared/M";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
+import { parseEnum } from "../shared/enum-utils";
 import { type FactoringMode, generateFactoring } from "./factoring";
 import { renderExprProblems } from "./renderExprProblems";
 
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["fcmode", "fcformula"];
 const Factoring = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const fcmodeRaw = p.get("fcmode") ?? DEF.fcmode;
-    const fcmode = (["common", "formula", "mixed"] as const).includes(fcmodeRaw as FactoringMode)
-      ? (fcmodeRaw as FactoringMode)
-      : DEF.fcmode;
+    const fcmode = parseEnum(p.get("fcmode"), ["common", "formula", "mixed"] as const, DEF.fcmode);
     const fcformula = p.get("fcformula") === "1";
     return { fcmode, fcformula };
   });

@@ -3,6 +3,7 @@ import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderTextProblems } from "../shared/renderHelpers";
 import { generateSpeed } from "./speed";
+import { parseEnum } from "../shared/enum-utils";
 
 type SpeedFind = "mixed" | "distance" | "time" | "speed";
 
@@ -65,8 +66,5 @@ const Speed = () => {
     </ProblemPageLayout>
   );
 };
-
-const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
-  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
 
 export default Speed;

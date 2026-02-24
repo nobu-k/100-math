@@ -3,6 +3,7 @@ import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { generateClock, type ClockProblem } from "./clock";
 import ClockFace from "./ClockFace";
+import { parseEnum } from "../shared/enum-utils";
 
 type Prec = "hour" | "half" | "5min" | "1min";
 
@@ -79,8 +80,5 @@ const renderClockProblems = (items: ClockProblem[], showAnswers: boolean) => (
     ))}
   </div>
 );
-
-const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
-  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
 
 export default Clock;

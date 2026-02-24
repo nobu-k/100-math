@@ -4,16 +4,15 @@ import { unicodeToLatex } from "../shared/katex-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { type SqrtMode, generateSqrt } from "./square-root";
+import { parseEnum } from "../shared/enum-utils";
 
 const DEF = { sqmode: "mixed" as SqrtMode };
 const PARAM_KEYS = ["sqmode"];
-const SQ_VALID = ["find", "simplify", "mul-div", "add-sub", "rationalize", "mixed"] as const;
 
 const SquareRoot = () => {
   const [sqmode, setSqmode] = useState<SqrtMode>(() => {
     const p = new URLSearchParams(window.location.search);
-    const raw = p.get("sqmode") ?? DEF.sqmode;
-    return SQ_VALID.includes(raw as SqrtMode) ? (raw as SqrtMode) : DEF.sqmode;
+    return parseEnum(p.get("sqmode"), ["find", "simplify", "mul-div", "add-sub", "rationalize", "mixed"] as const, DEF.sqmode);
   });
 
   const getSettingsParams = useCallback((): Record<string, string> => {

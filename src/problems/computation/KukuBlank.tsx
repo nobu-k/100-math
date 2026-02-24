@@ -1,7 +1,8 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import { M, texBox } from "../shared/M";
-import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
+import useProblemPage from "../shared/useProblemPage";
 import { generateKukuBlank } from "./kuku-blank";
 
 const DEF = { blank: "any" as "any" | "product" | "factor" };
@@ -10,10 +11,7 @@ const PARAM_KEYS = ["blank"];
 const KukuBlank = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const blankRaw = p.get("blank") ?? DEF.blank;
-    const blank: "any" | "product" | "factor" =
-      (["any", "product", "factor"] as const).includes(blankRaw as any)
-        ? (blankRaw as any) : DEF.blank;
+    const blank = parseEnum(p.get("blank"), ["any", "product", "factor"] as const, DEF.blank);
     return { blank };
   });
 

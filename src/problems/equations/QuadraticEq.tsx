@@ -3,6 +3,7 @@ import { M, texRed } from "../shared/M";
 import { unicodeToLatex } from "../shared/katex-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
+import { parseEnum } from "../shared/enum-utils";
 import { type QuadEqMode, generateQuadEq } from "./quadratic-eq";
 
 const DEF = { qemode: "mixed" as QuadEqMode, qeformula: false };
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["qemode", "qeformula"];
 const QuadraticEq = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const qemodeRaw = p.get("qemode") ?? DEF.qemode;
-    const qemode = (["factoring", "formula", "mixed"] as const).includes(qemodeRaw as QuadEqMode)
-      ? (qemodeRaw as QuadEqMode)
-      : DEF.qemode;
+    const qemode = parseEnum(p.get("qemode"), ["factoring", "formula", "mixed"] as const, DEF.qemode);
     const qeformula = p.get("qeformula") === "1";
     return { qemode, qeformula };
   });

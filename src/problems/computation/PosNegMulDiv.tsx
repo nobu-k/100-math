@@ -1,8 +1,9 @@
 import { useState, useCallback, useMemo } from "react";
-import { M, texAns } from "../shared/M";
+import { parseEnum } from "../shared/enum-utils";
 import { unicodeToLatex } from "../shared/katex-utils";
-import useProblemPage from "../shared/useProblemPage";
+import { M, texAns } from "../shared/M";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
+import useProblemPage from "../shared/useProblemPage";
 import type { PosNegMulDivMode } from "./pos-neg-mul-div";
 import { generatePosNegMulDiv } from "./pos-neg-mul-div";
 
@@ -12,9 +13,7 @@ const PARAM_KEYS = ["mdmode"];
 const PosNegMulDiv = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const mdmodeRaw = p.get("mdmode") ?? DEF.mdmode;
-    const mdmode = (["mul", "div", "mixed", "power"] as const).includes(mdmodeRaw as any)
-      ? (mdmodeRaw as PosNegMulDivMode) : DEF.mdmode;
+    const mdmode = parseEnum(p.get("mdmode"), ["mul", "div", "mixed", "power"] as const, DEF.mdmode);
     return { mdmode };
   });
 

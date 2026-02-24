@@ -3,18 +3,17 @@ import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderTextProblems } from "../shared/renderHelpers";
 import { generateDecimalPlace } from "./decimal-place";
+import { parseEnum } from "../shared/enum-utils";
 
 type DpMode = "count" | "multiply" | "mixed";
 
 const DEF = { dpmode: "mixed" as DpMode };
 const PARAM_KEYS = ["dpmode"];
-const DP_VALID = ["count", "multiply", "mixed"] as const;
 
 const DecimalPlace = () => {
   const [dpmode, setDpmode] = useState<DpMode>(() => {
     const p = new URLSearchParams(window.location.search);
-    const raw = p.get("dpmode") ?? DEF.dpmode;
-    return DP_VALID.includes(raw as DpMode) ? (raw as DpMode) : DEF.dpmode;
+    return parseEnum(p.get("dpmode"), ["count", "multiply", "mixed"] as const, DEF.dpmode);
   });
 
   const getSettingsParams = useCallback((): Record<string, string> => {

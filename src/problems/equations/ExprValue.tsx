@@ -3,6 +3,7 @@ import { M } from "../shared/M";
 import { unicodeToLatex } from "../shared/katex-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
+import { parseEnum } from "../shared/enum-utils";
 import { type ExprValueVars, generateExprValue } from "./expr-value";
 
 const DEF = { evvars: "one" as ExprValueVars };
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["evvars"];
 const ExprValue = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const evvarsRaw = p.get("evvars") ?? DEF.evvars;
-    const evvars = (["one", "two"] as const).includes(evvarsRaw as ExprValueVars)
-      ? (evvarsRaw as ExprValueVars)
-      : DEF.evvars;
+    const evvars = parseEnum(p.get("evvars"), ["one", "two"] as const, DEF.evvars);
     return { evvars };
   });
 

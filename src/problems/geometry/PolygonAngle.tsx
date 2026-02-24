@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderFigProblemsQA } from "./renderHelpers";
@@ -12,9 +13,7 @@ const PARAM_KEYS = ["pamode"];
 const PolygonAngle = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const pamodeRaw = p.get("pamode") ?? DEF.pamode;
-    const pamode = (["interior-sum", "regular", "exterior", "find-n", "mixed"] as const).includes(pamodeRaw as any)
-      ? (pamodeRaw as PolygonAngleMode) : DEF.pamode;
+    const pamode = parseEnum(p.get("pamode"), ["interior-sum", "regular", "exterior", "find-n", "mixed"] as const, DEF.pamode);
     return { pamode };
   });
 

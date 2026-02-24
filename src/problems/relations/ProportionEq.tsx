@@ -4,6 +4,7 @@ import { unicodeToLatex } from "../shared/katex-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { type ProportionMode, generateProportion } from "./proportion-eq";
+import { parseEnum } from "../shared/enum-utils";
 
 const DEF = { propmode: "mixed" as ProportionMode };
 const PARAM_KEYS = ["propmode"];
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["propmode"];
 const ProportionEq = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const propmodeRaw = p.get("propmode") ?? DEF.propmode;
-    const propmode = (["mixed", "direct", "inverse"] as const).includes(propmodeRaw as any)
-      ? (propmodeRaw as ProportionMode)
-      : DEF.propmode;
+    const propmode = parseEnum(p.get("propmode"), ["mixed", "direct", "inverse"] as const, DEF.propmode);
     return { propmode };
   });
 

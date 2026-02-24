@@ -1,7 +1,8 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import { M, texBox } from "../shared/M";
-import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
+import useProblemPage from "../shared/useProblemPage";
 import { generateDivision } from "./division";
 
 const DEF = { rem: "mixed" as "none" | "yes" | "mixed" };
@@ -10,10 +11,7 @@ const PARAM_KEYS = ["rem"];
 const Division = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const remRaw = p.get("rem") ?? DEF.rem;
-    const rem: "none" | "yes" | "mixed" =
-      (["none", "yes", "mixed"] as const).includes(remRaw as any)
-        ? (remRaw as any) : DEF.rem;
+    const rem = parseEnum(p.get("rem"), ["none", "yes", "mixed"] as const, DEF.rem);
     return { rem };
   });
 

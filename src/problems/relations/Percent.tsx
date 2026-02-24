@@ -3,6 +3,7 @@ import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderTextProblems } from "../shared/renderHelpers";
 import { generatePercent } from "./percent";
+import { parseEnum } from "../shared/enum-utils";
 
 const DEF = { pfind: "mixed" as const };
 const PARAM_KEYS = ["pfind"];
@@ -10,11 +11,7 @@ const PARAM_KEYS = ["pfind"];
 const Percent = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const pfindRaw = p.get("pfind") ?? DEF.pfind;
-    const pfind: "mixed" | "ratio" | "compared" | "base" =
-      (["mixed", "ratio", "compared", "base"] as const).includes(pfindRaw as any)
-        ? (pfindRaw as any)
-        : DEF.pfind;
+    const pfind = parseEnum(p.get("pfind"), ["mixed", "ratio", "compared", "base"] as const, DEF.pfind);
     return { pfind };
   });
 

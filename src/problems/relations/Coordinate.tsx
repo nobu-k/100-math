@@ -4,6 +4,7 @@ import { unicodeToLatex } from "../shared/katex-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { type CoordinateProblem, type CoordinateMode, generateCoordinate } from "./coordinate";
+import { parseEnum } from "../shared/enum-utils";
 
 const DEF = { comode: "mixed" as CoordinateMode };
 const PARAM_KEYS = ["comode"];
@@ -57,10 +58,7 @@ const renderCoordinateFigure = (p: CoordinateProblem) => {
 const Coordinate = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const comodeRaw = p.get("comode") ?? DEF.comode;
-    const comode = (["mixed", "quadrant", "on-graph"] as const).includes(comodeRaw as any)
-      ? (comodeRaw as CoordinateMode)
-      : DEF.comode;
+    const comode = parseEnum(p.get("comode"), ["mixed", "quadrant", "on-graph"] as const, DEF.comode);
     return { comode };
   });
 

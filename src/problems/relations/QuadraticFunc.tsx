@@ -4,6 +4,7 @@ import { unicodeToLatex } from "../shared/katex-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { type QuadFuncMode, generateQuadFunc } from "./quadratic-func";
+import { parseEnum } from "../shared/enum-utils";
 
 const DEF = { qfmode: "mixed" as QuadFuncMode };
 const PARAM_KEYS = ["qfmode"];
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["qfmode"];
 const QuadraticFunc = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const qfmodeRaw = p.get("qfmode") ?? DEF.qfmode;
-    const qfmode = (["mixed", "value", "rate-of-change", "graph"] as const).includes(qfmodeRaw as any)
-      ? (qfmodeRaw as QuadFuncMode)
-      : DEF.qfmode;
+    const qfmode = parseEnum(p.get("qfmode"), ["mixed", "value", "rate-of-change", "graph"] as const, DEF.qfmode);
     return { qfmode };
   });
 

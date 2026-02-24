@@ -3,6 +3,7 @@ import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderTextProblems } from "../shared/renderHelpers";
 import { generateTimeCalc } from "./time-calc";
+import { parseEnum } from "../shared/enum-utils";
 
 type TimeType = "mixed" | "after" | "duration";
 
@@ -64,8 +65,5 @@ const TimeCalc = () => {
     </ProblemPageLayout>
   );
 };
-
-const parseEnum = <T extends string>(raw: string | null, values: readonly T[], def: T): T =>
-  raw !== null && (values as readonly string[]).includes(raw) ? (raw as T) : def;
 
 export default TimeCalc;

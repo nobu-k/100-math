@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { parseEnum } from "../shared/enum-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderFigProblems } from "./renderHelpers";
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["vshape"];
 const Volume = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const vshapeRaw = p.get("vshape") ?? DEF.vshape;
-    const vshape: "cube" | "rect" | "mixed" =
-      (["cube", "rect", "mixed"] as const).includes(vshapeRaw as any)
-        ? (vshapeRaw as any) : DEF.vshape;
+    const vshape = parseEnum(p.get("vshape"), ["cube", "rect", "mixed"] as const, DEF.vshape);
     return { vshape };
   });
 

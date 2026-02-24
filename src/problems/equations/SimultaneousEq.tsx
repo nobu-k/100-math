@@ -3,6 +3,7 @@ import { M, texRed } from "../shared/M";
 import { unicodeToLatex } from "../shared/katex-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
+import { parseEnum } from "../shared/enum-utils";
 import { type SimEqMode, generateSimEq } from "./simultaneous-eq";
 
 const DEF = { seqmode: "mixed" as SimEqMode };
@@ -11,10 +12,7 @@ const PARAM_KEYS = ["seqmode"];
 const SimultaneousEq = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const seqmodeRaw = p.get("seqmode") ?? DEF.seqmode;
-    const seqmode = (["addition", "substitution", "mixed"] as const).includes(seqmodeRaw as SimEqMode)
-      ? (seqmodeRaw as SimEqMode)
-      : DEF.seqmode;
+    const seqmode = parseEnum(p.get("seqmode"), ["addition", "substitution", "mixed"] as const, DEF.seqmode);
     return { seqmode };
   });
 
