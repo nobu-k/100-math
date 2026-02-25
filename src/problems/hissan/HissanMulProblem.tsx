@@ -1,4 +1,4 @@
-import type { Problem, HissanConfig } from "./common";
+import type { Problem } from "./common";
 import { toDigitCells, decimalDisplayWidth } from "./common";
 import { computeMulDetails } from "./mul";
 import { cx } from "./render-utils";
@@ -7,13 +7,15 @@ export const HissanMulProblem = ({
   index,
   problem,
   showAnswers,
-  cfg,
+  maxDigits,
+  mulMaxDigits,
   dps,
 }: {
   index: number;
   problem: Problem;
   showAnswers: boolean;
-  cfg: HissanConfig;
+  maxDigits: number;
+  mulMaxDigits: number;
   dps: number[];
 }) => {
   const [multiplicand, multiplier] = problem;
@@ -36,7 +38,7 @@ export const HissanMulProblem = ({
     const maxPartialWidth = Math.max(...partials.map(pp => String(pp.value).length + pp.shift));
     totalCols = Math.max(mcandDisplayWidth + 1, mplierDisplayWidth + 1, maxPartialWidth, answerDisplayWidth);
   } else {
-    totalCols = cfg.maxDigits + cfg.mulMaxDigits;
+    totalCols = maxDigits + mulMaxDigits;
   }
 
   /** Build digit cells for a number with dp decimal places.

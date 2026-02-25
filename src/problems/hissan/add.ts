@@ -1,4 +1,4 @@
-import { type HissanConfig, type Problem, randInt, digitsWithMinSum, digitsWithExactSum, generateNumber } from "./common";
+import { type Problem, randInt, digitsWithMinSum, digitsWithExactSum, generateNumber } from "./common";
 
 /**
  * Constructively generate a problem with carries in every column.
@@ -6,7 +6,7 @@ import { type HissanConfig, type Problem, randInt, digitsWithMinSum, digitsWithE
  * - Middle columns: digit sum = 10 - carry_in (corner case, total = 10, carry out = 1).
  * - Highest column: digit sum + carry_in >= 10 (carries out).
  */
-export const generateCarryChainProblem = (rng: () => number, cfg: HissanConfig): Problem => {
+export const generateCarryChainProblem = (rng: () => number, cfg: { minDigits: number; maxDigits: number; addMinDigits: number; addMaxDigits: number; numOperands: number }): Problem => {
   const numOps = cfg.numOperands;
 
   for (let attempt = 0; attempt < 100; attempt++) {

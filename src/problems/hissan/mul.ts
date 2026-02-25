@@ -1,4 +1,4 @@
-import { type HissanConfig, type Problem, generateNumber } from "./common";
+import { type Problem, generateNumber } from "./common";
 
 export interface MulPartialProduct {
   value: number;
@@ -38,7 +38,7 @@ export const computeMulDetails = (multiplicand: number, multiplier: number): Mul
 };
 
 /** Generate a multiplication problem. */
-export const generateMultiplicationProblem = (rng: () => number, cfg: HissanConfig): Problem => {
+export const generateMultiplicationProblem = (rng: () => number, cfg: { minDigits: number; maxDigits: number; mulMinDigits: number; mulMaxDigits: number }): Problem => {
   const multiplicand = generateNumber(rng, cfg.minDigits, cfg.maxDigits);
   const multiplier = generateNumber(rng, cfg.mulMinDigits, cfg.mulMaxDigits);
   return [multiplicand, multiplier];

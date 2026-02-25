@@ -1,7 +1,7 @@
-import { type HissanConfig, type Problem, generateNumber, randInt, digitsWithMinSum } from "./common";
+import { type Problem, generateNumber, randInt, digitsWithMinSum } from "./common";
 
 /** Generate a subtraction problem where minuend - subtrahend1 - subtrahend2 - ... >= 0. */
-export const generateSubtractionProblem = (rng: () => number, cfg: HissanConfig): Problem => {
+export const generateSubtractionProblem = (rng: () => number, cfg: { minDigits: number; maxDigits: number; numOperands: number }): Problem => {
   for (let attempt = 0; attempt < 100; attempt++) {
     const minuend = generateNumber(rng, cfg.minDigits, cfg.maxDigits);
     const subtrahends: number[] = [];
@@ -27,7 +27,7 @@ export const generateSubtractionProblem = (rng: () => number, cfg: HissanConfig)
  * Column-by-column (right-to-left): choose minuend digit and subtrahend digits
  * such that minuendDigit - subDigitSum - borrowIn < 0, forcing a borrow.
  */
-export const generateBorrowChainProblem = (rng: () => number, cfg: HissanConfig): Problem => {
+export const generateBorrowChainProblem = (rng: () => number, cfg: { minDigits: number; maxDigits: number; numOperands: number }): Problem => {
   const numSubs = cfg.numOperands - 1;
 
   for (let attempt = 0; attempt < 100; attempt++) {

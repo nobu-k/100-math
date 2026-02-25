@@ -1,4 +1,4 @@
-import { type HissanConfig, type Problem, generateNumber, randInt, numberToDigits } from "./common";
+import { type Problem, generateNumber, randInt, numberToDigits } from "./common";
 
 export interface DivStep {
   position: number;      // column index in dividend (0-based from left)
@@ -69,8 +69,41 @@ export const computeDivDetails = (dividend: number, divisor: number, extraDigits
   return { quotient, remainder: finalRemainder, steps, extraStepCount, cycleStart, cycleLength };
 };
 
+/** Check whether dividend ÷ divisor terminates within maxExtraSteps
+ *  additional decimal extension steps (bringing down zeros). */
+export const divisionTerminates = (dividend: number, divisor: number, maxExtraSteps: number): { terminates: boolean; stepsNeeded: number } => {
+  let remainder = dividend % divisor;
+  if (remainder === 0) return { terminates: true, stepsNeeded: 0 };
+  for (let i = 1; i <= maxExtraSteps; i++) {
+    remainder = (remainder * 10) % divisor;
+    if (remainder === 0) return { terminates: true, stepsNeeded: i };
+  }
+  return { terminates: false, stepsNeeded: 0 };
+};
+
+/** Detect the cycle in the decimal expansion of dividend ÷ divisor.
+ *  Returns cycleStart (number of non-repeating extension digits) and
+ *  cycleLength, or null if the division terminates or no cycle is found
+ *  within maxSteps. */
+export const divisionCycleLength = (dividend: number, divisor: number, maxSteps: number): { cycleStart: number; cycleLength: number } | null => {
+  let remainder = dividend % divisor;
+  if (remainder === 0) return null;
+  const seen = new Map<number, number>();
+  seen.set(remainder, 0);
+  for (let i = 1; i <= maxSteps; i++) {
+    remainder = (remainder * 10) % divisor;
+    if (remainder === 0) return null;
+    if (seen.has(remainder)) {
+      const cycleStart = seen.get(remainder)!;
+      return { cycleStart, cycleLength: i - cycleStart };
+    }
+    seen.set(remainder, i);
+  }
+  return null;
+};
+
 /** Generate a division problem. */
-export const generateDivisionProblem = (rng: () => number, cfg: HissanConfig): Problem => {
+export const generateDivisionProblem = (rng: () => number, cfg: { minDigits: number; maxDigits: number; divMinDigits: number; divMaxDigits: number; divAllowRemainder: boolean }): Problem => {
   if (!cfg.divAllowRemainder) {
     // Exact mode: generate divisor and quotient, compute dividend = divisor × quotient
     for (let attempt = 0; attempt < 100; attempt++) {

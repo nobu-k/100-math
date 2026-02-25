@@ -1,15 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { mulberry32 } from "../random";
 import { generateCarryChainProblem } from "./add";
-import type { HissanConfig } from "./common";
-
-const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, divAllowRepeating: false, useDecimals: false } as const;
+import { parseConfig, buildParams, generateProblems } from "./Addition";
 
 describe("generateCarryChainProblem", () => {
   /** Check that at least 2 consecutive columns (from ones) produce a carry. */
   const verifyCarryChain = (problem: number[]) => {
     const width = Math.max(...problem.map((n) => String(n).length));
-    // Extract digits per column (right = col 0)
     const getDigit = (n: number, col: number): number => {
       return Math.floor(n / Math.pow(10, col)) % 10;
     };
@@ -32,10 +29,8 @@ describe("generateCarryChainProblem", () => {
   };
 
   it("every column in chain produces a carry (2-digit, 2 operands)", () => {
-    const cfg: HissanConfig = {
-      minDigits: 2, maxDigits: 2, numOperands: 2,
-      consecutiveCarries: true, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 2, addMaxDigits: 2,
+    const cfg = {
+      minDigits: 2, maxDigits: 2, addMinDigits: 2, addMaxDigits: 2, numOperands: 2,
     };
     const seeds = [1, 2, 3, 4, 5, 10, 20, 50, 100, 200];
     for (const seed of seeds) {
@@ -47,10 +42,8 @@ describe("generateCarryChainProblem", () => {
   });
 
   it("works with 3 operands", () => {
-    const cfg: HissanConfig = {
-      minDigits: 2, maxDigits: 3, numOperands: 3,
-      consecutiveCarries: true, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 2, addMaxDigits: 3,
+    const cfg = {
+      minDigits: 2, maxDigits: 3, addMinDigits: 2, addMaxDigits: 3, numOperands: 3,
     };
     const seeds = [1, 5, 10, 42, 99];
     for (const seed of seeds) {
@@ -60,5 +53,41 @@ describe("generateCarryChainProblem", () => {
       const chain = verifyCarryChain(problem);
       expect(chain).toBeGreaterThanOrEqual(2);
     }
+  });
+});
+
+describe("parseConfig / buildParams round-trip", () => {
+  it("recovers config for various addition configs", () => {
+    const configs = [
+      { minDigits: 1, maxDigits: 2, addMinDigits: 1, addMaxDigits: 2, numOperands: 2, consecutiveCarries: false, showGrid: true, useDecimals: false },
+      { minDigits: 2, maxDigits: 4, addMinDigits: 2, addMaxDigits: 4, numOperands: 3, consecutiveCarries: true, showGrid: false, useDecimals: false },
+      { minDigits: 1, maxDigits: 3, addMinDigits: 1, addMaxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, useDecimals: true },
+    ];
+    for (const cfg of configs) {
+      const params = buildParams(123, false, cfg);
+      const recovered = parseConfig(params);
+      expect(recovered).toEqual(cfg);
+    }
+  });
+});
+
+describe("generateProblems", () => {
+  it("returns 12 problems for integer mode", () => {
+    const cfg = { minDigits: 1, maxDigits: 2, addMinDigits: 1, addMaxDigits: 2, numOperands: 2, consecutiveCarries: false, showGrid: true, useDecimals: false };
+    const { problems } = generateProblems(42, cfg);
+    expect(problems).toHaveLength(12);
+  });
+
+  it("returns 8 problems for decimal mode", () => {
+    const cfg = { minDigits: 1, maxDigits: 2, addMinDigits: 1, addMaxDigits: 2, numOperands: 2, consecutiveCarries: false, showGrid: true, useDecimals: true };
+    const { problems } = generateProblems(42, cfg);
+    expect(problems).toHaveLength(8);
+  });
+
+  it("is deterministic for the same seed", () => {
+    const cfg = { minDigits: 1, maxDigits: 3, addMinDigits: 1, addMaxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, useDecimals: false };
+    const a = generateProblems(12345, cfg);
+    const b = generateProblems(12345, cfg);
+    expect(a).toEqual(b);
   });
 });

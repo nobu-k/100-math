@@ -1,9 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { mulberry32 } from "../random";
 import { generateSubtractionProblem, generateBorrowChainProblem } from "./sub";
-import type { HissanConfig } from "./common";
-
-const divDefaults = { divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, divAllowRepeating: false, useDecimals: false } as const;
+import { parseConfig, buildParams, generateProblems } from "./Subtraction";
 
 describe("generateBorrowChainProblem", () => {
   /** Check that at least 2 consecutive columns (from ones) require a borrow. */
@@ -35,12 +33,7 @@ describe("generateBorrowChainProblem", () => {
   };
 
   it("most seeds produce consecutive borrows from ones column", () => {
-    // Use a wider digit range so the algorithm has more room
-    const cfg: HissanConfig = {
-      minDigits: 2, maxDigits: 3, numOperands: 2,
-      consecutiveCarries: true, showGrid: true, operator: "sub",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 2, addMaxDigits: 3,
-    };
+    const cfg = { minDigits: 2, maxDigits: 3, numOperands: 2 };
     let successCount = 0;
     const total = 100;
     for (let seed = 1; seed <= total; seed++) {
@@ -51,16 +44,11 @@ describe("generateBorrowChainProblem", () => {
       const chain = verifyBorrowChain(problem);
       if (chain >= 2) successCount++;
     }
-    // The algorithm should succeed for a good fraction of seeds
     expect(successCount).toBeGreaterThan(0);
   });
 
   it("result is non-negative across many seeds", () => {
-    const cfg: HissanConfig = {
-      minDigits: 1, maxDigits: 3, numOperands: 2,
-      consecutiveCarries: true, showGrid: true, operator: "sub",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 3,
-    };
+    const cfg = { minDigits: 1, maxDigits: 3, numOperands: 2 };
     for (let seed = 0; seed < 50; seed++) {
       const rng = mulberry32(seed);
       const problem = generateBorrowChainProblem(rng, cfg);
@@ -71,15 +59,53 @@ describe("generateBorrowChainProblem", () => {
 
 describe("generateSubtractionProblem", () => {
   it("result is non-negative across many seeds", () => {
-    const cfg: HissanConfig = {
-      minDigits: 1, maxDigits: 3, numOperands: 2,
-      consecutiveCarries: false, showGrid: true, operator: "sub",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 3,
-    };
+    const cfg = { minDigits: 1, maxDigits: 3, numOperands: 2 };
     for (let seed = 0; seed < 50; seed++) {
       const rng = mulberry32(seed);
       const problem = generateSubtractionProblem(rng, cfg);
       expect(problem[0] - problem[1]).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+describe("parseConfig / buildParams round-trip", () => {
+  it("recovers config for various subtraction configs", () => {
+    const configs = [
+      { minDigits: 1, maxDigits: 3, consecutiveCarries: true, showGrid: true, useDecimals: false },
+      { minDigits: 1, maxDigits: 3, consecutiveCarries: false, showGrid: true, useDecimals: true },
+      { minDigits: 2, maxDigits: 4, consecutiveCarries: false, showGrid: false, useDecimals: false },
+    ];
+    for (const cfg of configs) {
+      const params = buildParams(123, false, cfg);
+      const recovered = parseConfig(params);
+      expect(recovered).toEqual(cfg);
+    }
+  });
+});
+
+describe("generateProblems", () => {
+  it("returns 12 problems for integer mode", () => {
+    const cfg = { minDigits: 1, maxDigits: 2, consecutiveCarries: false, showGrid: true, useDecimals: false };
+    const { problems } = generateProblems(42, cfg);
+    expect(problems).toHaveLength(12);
+  });
+
+  it("returns 8 problems for decimal mode", () => {
+    const cfg = { minDigits: 1, maxDigits: 3, consecutiveCarries: false, showGrid: true, useDecimals: true };
+    const { problems, decimalPlaces } = generateProblems(42, cfg);
+    expect(problems).toHaveLength(8);
+    expect(decimalPlaces).toHaveLength(8);
+  });
+
+  it("decimal sub answer is non-negative across many seeds", () => {
+    const cfg = { minDigits: 1, maxDigits: 3, consecutiveCarries: false, showGrid: true, useDecimals: true };
+    for (let seed = 0; seed < 50; seed++) {
+      const { problems, decimalPlaces } = generateProblems(seed, cfg);
+      for (let i = 0; i < problems.length; i++) {
+        const maxDP = Math.max(...decimalPlaces[i]);
+        const aligned = problems[i].map((op, j) => op * Math.pow(10, maxDP - decimalPlaces[i][j]));
+        expect(aligned[0] - aligned[1]).toBeGreaterThanOrEqual(0);
+      }
     }
   });
 });
