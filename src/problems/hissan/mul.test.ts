@@ -66,7 +66,7 @@ describe("generateMultiplicationProblem", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "mul",
-      mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults, addMinDigits: 2, addMaxDigits: 3,
     };
     for (let seed = 0; seed < 50; seed++) {
       const rng = mulberry32(seed);

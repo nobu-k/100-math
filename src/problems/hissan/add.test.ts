@@ -35,7 +35,7 @@ describe("generateCarryChainProblem", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 2, numOperands: 2,
       consecutiveCarries: true, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 2, addMaxDigits: 2,
     };
     const seeds = [1, 2, 3, 4, 5, 10, 20, 50, 100, 200];
     for (const seed of seeds) {
@@ -50,7 +50,7 @@ describe("generateCarryChainProblem", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 3,
       consecutiveCarries: true, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 2, addMaxDigits: 3,
     };
     const seeds = [1, 5, 10, 42, 99];
     for (const seed of seeds) {

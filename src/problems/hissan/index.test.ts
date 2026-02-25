@@ -20,7 +20,7 @@ describe("getProblemCount", () => {
     const addCfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 2,
     };
     expect(getProblemCount(addCfg)).toBe(12);
 
@@ -34,7 +34,7 @@ describe("getProblemCount", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "mul",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 2, addMaxDigits: 3,
     };
     expect(getProblemCount(cfg)).toBe(12);
   });
@@ -43,7 +43,7 @@ describe("getProblemCount", () => {
     const cfg2: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "mul",
-      mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults, addMinDigits: 2, addMaxDigits: 3,
     };
     expect(getProblemCount(cfg2)).toBe(6);
 
@@ -59,7 +59,7 @@ describe("getProblemCount", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
-      divAllowRepeating: false, useDecimals: false,
+      divAllowRepeating: false, useDecimals: false, addMinDigits: 1, addMaxDigits: 4,
     };
     expect(getProblemCount(cfg)).toBe(6);
   });
@@ -68,7 +68,7 @@ describe("getProblemCount", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true, addMinDigits: 1, addMaxDigits: 2,
     };
     expect(getProblemCount(cfg)).toBe(8);
   });
@@ -81,7 +81,7 @@ describe("generateProblem (addition)", () => {
   const cfg: HissanConfig = {
     minDigits: 1, maxDigits: 2, numOperands: 3,
     consecutiveCarries: false, showGrid: true, operator: "add",
-    mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+    mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 2,
   };
 
   it("returns correct operand count", () => {
@@ -110,7 +110,7 @@ describe("generateProblem (subtraction)", () => {
   const cfg: HissanConfig = {
     minDigits: 1, maxDigits: 2, numOperands: 2,
     consecutiveCarries: false, showGrid: true, operator: "sub",
-    mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+    mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 2,
   };
 
   it("returns 2 operands", () => {
@@ -149,7 +149,7 @@ describe("generateProblems", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 2,
     };
     const { problems } = generateProblems(42, cfg);
     expect(problems).toHaveLength(12);
@@ -159,7 +159,7 @@ describe("generateProblems", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 3,
     };
     const a = generateProblems(12345, cfg);
     const b = generateProblems(12345, cfg);
@@ -175,7 +175,7 @@ describe("generateProblems (mul)", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "mul",
-      mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults, addMinDigits: 2, addMaxDigits: 3,
     };
     const { problems } = generateProblems(42, cfg);
     expect(problems).toHaveLength(6);
@@ -185,7 +185,7 @@ describe("generateProblems (mul)", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "mul",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 2, addMaxDigits: 3,
     };
     const { problems } = generateProblems(42, cfg);
     expect(problems).toHaveLength(12);
@@ -202,7 +202,7 @@ describe("generateProblems (div)", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
-      divAllowRepeating: false, useDecimals: false,
+      divAllowRepeating: false, useDecimals: false, addMinDigits: 1, addMaxDigits: 4,
     };
     const { problems } = generateProblems(42, cfg);
     expect(problems).toHaveLength(6);
@@ -214,7 +214,7 @@ describe("generateProblems (decimal)", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true, addMinDigits: 1, addMaxDigits: 3,
     };
     const { problems, decimalPlaces } = generateProblems(42, cfg);
     expect(problems).toHaveLength(8);
@@ -235,7 +235,7 @@ describe("generateProblems (decimal)", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "sub",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true, addMinDigits: 1, addMaxDigits: 3,
     };
     const { problems, decimalPlaces } = generateProblems(42, cfg);
     expect(problems).toHaveLength(8);
@@ -259,7 +259,7 @@ describe("generateProblems (decimal)", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "sub",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true, addMinDigits: 1, addMaxDigits: 3,
     };
     for (let seed = 0; seed < 50; seed++) {
       const { problems, decimalPlaces } = generateProblems(seed, cfg);
@@ -277,7 +277,7 @@ describe("generateProblems (decimal)", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
-      divAllowRepeating: false, useDecimals: true,
+      divAllowRepeating: false, useDecimals: true, addMinDigits: 1, addMaxDigits: 4,
     };
     for (let seed = 0; seed < 20; seed++) {
       const { problems, decimalPlaces, divExtra } = generateProblems(seed, cfg);
@@ -311,7 +311,7 @@ describe("generateProblems (decimal)", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 2,
     };
     const { decimalPlaces } = generateProblems(42, cfg);
     for (const dps of decimalPlaces) {
@@ -393,7 +393,7 @@ describe("decimal div column width constraint", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: false,
-      divAllowRepeating: false, useDecimals: true,
+      divAllowRepeating: false, useDecimals: true, addMinDigits: 1, addMaxDigits: 4,
     };
     for (let seed = 0; seed < 50; seed++) {
       const { problems, decimalPlaces, divExtra } = generateProblems(seed, cfg);
@@ -427,7 +427,7 @@ describe("decimal div column width constraint", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false,
-      divAllowRepeating: false, useDecimals: true,
+      divAllowRepeating: false, useDecimals: true, addMinDigits: 1, addMaxDigits: 4,
     };
     for (let seed = 0; seed < 100; seed++) {
       const { problems, decimalPlaces } = generateProblems(seed, cfg);

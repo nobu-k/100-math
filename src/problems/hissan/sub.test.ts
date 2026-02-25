@@ -39,7 +39,7 @@ describe("generateBorrowChainProblem", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: true, showGrid: true, operator: "sub",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 2, addMaxDigits: 3,
     };
     let successCount = 0;
     const total = 100;
@@ -59,7 +59,7 @@ describe("generateBorrowChainProblem", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 3, numOperands: 2,
       consecutiveCarries: true, showGrid: true, operator: "sub",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 3,
     };
     for (let seed = 0; seed < 50; seed++) {
       const rng = mulberry32(seed);
@@ -74,7 +74,7 @@ describe("generateSubtractionProblem", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "sub",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 3,
     };
     for (let seed = 0; seed < 50; seed++) {
       const rng = mulberry32(seed);

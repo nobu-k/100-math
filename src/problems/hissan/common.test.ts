@@ -31,6 +31,8 @@ describe("parseConfig", () => {
       mulMinDigits: 1,
       mulMaxDigits: 1,
       ...divDefaults,
+      addMinDigits: 1,
+      addMaxDigits: 2,
     });
   });
 
@@ -47,6 +49,8 @@ describe("parseConfig", () => {
       mulMinDigits: 1,
       mulMaxDigits: 1,
       ...divDefaults,
+      addMinDigits: 2,
+      addMaxDigits: 3,
     });
   });
 
@@ -181,7 +185,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true, addMinDigits: 1, addMaxDigits: 2,
     };
     const params = buildParams(42, false, cfg);
     expect(params.get("dec")).toBe("1");
@@ -191,7 +195,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 2,
     };
     const params = buildParams(42, false, cfg);
     expect(params.has("dec")).toBe(false);
@@ -201,7 +205,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 3,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 2,
     };
     const params = buildParams(42, false, cfg);
     expect(params.get("ops")).toBe("3");
@@ -212,7 +216,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "sub",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 2,
     };
     const params = buildParams(42, false, cfg);
     expect(params.has("ops")).toBe(false);
@@ -222,7 +226,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 2,
     };
     const params = buildParams(42, true, cfg);
     expect(params.get("answers")).toBe("1");
@@ -232,7 +236,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: true, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 2,
     };
     const params = buildParams(42, false, cfg);
     expect(params.get("cc")).toBe("1");
@@ -242,7 +246,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 2,
     };
     const params = buildParams(42, false, cfg);
     expect(params.has("cc")).toBe(false);
@@ -252,7 +256,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: false, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 2,
     };
     const params = buildParams(42, false, cfg);
     expect(params.get("grid")).toBe("0");
@@ -262,7 +266,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 1, maxDigits: 2, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "add",
-      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 2,
     };
     const params = buildParams(42, false, cfg);
     expect(params.has("grid")).toBe(false);
@@ -272,7 +276,7 @@ describe("buildParams", () => {
     const cfg: HissanConfig = {
       minDigits: 2, maxDigits: 3, numOperands: 2,
       consecutiveCarries: false, showGrid: true, operator: "mul",
-      mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults,
+      mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults, addMinDigits: 2, addMaxDigits: 3,
     };
     const params = buildParams(42, false, cfg);
     expect(params.get("mmin")).toBe("1");
@@ -286,7 +290,7 @@ describe("buildParams", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: true, divAllowRepeating: false,
-      useDecimals: false,
+      useDecimals: false, addMinDigits: 1, addMaxDigits: 4,
     };
     const params = buildParams(42, false, cfg);
     expect(params.get("dmin")).toBe("1");
@@ -301,7 +305,7 @@ describe("buildParams", () => {
       consecutiveCarries: false, showGrid: true, operator: "div",
       mulMinDigits: 1, mulMaxDigits: 1,
       divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, divAllowRepeating: false,
-      useDecimals: false,
+      useDecimals: false, addMinDigits: 1, addMaxDigits: 4,
     };
     const params = buildParams(42, false, cfg);
     expect(params.has("dr")).toBe(false);
@@ -309,16 +313,16 @@ describe("buildParams", () => {
 
   it("round-trips: parseConfig(buildParams(...), operator) recovers config", () => {
     const configs: HissanConfig[] = [
-      { minDigits: 1, maxDigits: 2, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "add", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults },
-      { minDigits: 2, maxDigits: 4, numOperands: 3, consecutiveCarries: true, showGrid: false, operator: "add", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults },
-      { minDigits: 1, maxDigits: 3, numOperands: 2, consecutiveCarries: true, showGrid: true, operator: "sub", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults },
-      { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "mul", mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults },
-      { minDigits: 1, maxDigits: 2, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "mul", mulMinDigits: 2, mulMaxDigits: 3, ...divDefaults },
-      { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, divAllowRepeating: false, useDecimals: false },
-      { minDigits: 3, maxDigits: 4, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: true, divAllowRepeating: false, useDecimals: false },
-      { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: false, divAllowRepeating: true, useDecimals: true },
-      { minDigits: 1, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "add", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true },
-      { minDigits: 1, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "sub", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true },
+      { minDigits: 1, maxDigits: 2, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "add", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 2 },
+      { minDigits: 2, maxDigits: 4, numOperands: 3, consecutiveCarries: true, showGrid: false, operator: "add", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 2, addMaxDigits: 4 },
+      { minDigits: 1, maxDigits: 3, numOperands: 2, consecutiveCarries: true, showGrid: true, operator: "sub", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 3 },
+      { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "mul", mulMinDigits: 1, mulMaxDigits: 2, ...divDefaults, addMinDigits: 2, addMaxDigits: 3 },
+      { minDigits: 1, maxDigits: 2, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "mul", mulMinDigits: 2, mulMaxDigits: 3, ...divDefaults, addMinDigits: 1, addMaxDigits: 2 },
+      { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 1, divAllowRemainder: false, divAllowRepeating: false, useDecimals: false, addMinDigits: 2, addMaxDigits: 3 },
+      { minDigits: 3, maxDigits: 4, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: true, divAllowRepeating: false, useDecimals: false, addMinDigits: 3, addMaxDigits: 4 },
+      { minDigits: 2, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "div", mulMinDigits: 1, mulMaxDigits: 1, divMinDigits: 1, divMaxDigits: 2, divAllowRemainder: false, divAllowRepeating: true, useDecimals: true, addMinDigits: 2, addMaxDigits: 3 },
+      { minDigits: 1, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "add", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, useDecimals: true, addMinDigits: 1, addMaxDigits: 3 },
+      { minDigits: 1, maxDigits: 3, numOperands: 2, consecutiveCarries: false, showGrid: true, operator: "sub", mulMinDigits: 1, mulMaxDigits: 1, ...divDefaults, addMinDigits: 1, addMaxDigits: 3, useDecimals: true },
     ];
     for (const cfg of configs) {
       const params = buildParams(123, false, cfg);

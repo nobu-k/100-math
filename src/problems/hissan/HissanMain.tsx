@@ -21,7 +21,7 @@ const operatorFromPath = (path: string): HissanOperator => {
   return "add";
 };
 
-const PARAM_KEYS = ["q", "answers", "min", "max", "ops", "cc", "grid", "mmin", "mmax", "dmin", "dmax", "dr", "dre", "dec"];
+const PARAM_KEYS = ["q", "answers", "min", "max", "amin", "amax", "ops", "cc", "grid", "mmin", "mmax", "dmin", "dmax", "dr", "dre", "dec"];
 
 const updateUrl = (seed: number, showAnswers: boolean, cfg: HissanConfig) => {
   const url = new URL(window.location.href);
@@ -103,6 +103,10 @@ export const Hissan = ({ operator: operatorPath }: { operator: string }) => {
           next.maxDigits = next.minDigits;
         if (field === "maxDigits" && next.maxDigits < next.minDigits)
           next.minDigits = next.maxDigits;
+        if (field === "addMinDigits" && next.addMinDigits > next.addMaxDigits)
+          next.addMaxDigits = next.addMinDigits;
+        if (field === "addMaxDigits" && next.addMaxDigits < next.addMinDigits)
+          next.addMinDigits = next.addMaxDigits;
         if (field === "mulMinDigits" && next.mulMinDigits > next.mulMaxDigits)
           next.mulMaxDigits = next.mulMinDigits;
         if (field === "mulMaxDigits" && next.mulMaxDigits < next.mulMinDigits)
@@ -155,7 +159,7 @@ export const Hissan = ({ operator: operatorPath }: { operator: string }) => {
       {showSettings && (
         <div className="no-print settings-panel">
           <label>
-            {cfg.operator === "mul" ? "かけられる数" : cfg.operator === "div" ? "割られる数" : "桁数"} 最小{" "}
+            {cfg.operator === "mul" ? "かけられる数" : cfg.operator === "div" ? "割られる数" : cfg.operator === "add" ? "被加数" : "桁数"} 最小{" "}
             <select className="operator-select" value={cfg.minDigits} onChange={handleConfigChange("minDigits")}>
               {(cfg.operator === "mul" ? [1, 2, 3] : cfg.operator === "div" ? [2, 3, 4] : [1, 2, 3, 4]).map((d) => <option key={d} value={d}>{d} 桁</option>)}
             </select>
@@ -166,6 +170,22 @@ export const Hissan = ({ operator: operatorPath }: { operator: string }) => {
               {(cfg.operator === "mul" ? [1, 2, 3] : cfg.operator === "div" ? [2, 3, 4] : [1, 2, 3, 4]).map((d) => <option key={d} value={d}>{d} 桁</option>)}
             </select>
           </label>
+          {cfg.operator === "add" && (
+            <>
+              <label>
+                加数 最小{" "}
+                <select className="operator-select" value={cfg.addMinDigits} onChange={handleConfigChange("addMinDigits")}>
+                  {[1, 2, 3, 4].map((d) => <option key={d} value={d}>{d} 桁</option>)}
+                </select>
+              </label>
+              <label>
+                最大{" "}
+                <select className="operator-select" value={cfg.addMaxDigits} onChange={handleConfigChange("addMaxDigits")}>
+                  {[1, 2, 3, 4].map((d) => <option key={d} value={d}>{d} 桁</option>)}
+                </select>
+              </label>
+            </>
+          )}
           {cfg.operator === "mul" && (
             <>
               <label>
@@ -269,7 +289,7 @@ export const Hissan = ({ operator: operatorPath }: { operator: string }) => {
               index={i}
               problem={problem}
               showAnswers={showAnswers}
-              maxDigits={cfg.maxDigits}
+              maxDigits={Math.max(cfg.maxDigits, cfg.addMaxDigits)}
               operator={cfg.operator}
               dps={decimalPlaces[i]}
             />

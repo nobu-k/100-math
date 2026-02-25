@@ -11,9 +11,11 @@ export const generateCarryChainProblem = (rng: () => number, cfg: HissanConfig):
 
   for (let attempt = 0; attempt < 100; attempt++) {
     // Choose digit count for each operand independently
-    const opWidths = Array.from({ length: numOps }, () =>
-      cfg.minDigits + Math.floor(rng() * (cfg.maxDigits - cfg.minDigits + 1)),
-    );
+    const opWidths = Array.from({ length: numOps }, (_, i) => {
+      const min = i === 0 ? cfg.minDigits : cfg.addMinDigits;
+      const max = i === 0 ? cfg.maxDigits : cfg.addMaxDigits;
+      return min + Math.floor(rng() * (max - min + 1));
+    });
     const width = Math.max(...opWidths);
     // Carry chain spans 2..width columns from ones (or 1 if width=1)
     const minChain = Math.min(2, width);
@@ -62,7 +64,7 @@ export const generateCarryChainProblem = (rng: () => number, cfg: HissanConfig):
   }
 
   // Fallback (should rarely happen)
-  return Array.from({ length: numOps }, () =>
-    generateNumber(rng, cfg.minDigits, cfg.maxDigits),
+  return Array.from({ length: numOps }, (_, i) =>
+    generateNumber(rng, i === 0 ? cfg.minDigits : cfg.addMinDigits, i === 0 ? cfg.maxDigits : cfg.addMaxDigits),
   );
 };

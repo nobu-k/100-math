@@ -6,6 +6,8 @@ export type HissanOperator = "add" | "sub" | "mul" | "div";
 export interface HissanConfig {
   minDigits: number;
   maxDigits: number;
+  addMinDigits: number;
+  addMaxDigits: number;
   numOperands: number;
   consecutiveCarries: boolean;
   showGrid: boolean;
@@ -175,6 +177,11 @@ export const parseConfig = (params: URLSearchParams, operator: HissanOperator): 
   if (!(maxDigits >= 1 && maxDigits <= 4)) maxDigits = 2;
   if (minDigits > maxDigits) maxDigits = minDigits;
   if (!(numOperands >= 2 && numOperands <= 3)) numOperands = 2;
+  let addMinDigits = parseInt(params.get("amin") || "", 10);
+  let addMaxDigits = parseInt(params.get("amax") || "", 10);
+  if (!(addMinDigits >= 1 && addMinDigits <= 4)) addMinDigits = minDigits;
+  if (!(addMaxDigits >= 1 && addMaxDigits <= 4)) addMaxDigits = maxDigits;
+  if (addMinDigits > addMaxDigits) addMaxDigits = addMinDigits;
   const consecutiveCarries = params.get("cc") === "1";
   const showGrid = params.get("grid") !== "0";
 
@@ -205,7 +212,7 @@ export const parseConfig = (params: URLSearchParams, operator: HissanOperator): 
     if (maxDigits < minDigits) maxDigits = minDigits;
   }
 
-  return { minDigits, maxDigits, numOperands, consecutiveCarries, showGrid, operator, mulMinDigits, mulMaxDigits, divMinDigits, divMaxDigits, divAllowRemainder, divAllowRepeating, useDecimals };
+  return { minDigits, maxDigits, addMinDigits, addMaxDigits, numOperands, consecutiveCarries, showGrid, operator, mulMinDigits, mulMaxDigits, divMinDigits, divMaxDigits, divAllowRemainder, divAllowRepeating, useDecimals };
 };
 
 export const buildParams = (seed: number, showAnswers: boolean, cfg: HissanConfig): URLSearchParams => {
@@ -218,6 +225,8 @@ export const buildParams = (seed: number, showAnswers: boolean, cfg: HissanConfi
   params.set("max", String(cfg.maxDigits));
   if (cfg.operator === "add") {
     params.set("ops", String(cfg.numOperands));
+    params.set("amin", String(cfg.addMinDigits));
+    params.set("amax", String(cfg.addMaxDigits));
   }
   if (cfg.consecutiveCarries) {
     params.set("cc", "1");

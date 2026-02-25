@@ -27,8 +27,8 @@ export const generateProblem = (rng: () => number, cfg: HissanConfig): Problem =
     return generateSubtractionProblem(rng, cfg);
   }
   if (cfg.consecutiveCarries) return generateCarryChainProblem(rng, cfg);
-  return Array.from({ length: cfg.numOperands }, () =>
-    generateNumber(rng, cfg.minDigits, cfg.maxDigits),
+  return Array.from({ length: cfg.numOperands }, (_, i) =>
+    generateNumber(rng, i === 0 ? cfg.minDigits : cfg.addMinDigits, i === 0 ? cfg.maxDigits : cfg.addMaxDigits),
   );
 };
 
