@@ -170,6 +170,7 @@ export const Hissan = ({ operator: operatorPath }: { operator: string }) => {
               {(cfg.operator === "mul" ? [1, 2, 3] : cfg.operator === "div" ? [2, 3, 4] : [1, 2, 3, 4]).map((d) => <option key={d} value={d}>{d} 桁</option>)}
             </select>
           </label>
+          {cfg.operator === "add" && <div style={{ flexBasis: "100%" }} />}
           {cfg.operator === "add" && (
             <>
               <label>
