@@ -4,9 +4,9 @@ import { generateScale } from "./scale";
 const seeds = [1, 2, 42, 100, 999];
 
 describe("generateScale", () => {
-  it("returns 10 problems", () => {
+  it("returns 8 problems", () => {
     const problems = generateScale(42);
-    expect(problems).toHaveLength(10);
+    expect(problems).toHaveLength(8);
   });
 
   it("is deterministic with the same seed", () => {

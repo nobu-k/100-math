@@ -1297,6 +1297,8 @@
 @media print {
   .g1-page {
     justify-content: center;
+    padding: 0 2mm;
+    gap: 14px 12px;
   }
 
   .g1-val {
@@ -1485,9 +1487,15 @@
 
   .dev-fig-page {
     gap: 4px 12px;
+    padding-left: 2mm;
   }
 
   .dev-prop-block svg {
+    height: auto;
+  }
+
+  .line-chart {
+    width: 300px;
     height: auto;
   }
 
@@ -1548,7 +1556,7 @@
 
 @media print {
   .g1-problem .katex {
-    font-size: 24px;
+    font-size: 20px;
     white-space: nowrap;
   }
 

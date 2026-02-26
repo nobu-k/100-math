@@ -41,6 +41,8 @@ const LineGraph = () => {
                 ({idx + 1}) {p.title}
               </div>
               <svg
+                className="line-chart"
+                viewBox={`0 0 ${graphWidth + padding * 2} ${graphHeight + padding * 2}`}
                 width={graphWidth + padding * 2}
                 height={graphHeight + padding * 2}
                 style={{ display: "block", margin: "8px 0" }}

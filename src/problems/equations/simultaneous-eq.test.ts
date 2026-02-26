@@ -4,9 +4,9 @@ import { generateSimEq } from "./simultaneous-eq";
 const seeds = [1, 2, 42, 100, 999];
 
 describe("generateSimEq", () => {
-  it("returns 12 problems", () => {
+  it("returns 8 problems", () => {
     const problems = generateSimEq(42, "mixed");
-    expect(problems).toHaveLength(12);
+    expect(problems).toHaveLength(8);
   });
 
   it("is deterministic with the same seed", () => {

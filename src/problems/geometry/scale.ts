@@ -7,7 +7,7 @@ export const generateScale = (seed: number): TextProblem[] => {
 
   const scales = [1000, 2000, 5000, 10000, 25000, 50000];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 8; i++) {
     const scale = scales[Math.floor(rng() * scales.length)];
 
     if (rng() < 0.5) {

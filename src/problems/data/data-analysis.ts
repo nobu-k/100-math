@@ -41,8 +41,7 @@ export const generateDataAnalysis = (
   const rng = mulberry32(seed);
   const problems: DataAnalysisProblem[] = [];
 
-  const count =
-    mode === "mixed" ? 8 : mode === "representative" ? 8 : 6;
+  const count = 6;
 
   for (let i = 0; i < count; i++) {
     const pick =
