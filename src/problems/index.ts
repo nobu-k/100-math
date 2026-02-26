@@ -5,6 +5,7 @@ export { integer } from "./Integer";
 export { computation } from "./Computation";
 export { numbers } from "./Numbers";
 export { fractions } from "./Fractions";
+export { decimals } from "./Decimals";
 export { equations } from "./Equations";
 export { geometry } from "./Geometry";
 export { measurement } from "./Measurement";
@@ -17,6 +18,7 @@ import { integer } from "./Integer";
 import { computation } from "./Computation";
 import { numbers } from "./Numbers";
 import { fractions } from "./Fractions";
+import { decimals } from "./Decimals";
 import { equations } from "./Equations";
 import { geometry } from "./Geometry";
 import { measurement } from "./Measurement";
@@ -26,6 +28,6 @@ import type { ProblemGroup } from "./types";
 
 export const problemGroups: ProblemGroup[] = [
   grid100, hissan, integer,
-  computation, numbers, fractions, equations,
+  computation, numbers, fractions, decimals, equations,
   geometry, measurement, relations, data,
 ];
