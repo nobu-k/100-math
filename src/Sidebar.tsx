@@ -24,7 +24,7 @@ const GRADE_LABELS: Record<number, string> = {
 const CATEGORY_LABELS: [string, string][] = [
   ["computation", "計算"],
   ["numbers", "数の性質"],
-  ["fractions", "分数・小数"],
+  ["fractions", "分数"],
   ["equations", "式・方程式"],
   ["geometry", "図形"],
   ["measurement", "測定"],
