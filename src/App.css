@@ -1490,6 +1490,11 @@
     padding-left: 2mm;
   }
 
+  .print-spread {
+    min-height: 250mm;
+    align-content: space-between;
+  }
+
   .dev-prop-block svg {
     height: auto;
   }

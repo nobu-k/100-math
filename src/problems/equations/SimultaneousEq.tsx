@@ -65,7 +65,7 @@ const SimultaneousEq = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="dev-fig-page">
+      <div className="dev-fig-page print-spread">
         {problems.map((p, i) => (
           <div key={i} className="dev-prop-block">
             <div className="dev-prop-label">({i + 1})</div>
