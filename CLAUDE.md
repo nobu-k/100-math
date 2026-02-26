@@ -46,7 +46,7 @@ Students need blank space between and around problems to write answers and show 
 - Problems requiring multi-step work (e.g., simultaneous equations, data analysis): 6–8 problems max. Use a 2-column layout and the `print-spread` class to distribute rows evenly across the full page height.
 - Graph/chart problems with sub-questions: 2–3 graphs per page. Scale down SVGs for print to leave room for answers near each question.
 
-**The `print-spread` class:** Add `print-spread` to any grid container where problems are sparse relative to the page. It sets `min-height: 250mm` (the printable A4 height minus title area) and `align-content: space-between` to distribute grid rows evenly from top to bottom. This ensures that the vertical space between problems grows to fill the page, giving students room to show their work.
+**The `print-spread` class:** Add `print-spread` to any grid container where problems are sparse relative to the page. It sets `min-height: 220mm` (the printable A4 height minus title area) and `align-content: space-between` to distribute grid rows evenly from top to bottom. This ensures that the vertical space between problems grows to fill the page, giving students room to show their work.
 
 ```html
 <div className="dev-fig-page print-spread">
