@@ -5,6 +5,7 @@ export type SeqMode = "arithmetic" | "geometric" | "sigma" | "mixed";
 export interface SeqProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateArithGeoSeq = (
@@ -58,7 +59,7 @@ const generateArithmetic = (rng: () => number): SeqProblem | null => {
     const an = a1 + (n - 1) * d;
     const expr = `初項 ${fmt(a1)}，公差 ${fmt(d)} の等差数列の第 ${n} 項`;
     const answerExpr = `a${subscript(n)} = ${fmt(a1)} + ${n - 1} × ${fmt(d)} = ${fmt(an)}`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   if (variant === 1) {
@@ -70,7 +71,7 @@ const generateArithmetic = (rng: () => number): SeqProblem | null => {
     const sn = n * (a1 + an) / 2;
     const expr = `初項 ${fmt(a1)}，公差 ${fmt(d)} の等差数列の初項から第 ${n} 項までの和`;
     const answerExpr = `S${subscript(n)} = ${n}(${fmt(a1)} + ${fmt(an)})/2 = ${fmt(sn)}`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   // Find a₁ and d from two terms
@@ -83,7 +84,7 @@ const generateArithmetic = (rng: () => number): SeqProblem | null => {
   const v2 = a1 + (n2 - 1) * d;
   const expr = `等差数列で a${subscript(n1)} = ${fmt(v1)}, a${subscript(n2)} = ${fmt(v2)} のとき，初項 a₁ と公差 d`;
   const answerExpr = `d = ${fmt(d)}, a₁ = ${fmt(a1)}`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateGeometric = (rng: () => number): SeqProblem | null => {
@@ -104,7 +105,7 @@ const generateGeometric = (rng: () => number): SeqProblem | null => {
 
     const expr = `初項 ${a1}，公比 ${rStr} の等比数列の第 ${n} 項`;
     const answerExpr = `a${subscript(n)} = ${anStr}`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   if (variant === 1) {
@@ -119,7 +120,7 @@ const generateGeometric = (rng: () => number): SeqProblem | null => {
 
     const expr = `初項 ${a1}，公比 ${fmt(r)} の等比数列の初項から第 ${n} 項までの和`;
     const answerExpr = `S${subscript(n)} = ${fmt(sn)}`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   // Find a₁ and r from two terms
@@ -133,7 +134,7 @@ const generateGeometric = (rng: () => number): SeqProblem | null => {
 
   const expr = `等比数列で a₁ = ${fmt(v1)}, a${subscript(n2)} = ${fmt(v2)} のとき，公比 r`;
   const answerExpr = `r = ${fmt(r)}`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateSigma = (rng: () => number): SeqProblem | null => {

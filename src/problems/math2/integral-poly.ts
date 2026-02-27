@@ -6,6 +6,7 @@ export type IntegralPolyMode = "indefinite" | "definite" | "area" | "mixed";
 export interface IntegralPolyProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateIntegralPoly = (
@@ -161,6 +162,7 @@ const generateArea = (rng: () => number): IntegralPolyProblem | null => {
   const integral = polyEval(antideriv, r2) - polyEval(antideriv, r1);
   const area = Math.abs(integral);
 
+  const isNL = true;
   const expr = `y = ${formatPoly(coeffs)} と x 軸で囲まれた面積`;
 
   let answerExpr: string;
@@ -172,13 +174,13 @@ const generateArea = (rng: () => number): IntegralPolyProblem | null => {
       if (Math.abs(n / d - area) < 0.0001) {
         const g = gcd(n, d);
         answerExpr = `${n / g}/${d / g}`;
-        return { expr, answerExpr };
+        return { expr, answerExpr, isNL };
       }
     }
     answerExpr = `${Math.round(area * 100) / 100}`;
   }
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL };
 };
 
 const appendTermStr = (parts: string[], coeff: number, v: string) => {

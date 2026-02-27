@@ -5,6 +5,7 @@ export type ComplexPlaneMode = "polar" | "de-moivre" | "roots" | "mixed";
 export interface ComplexPlaneProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateComplexPlane = (
@@ -68,7 +69,7 @@ const generatePolar = (rng: () => number): ComplexPlaneProblem | null => {
     const [a, b, rStr, thetaStr] = cases[Math.floor(rng() * cases.length)];
     const expr = `${fmtComplex(a, b)} を極形式で表せ`;
     const answerExpr = `${rStr}(cos ${thetaStr} + i sin ${thetaStr})`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   // Multiply in polar form
@@ -108,7 +109,7 @@ const generateRoots = (rng: () => number): ComplexPlaneProblem | null => {
     }
   }
   const answerExpr = roots.join("，");
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const fmtComplex = (re: number, im: number): string => {

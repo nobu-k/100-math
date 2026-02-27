@@ -5,6 +5,7 @@ export type LogCalcMode = "convert" | "properties" | "equations" | "mixed";
 export interface LogCalcProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateLogCalc = (
@@ -57,7 +58,7 @@ const generateConvert = (rng: () => number): LogCalcProblem | null => {
     // Exponential → logarithmic
     const expr = `${base}${superscript(exp)} = ${value} を対数で表せ`;
     const answerExpr = `log${subscript(base)} ${value} = ${exp}`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
   // Evaluate logarithm
   const expr = `log${subscript(base)} ${value}`;
@@ -130,7 +131,7 @@ const generateEquations = (rng: () => number): LogCalcProblem | null => {
     const answer = Math.pow(base, b);
     const expr = `log${subscript(base)} x = ${b} を解け`;
     const answerExpr = `x = ${answer}`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   // Solve a^x = b where b = a^k
@@ -140,7 +141,7 @@ const generateEquations = (rng: () => number): LogCalcProblem | null => {
   const b = Math.pow(base, k);
   const expr = `${base}ˣ = ${b} を解け`;
   const answerExpr = `x = ${k}`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const superscript = (n: number): string => {

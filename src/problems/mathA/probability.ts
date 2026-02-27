@@ -7,6 +7,7 @@ export type ProbabilityMode = "basic" | "complement" | "conditional" | "expected
 export interface ProbabilityProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateProbability = (
@@ -65,7 +66,7 @@ const generateBasic = (rng: () => number): ProbabilityProblem | null => {
   const expr = `袋の中に赤玉 ${red} 個，青玉 ${blue} 個がある。${draw} 個同時に取り出すとき，${draw} 個とも赤玉である確率`;
   const answerExpr = `${red}C${draw}/${total}C${draw} = ${num / g}/${den / g}`;
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateComplement = (rng: () => number): ProbabilityProblem | null => {
@@ -85,7 +86,7 @@ const generateComplement = (rng: () => number): ProbabilityProblem | null => {
   const expr = `袋の中に赤玉 ${red} 個，青玉 ${blue} 個がある。${draw} 個同時に取り出すとき，少なくとも 1 個は赤玉である確率`;
   const answerExpr = `1 − ${noneRed / gcd(noneRed, allWays)}/${allWays / gcd(noneRed, allWays)} = ${num / g}/${allWays / g}`;
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateConditional = (rng: () => number): ProbabilityProblem | null => {
@@ -101,7 +102,7 @@ const generateConditional = (rng: () => number): ProbabilityProblem | null => {
   const expr = `2 つのさいころを投げるとき，1 つ目が ${firstDie} であるとき，合計が ${targetSum} になる確率`;
   const answerExpr = favorable === 0 ? "0" : "1/6";
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateExpectedValue = (rng: () => number): ProbabilityProblem | null => {
@@ -115,5 +116,5 @@ const generateExpectedValue = (rng: () => number): ProbabilityProblem | null => 
   const expr = `コインを ${n} 回投げ，表が出た回数 × ${reward * 100} 円もらえるとき，もらえる金額の期待値`;
   const answerExpr = `E(X) = ${n} × 1/2 × ${reward * 100} = ${expected} 円`;
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };

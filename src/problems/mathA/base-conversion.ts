@@ -5,6 +5,7 @@ export type BaseConversionMode = "to-decimal" | "from-decimal" | "binary-arith" 
 export interface BaseConversionProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateBaseConversion = (
@@ -57,7 +58,7 @@ const generateToDecimal = (rng: () => number): BaseConversionProblem | null => {
   const expr = `${repr}${sub} を10進法で表せ`;
   const answerExpr = `${value}`;
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateFromDecimal = (rng: () => number): BaseConversionProblem | null => {
@@ -71,7 +72,7 @@ const generateFromDecimal = (rng: () => number): BaseConversionProblem | null =>
   const expr = `${value} を${base}進法で表せ`;
   const answerExpr = `${repr}${sub}`;
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateBinaryArith = (rng: () => number): BaseConversionProblem | null => {
@@ -86,7 +87,7 @@ const generateBinaryArith = (rng: () => number): BaseConversionProblem | null =>
     const result = a + b;
     const expr = `${aBin}₍₂₎ + ${bBin}₍₂₎ を2進法で計算せよ`;
     const answerExpr = `${result.toString(2)}₍₂₎`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   // Subtraction: ensure a >= b
@@ -96,7 +97,7 @@ const generateBinaryArith = (rng: () => number): BaseConversionProblem | null =>
   const result = big - small;
   const expr = `${bigBin}₍₂₎ − ${smallBin}₍₂₎ を2進法で計算せよ`;
   const answerExpr = `${result.toString(2)}₍₂₎`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const subscript = (base: number): string => {

@@ -5,6 +5,7 @@ export type NormalDistMode = "standardize" | "probability" | "mixed";
 export interface NormalDistProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateNormalDist = (
@@ -51,7 +52,7 @@ const generateStandardize = (rng: () => number): NormalDistProblem | null => {
   const zStr = z < 0 ? `−${Math.abs(z)}` : `${z}`;
   const answerExpr = `Z = (${x} − ${mu})/${sigma} = ${zStr}`;
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateProbabilityCalc = (rng: () => number): NormalDistProblem | null => {
@@ -73,5 +74,5 @@ const generateProbabilityCalc = (rng: () => number): NormalDistProblem | null =>
   const zStr = z < 0 ? `−${Math.abs(z)}` : `${z}`;
   const answerExpr = `Z = ${zStr} より P(X ≤ ${x}) = ${prob}`;
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };

@@ -6,6 +6,7 @@ export type BinomialDistMode = "probability" | "mean-var" | "mixed";
 export interface BinomialDistProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateBinomialDist = (
@@ -65,7 +66,7 @@ const generateProbability = (rng: () => number): BinomialDistProblem | null => {
     ? `${ansNum}`
     : `${n}C${k} × (${pNum}/${pDen})${sup(k)} × (${qNum}/${qDen})${sup(n - k)} = ${ansNum}/${ansDen}`;
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateMeanVar = (rng: () => number): BinomialDistProblem | null => {
@@ -89,7 +90,7 @@ const generateMeanVar = (rng: () => number): BinomialDistProblem | null => {
   const expr = `X ~ B(${n}, ${pNum}/${pDen}) のとき，E(X) と V(X)`;
   const answerExpr = `E(X) = ${eStr}, V(X) = ${vStr}`;
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const sup = (n: number): string => {

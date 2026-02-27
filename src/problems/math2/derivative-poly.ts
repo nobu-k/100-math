@@ -6,6 +6,7 @@ export type DerivativePolyMode = "differentiate" | "tangent-line" | "extrema" | 
 export interface DerivativePolyProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateDerivativePoly = (
@@ -61,7 +62,7 @@ const generateDifferentiate = (rng: () => number): DerivativePolyProblem | null 
 
   const expr = `f(x) = ${formatPoly(coeffs)} を微分せよ`;
   const answerExpr = `f'(x) = ${formatPoly(deriv)}`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateTangentLine = (rng: () => number): DerivativePolyProblem | null => {
@@ -101,7 +102,7 @@ const generateTangentLine = (rng: () => number): DerivativePolyProblem | null =>
     }
   }
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateExtrema = (rng: () => number): DerivativePolyProblem | null => {
@@ -146,5 +147,5 @@ const generateExtrema = (rng: () => number): DerivativePolyProblem | null => {
   // For a > 0: max at p (smaller root), min at q (larger root)
   const answerExpr = `極大値 ${fpStr}（x = ${pStr}），極小値 ${fqStr}（x = ${qStr}）`;
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };

@@ -6,6 +6,7 @@ export type VectorCalcMode = "operations" | "inner-product" | "angle" | "mixed";
 export interface VectorCalcProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateVectorCalc = (
@@ -61,7 +62,7 @@ const generateOperations = (rng: () => number): VectorCalcProblem | null => {
     const r2 = a2 + b2;
     const expr = `a⃗ = (${fmt(a1)}, ${fmt(a2)}), b⃗ = (${fmt(b1)}, ${fmt(b2)}) のとき，a⃗ + b⃗`;
     const answerExpr = `(${fmt(r1)}, ${fmt(r2)})`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   if (variant === 1) {
@@ -70,7 +71,7 @@ const generateOperations = (rng: () => number): VectorCalcProblem | null => {
     const r2 = a2 - b2;
     const expr = `a⃗ = (${fmt(a1)}, ${fmt(a2)}), b⃗ = (${fmt(b1)}, ${fmt(b2)}) のとき，a⃗ − b⃗`;
     const answerExpr = `(${fmt(r1)}, ${fmt(r2)})`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   // |a⃗| magnitude
@@ -81,7 +82,7 @@ const generateOperations = (rng: () => number): VectorCalcProblem | null => {
 
   const expr = `a⃗ = (${fmt(a1)}, ${fmt(a2)}) のとき，|a⃗|`;
   const answerExpr = magStr;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateInnerProduct = (rng: () => number): VectorCalcProblem | null => {
@@ -94,7 +95,7 @@ const generateInnerProduct = (rng: () => number): VectorCalcProblem | null => {
 
   const expr = `a⃗ = (${fmt(a1)}, ${fmt(a2)}), b⃗ = (${fmt(b1)}, ${fmt(b2)}) のとき，a⃗ · b⃗`;
   const answerExpr = `${fmt(a1)} × ${fmt(b1)} + ${fmt(a2)} × ${fmt(b2)} = ${fmt(dot)}`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateAngle = (rng: () => number): VectorCalcProblem | null => {
@@ -123,7 +124,7 @@ const generateAngle = (rng: () => number): VectorCalcProblem | null => {
 
   const expr = `a⃗ = (${fmt(a1)}, ${fmt(a2)}), b⃗ = (${fmt(b1)}, ${fmt(b2)}) のなす角 θ`;
   const answerExpr = `cos θ = ${fmt(dot)}/(${magAStr} × ${magBStr})，θ = ${angle}`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const fmt = (n: number): string => n < 0 ? `−${Math.abs(n)}` : `${n}`;

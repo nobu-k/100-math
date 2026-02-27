@@ -6,6 +6,7 @@ export type CoordGeometryMode = "distance" | "division" | "line-eq" | "point-lin
 export interface CoordGeometryProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateCoordGeometry = (
@@ -69,7 +70,7 @@ const generateDistance = (rng: () => number): CoordGeometryProblem | null => {
 
   const expr = `2点 (${fmt(x1)}, ${fmt(y1)}), (${fmt(x2)}, ${fmt(y2)}) 間の距離`;
   const answerExpr = distStr;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateDivision = (rng: () => number): CoordGeometryProblem | null => {
@@ -106,7 +107,7 @@ const generateDivision = (rng: () => number): CoordGeometryProblem | null => {
 
   const expr = `2点 (${fmt(x1)}, ${fmt(y1)}), (${fmt(x2)}, ${fmt(y2)}) を ${m}:${n} に内分する点`;
   const answerExpr = `(${fmt(px)}, ${fmt(py)})`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateLineEq = (rng: () => number): CoordGeometryProblem | null => {
@@ -131,14 +132,14 @@ const generateLineEq = (rng: () => number): CoordGeometryProblem | null => {
     if (slopeDen === 1) {
       const b = y1 - slopeNum * x1;
       const answerExpr = formatLinear(slopeNum, b);
-      return { expr, answerExpr };
+      return { expr, answerExpr, isNL: true };
     }
     // Express as fraction slope
     const slopeStr = `${fmt(slopeNum)}/${slopeDen}`;
     const b = y1 - (slopeNum / slopeDen) * x1;
     const bStr = Number.isInteger(b) ? (b >= 0 ? `+ ${b}` : `− ${Math.abs(b)}`) : "";
     const answerExpr = `y = (${slopeStr})x ${bStr}`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   // From point and slope
@@ -149,7 +150,7 @@ const generateLineEq = (rng: () => number): CoordGeometryProblem | null => {
   const b = y0 - slope * x0;
   const expr = `点 (${fmt(x0)}, ${fmt(y0)}) を通り，傾き ${fmt(slope)} の直線の方程式`;
   const answerExpr = formatLinear(slope, b);
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generatePointLineDist = (rng: () => number): CoordGeometryProblem | null => {
@@ -193,7 +194,7 @@ const generatePointLineDist = (rng: () => number): CoordGeometryProblem | null =
   const lineStr = formatLineStd(a, b, c);
   const expr = `点 (${fmt(x0)}, ${fmt(y0)}) と直線 ${lineStr} の距離`;
   const answerExpr = distStr;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const fmt = (n: number): string => n < 0 ? `−${Math.abs(n)}` : `${n}`;

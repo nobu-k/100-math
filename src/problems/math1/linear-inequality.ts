@@ -5,6 +5,7 @@ export type LinearInequalityMode = "single" | "system" | "mixed";
 export interface LinearInequalityProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateLinearInequality = (
@@ -175,7 +176,7 @@ const generateTwoInequalities = (rng: () => number): LinearInequalityProblem | n
   const rightSign = strict2 ? "<" : "≤";
   const answerExpr = `${fmtNum(bound1)} ${leftSign} x ${rightSign} ${fmtNum(bound2)}`;
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 /** Compound form: a < bx + c < d */

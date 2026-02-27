@@ -5,6 +5,7 @@ export type RadianMode = "convert" | "arc-sector" | "mixed";
 export interface RadianProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateRadian = (
@@ -48,13 +49,13 @@ const generateConvert = (rng: () => number): RadianProblem | null => {
     const rad = degToRadianStr(deg);
     const expr = `${deg}° を弧度法で表せ`;
     const answerExpr = rad;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
   // Radians → degrees
   const rad = degToRadianStr(deg);
   const expr = `${rad} を度数法で表せ`;
   const answerExpr = `${deg}°`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateArcSector = (rng: () => number): RadianProblem | null => {
@@ -85,7 +86,7 @@ const generateArcSector = (rng: () => number): RadianProblem | null => {
 
     const expr = `半径 ${r}，中心角 ${thetaStr} の弧の長さ`;
     const answerExpr = `l = ${r} × ${thetaStr} = ${arcStr}`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   // Sector area: S = (1/2)r²θ
@@ -100,7 +101,7 @@ const generateArcSector = (rng: () => number): RadianProblem | null => {
 
   const expr = `半径 ${r}，中心角 ${thetaStr} の扇形の面積`;
   const answerExpr = `S = (1/2) × ${r}² × ${thetaStr} = ${areaStr}`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const degToRadianStr = (deg: number): string => {

@@ -6,6 +6,7 @@ export type TrigFuncMode = "general-angle" | "addition" | "double-angle" | "synt
 export interface TrigFuncProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateTrigFunc = (
@@ -131,7 +132,7 @@ const generateDoubleAngle = (rng: () => number): TrigFuncProblem | null => {
     const g = gcd(num, den);
     const expr = `sin θ = ${opp}/${hyp}（0° < θ < 90°）のとき，sin 2θ の値`;
     const answerExpr = `2 × ${opp}/${hyp} × ${adj}/${hyp} = ${num / g}/${den / g}`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   // cos2θ = cos²θ - sin²θ = (adj²-opp²)/hyp²
@@ -141,7 +142,7 @@ const generateDoubleAngle = (rng: () => number): TrigFuncProblem | null => {
   const sign = num < 0 ? "−" : "";
   const expr = `sin θ = ${opp}/${hyp}（0° < θ < 90°）のとき，cos 2θ の値`;
   const answerExpr = `${sign}${Math.abs(num) / g}/${den / g}`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateSynthesis = (rng: () => number): TrigFuncProblem | null => {
@@ -155,7 +156,7 @@ const generateSynthesis = (rng: () => number): TrigFuncProblem | null => {
 
   const expr = `${a} sin θ + ${b} cos θ を r sin(θ + α) の形にせよ`;
   const answerExpr = `${rStr} sin(θ + α)　ただし tan α = ${b}/${a}`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const latexToUnicode = (latex: string): string =>

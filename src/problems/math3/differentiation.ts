@@ -5,6 +5,7 @@ export type DifferentiationMode = "product-quotient" | "chain" | "trig-exp-log" 
 export interface DifferentiationProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateDifferentiation = (
@@ -56,18 +57,18 @@ const generateProductQuotient = (rng: () => number): DifferentiationProblem | nu
       const expr = `x${sup(n)} × eˣ を微分せよ`;
       // Simplify for n=1: (x + 1)eˣ, n=2: (x² + 2x)eˣ, n=3: (x³ + 3x²)eˣ
       const answerExpr = n === 1 ? "(x + 1)eˣ" : `(x${sup(n)} + ${n}x${sup(n - 1)})eˣ`;
-      return { expr, answerExpr };
+      return { expr, answerExpr, isNL: true };
     }
     if (variant === 1) {
       // x·sinx → sinx + x·cosx
       const expr = "x sin x を微分せよ";
       const answerExpr = "sin x + x cos x";
-      return { expr, answerExpr };
+      return { expr, answerExpr, isNL: true };
     }
     // x·lnx → lnx + 1
     const expr = "x ln x を微分せよ";
     const answerExpr = "ln x + 1";
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   // Quotient rule: (f/g)' = (f'g - fg')/g²
@@ -76,12 +77,12 @@ const generateProductQuotient = (rng: () => number): DifferentiationProblem | nu
     // sinx/x → (x·cosx - sinx)/x²
     const expr = "sin x / x を微分せよ";
     const answerExpr = "(x cos x − sin x)/x²";
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
   // eˣ/x → (x·eˣ - eˣ)/x² = (x-1)eˣ/x²
   const expr = "eˣ/x を微分せよ";
   const answerExpr = "(x − 1)eˣ/x²";
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateChain = (rng: () => number): DifferentiationProblem | null => {
@@ -96,7 +97,7 @@ const generateChain = (rng: () => number): DifferentiationProblem | null => {
     const coeff = n * a;
     const expr = `(${inner})${sup(n)} を微分せよ`;
     const answerExpr = `${coeff}(${inner})${sup(n - 1)}`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   if (variant === 1) {
@@ -107,7 +108,7 @@ const generateChain = (rng: () => number): DifferentiationProblem | null => {
     const expr = `sin(${inner}) を微分せよ`;
     const coeff = a === 1 ? "" : `${a}`;
     const answerExpr = `${coeff}cos(${inner})`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   if (variant === 2) {
@@ -118,7 +119,7 @@ const generateChain = (rng: () => number): DifferentiationProblem | null => {
     const expr = `e^(${inner}) を微分せよ`;
     const coeff = a === 1 ? "" : `${a}`;
     const answerExpr = `${coeff}e^(${inner})`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   // ln(ax + b) → a/(ax + b)
@@ -127,7 +128,7 @@ const generateChain = (rng: () => number): DifferentiationProblem | null => {
   const inner = a === 1 ? `x + ${b}` : `${a}x + ${b}`;
   const expr = `ln(${inner}) を微分せよ`;
   const answerExpr = `${a}/(${inner})`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateTrigExpLog = (rng: () => number): DifferentiationProblem | null => {
@@ -146,7 +147,7 @@ const generateTrigExpLog = (rng: () => number): DifferentiationProblem | null =>
     const [f, fp] = funcs[Math.floor(rng() * funcs.length)];
     const expr = `${f} を微分せよ`;
     const answerExpr = fp;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   if (variant === 1) {
@@ -155,7 +156,7 @@ const generateTrigExpLog = (rng: () => number): DifferentiationProblem | null =>
     const [f, fp] = funcs[Math.floor(rng() * funcs.length)];
     const expr = `${a}${f} を微分せよ`;
     const answerExpr = `${a}${fp.startsWith("−") ? `(${fp})` : fp}`;
-    return { expr, answerExpr };
+    return { expr, answerExpr, isNL: true };
   }
 
   // Sum/difference of two functions
@@ -168,7 +169,7 @@ const generateTrigExpLog = (rng: () => number): DifferentiationProblem | null =>
   const op = isPlus ? "+" : "−";
   const expr = `${f1} ${op} ${f2} を微分せよ`;
   const answerExpr = `${fp1} ${op} ${fp2}`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const sup = (n: number): string => {

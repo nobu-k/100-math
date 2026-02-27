@@ -5,6 +5,7 @@ export type SeqLimitMode = "rational" | "geometric" | "series" | "mixed";
 export interface SeqLimitProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateSeqLimit = (
@@ -123,7 +124,7 @@ const generateSeries = (rng: () => number): SeqLimitProblem | null => {
   const expr = `0.${repeating}${repeating}${repeating}… を分数で表せ`;
   const g = gcd(repeating, 9);
   const answerExpr = `${repeating / g}/${9 / g}`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const formatPolyN = (a: number, b: number, c: number): string => {

@@ -68,6 +68,32 @@
   margin-bottom: 48px;
 }
 
+.ws-expr-nl {
+  flex: 1;
+  align-self: stretch;
+  min-height: 120px;
+}
+
+.ws-nl-answer {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.ws-nl-label {
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ws-nl-line {
+  flex: 1;
+  border-bottom: 1px solid #000;
+  min-width: 80px;
+  height: 1em;
+}
+
 .ws-val {
   font-size: 28px;
   font-weight: bold;
@@ -238,5 +264,13 @@
 
   .ws-num {
     font-size: 12px;
+  }
+
+  .ws-expr-nl {
+    min-height: 0;
+  }
+
+  .ws-nl-label {
+    font-size: 13px;
   }
 }

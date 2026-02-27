@@ -6,6 +6,7 @@ export type PermCombMode = "permutation" | "combination" | "mixed";
 export interface PermCombProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generatePermComb = (
@@ -57,6 +58,7 @@ const generatePermutation = (rng: () => number): PermCombProblem | null => {
     return {
       expr: `${n} 人を円形に並べる方法の数`,
       answerExpr: `(${n} − 1)! = ${answer} 通り`,
+      isNL: true,
     };
   }
   // Permutations with repetition: n^r
@@ -66,6 +68,7 @@ const generatePermutation = (rng: () => number): PermCombProblem | null => {
   return {
     expr: `${n} 種類から重複を許して ${r} 個選んで並べる方法の数`,
     answerExpr: `${n}${superscript(r)} = ${answer} 通り`,
+    isNL: true,
   };
 };
 
@@ -86,6 +89,7 @@ const generateCombination = (rng: () => number): PermCombProblem | null => {
   return {
     expr: `${n} 人から ${r} 人を選ぶ。特定の 1 人を必ず含む選び方の数`,
     answerExpr: `${n - 1}C${r - 1} = ${answer} 通り`,
+    isNL: true,
   };
 };
 

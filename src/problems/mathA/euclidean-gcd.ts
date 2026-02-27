@@ -5,6 +5,7 @@ export type EuclideanGcdMode = "gcd" | "diophantine" | "mixed";
 export interface EuclideanGcdProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateEuclideanGcd = (
@@ -62,7 +63,7 @@ const generateGcd = (rng: () => number): EuclideanGcdProblem | null => {
   const expr = `ユークリッドの互除法で gcd(${big}, ${small}) を求めよ`;
   const answerExpr = `${steps.join("，")}　よって gcd = ${g}`;
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateDiophantine = (rng: () => number): EuclideanGcdProblem | null => {
@@ -81,7 +82,7 @@ const generateDiophantine = (rng: () => number): EuclideanGcdProblem | null => {
   const expr = `${big}x + ${small}y = ${g} を満たす整数 x, y の一組を求めよ`;
   const answerExpr = `x = ${x}, y = ${y}`;
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const gcdCalc = (a: number, b: number): number => {
