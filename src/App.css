@@ -1500,7 +1500,7 @@
   }
 
   .print-spread {
-    min-height: 245mm;
+    min-height: 210mm;
     grid-auto-rows: 1fr;
   }
 

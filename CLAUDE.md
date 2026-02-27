@@ -46,7 +46,7 @@ Students need blank space between and around problems to write answers and show 
 - Problems requiring multi-step work (e.g., simultaneous equations, data analysis): 6–8 problems max. Use a 2-column layout and the `print-spread` class to distribute rows evenly across the full page height.
 - Graph/chart problems with sub-questions: 2–3 graphs per page. Scale down SVGs for print to leave room for answers near each question.
 
-**The `print-spread` class:** Add `print-spread` to any grid container where problems are sparse relative to the page. It sets `min-height: 245mm` and `grid-auto-rows: 1fr` to give each row an equal fraction of the total height. This ensures every row — including the bottom one — has equal writing space below it.
+**The `print-spread` class:** Add `print-spread` to any grid container where problems are sparse relative to the page. It sets `min-height: 210mm` and `grid-auto-rows: 1fr` to give each row an equal fraction of the total height. This ensures every row — including the bottom one — has equal writing space below it.
 
 Note: Do NOT use `align-content: space-between` for this purpose. `space-between` places the first row at the top and last row at the bottom, leaving zero writing space below the last row. `grid-auto-rows: 1fr` divides the container equally so every row gets the same vertical space.
 
@@ -61,10 +61,30 @@ Note: Do NOT use `align-content: space-between` for this purpose. `space-between
 
 ## Verifying print layouts
 
-Use the `take-screenshot` skill with `--media print --full-page` at A4 size:
+### Visual check
+
+Use `take-screenshot` with `--media print` at A4 size to inspect layout:
 
 ```
-take-screenshot --full-page --media print http://localhost:5173/100-math/<group>/<operator> /tmp/screenshot.png 794 1123
+take-screenshot --media print http://localhost:5173/100-math/<group>/<operator> /tmp/screenshot.png 794 1123
 ```
 
 Then use the Read tool to visually inspect the resulting PNG.
+
+**Caveat:** The screenshot tool renders the page as a single continuous surface — it does NOT emulate real browser print pagination. Even without `--full-page`, it cannot detect whether content overflows onto a second page. Use screenshots only to check visual appearance (spacing, alignment, clipping), never to verify single-page fit.
+
+### Arithmetic check (required)
+
+Since screenshots cannot detect page breaks, you MUST verify single-page fit by calculating the total height:
+
+- A4 = 297mm, `@page { margin: 15mm }` → **printable height = 267mm**
+- Title + QR row ≈ 20mm (24px font + 12px margin + QR height)
+- **Maximum content area height ≈ 245mm**
+
+When setting `min-height` on a content container (e.g., `print-spread`), ensure:
+
+```
+title_row (~20mm) + min-height ≤ 267mm
+```
+
+Use a safety margin of ~20mm to account for browser differences. For example, `min-height: 210mm` uses 230mm total, leaving ~37mm of slack. Values above 230mm have been observed to cause a blank second page in real browser print even when screenshots look fine.
