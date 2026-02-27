@@ -2,48 +2,49 @@ import { useState, useCallback, useMemo } from "react";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { parseEnum } from "../shared/enum-utils";
-import { type CoordGeometryMode, generateCoordGeometry } from "./coord-geometry";
+import { type FuncType, generateSubstitutionIntegral } from "./substitution-integral";
 import { renderExprProblems } from "../equations/renderExprProblems";
 
-const DEF = { mode: "mixed" as CoordGeometryMode };
-const PARAM_KEYS = ["mode"];
+const FUNC_TYPES = ["polynomial", "trig", "exponential", "logarithmic", "mixed"] as const;
+const DEF = { funcType: "mixed" as FuncType };
+const PARAM_KEYS = ["funcType"];
 
-const CoordGeometry = () => {
+const SubstitutionIntegral = () => {
   const [initial] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    return { mode: parseEnum(p.get("mode"), ["distance", "division", "line-eq", "point-line-dist", "mixed"] as const, DEF.mode) };
+    return { funcType: parseEnum(p.get("funcType"), FUNC_TYPES, DEF.funcType) };
   });
 
-  const [mode, setMode] = useState(initial.mode);
+  const [funcType, setFuncType] = useState(initial.funcType);
 
   const getSettingsParams = useCallback((): Record<string, string> => {
     const m: Record<string, string> = {};
-    if (mode !== DEF.mode) m.mode = mode;
+    if (funcType !== DEF.funcType) m.funcType = funcType;
     return m;
-  }, [mode]);
+  }, [funcType]);
 
   const { seed, showAnswers, showSettings, setShowSettings, handleNew, handleToggleAnswers, regen, qrUrl } =
     useProblemPage(PARAM_KEYS, getSettingsParams);
 
-  const onModeChange = useCallback((v: CoordGeometryMode) => {
-    setMode(v);
+  const onFuncTypeChange = useCallback((v: FuncType) => {
+    setFuncType(v);
     const p: Record<string, string> = {};
-    if (v !== DEF.mode) p.mode = v;
+    if (v !== DEF.funcType) p.funcType = v;
     regen(p);
   }, [regen]);
 
-  const problems = useMemo(() => generateCoordGeometry(seed, mode), [seed, mode]);
+  const problems = useMemo(() => generateSubstitutionIntegral(seed, funcType), [seed, funcType]);
 
   const settingsPanel = (
     <div className="no-print settings-panel">
       <label>
-        種類{" "}
-        <select className="operator-select" value={mode} onChange={(e) => onModeChange(e.target.value as CoordGeometryMode)}>
+        関数{" "}
+        <select className="operator-select" value={funcType} onChange={(e) => onFuncTypeChange(e.target.value as FuncType)}>
           <option value="mixed">すべて</option>
-          <option value="distance">2点間の距離</option>
-          <option value="division">内分点</option>
-          <option value="line-eq">直線の方程式</option>
-          <option value="point-line-dist">点と直線の距離</option>
+          <option value="polynomial">多項式</option>
+          <option value="trig">三角関数</option>
+          <option value="exponential">指数関数</option>
+          <option value="logarithmic">対数関数</option>
         </select>
       </label>
     </div>
@@ -57,4 +58,4 @@ const CoordGeometry = () => {
   );
 };
 
-export default CoordGeometry;
+export default SubstitutionIntegral;

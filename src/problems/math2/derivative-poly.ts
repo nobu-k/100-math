@@ -1,7 +1,7 @@
 import { mulberry32 } from "../random";
 import { type Poly, polyDeriv, polyEval, formatPoly } from "../shared/poly-utils";
 
-export type DerivativePolyMode = "differentiate" | "tangent-line" | "extrema" | "mixed";
+export type DerivativePolyMode = "differentiate" | "extrema" | "mixed";
 
 export interface DerivativePolyProblem {
   expr: string;
@@ -24,7 +24,6 @@ export const generateDerivativePoly = (
 
       let result: DerivativePolyProblem | null = null;
       if (pick === "differentiate") result = generateDifferentiate(rng);
-      else if (pick === "tangent-line") result = generateTangentLine(rng);
       else result = generateExtrema(rng);
 
       if (!result) continue;
@@ -40,12 +39,9 @@ export const generateDerivativePoly = (
   return problems;
 };
 
-const pickMode = (rng: () => number, mode: DerivativePolyMode): "differentiate" | "tangent-line" | "extrema" => {
+const pickMode = (rng: () => number, mode: DerivativePolyMode): "differentiate" | "extrema" => {
   if (mode !== "mixed") return mode;
-  const r = rng();
-  if (r < 0.4) return "differentiate";
-  if (r < 0.7) return "tangent-line";
-  return "extrema";
+  return rng() < 0.5 ? "differentiate" : "extrema";
 };
 
 const generateDifferentiate = (rng: () => number): DerivativePolyProblem | null => {
@@ -62,46 +58,6 @@ const generateDifferentiate = (rng: () => number): DerivativePolyProblem | null 
 
   const expr = `f(x) = ${formatPoly(coeffs)} を微分せよ`;
   const answerExpr = `f'(x) = ${formatPoly(deriv)}`;
-  return { expr, answerExpr, isNL: true };
-};
-
-const generateTangentLine = (rng: () => number): DerivativePolyProblem | null => {
-  // Find tangent line at x=a for a cubic or quadratic
-  const a = Math.floor(rng() * 5) - 2; // [-2..2]
-
-  // Generate from nice coefficients
-  const c3 = Math.floor(rng() * 3) + 1; // [1..3]
-  const c2 = Math.floor(rng() * 7) - 3; // [-3..3]
-  const c1 = Math.floor(rng() * 7) - 3;
-  const c0 = Math.floor(rng() * 7) - 3;
-
-  const coeffs: Poly = [c0, c1, c2, c3];
-  const deriv = polyDeriv(coeffs);
-
-  const fa = polyEval(coeffs, a);
-  const fpa = polyEval(deriv, a);
-
-  // Tangent: y = f'(a)(x - a) + f(a) = f'(a)x + (f(a) - a·f'(a))
-  const slope = fpa;
-  const intercept = fa - a * fpa;
-
-  const aStr = a < 0 ? `−${Math.abs(a)}` : `${a}`;
-  const expr = `f(x) = ${formatPoly(coeffs)} の x = ${aStr} における接線の方程式`;
-
-  let answerExpr: string;
-  if (slope === 0) {
-    answerExpr = `y = ${intercept < 0 ? `−${Math.abs(intercept)}` : intercept}`;
-  } else {
-    const slopeStr = slope === 1 ? "x" : slope === -1 ? "−x" : `${slope}x`;
-    if (intercept === 0) {
-      answerExpr = `y = ${slopeStr}`;
-    } else if (intercept > 0) {
-      answerExpr = `y = ${slopeStr} + ${intercept}`;
-    } else {
-      answerExpr = `y = ${slopeStr} − ${Math.abs(intercept)}`;
-    }
-  }
-
   return { expr, answerExpr, isNL: true };
 };
 
