@@ -3,7 +3,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { randomSeed, seedToHex, hexToSeed } from "../random";
 import { M, texRed } from "../shared/M";
 import { DEFAULTS, PARAM_KEYS, frac, updateUrl, generateReductionProblems } from "./generators";
-import "../../App.css";
+import "./fraction.css";
 
 const defaults = DEFAULTS.reduction;
 const minFloor = 4;

@@ -6,7 +6,7 @@ import { generateDivisionProblem, divisionTerminates, divisionCycleLength } from
 import { HissanDivProblem } from "./HissanDivProblem";
 import { cx } from "./render-utils";
 import { useHissanState } from "./useHissanState";
-import "../../App.css";
+import "./hissan.css";
 
 export interface DivConfig {
   minDigits: number;

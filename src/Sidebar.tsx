@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { NavLink } from "react-router-dom";
+import "./Sidebar.css";
 import { problemGroups } from "./problems";
 import type { OperatorRoute } from "./problems";
 

@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { randomSeed, seedToHex, hexToSeed } from "../random";
 import { generateFactorsProblems, DEFAULTS, PARAM_KEYS } from "./generators";
-import "../../App.css";
+import "./integer.css";
 
 const defaults = DEFAULTS.factors;
 

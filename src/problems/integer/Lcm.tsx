@@ -3,7 +3,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { randomSeed, seedToHex, hexToSeed } from "../random";
 import { generateLcmProblems, DEFAULTS, PARAM_KEYS } from "./generators";
 import type { LcmProblem } from "./generators";
-import "../../App.css";
+import "./integer.css";
 
 const defaults = DEFAULTS.lcm;
 

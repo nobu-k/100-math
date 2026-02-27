@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { randomSeed } from "../random";
 import { generateProblem, getInitialSeed, updateUrl, buildQrUrl } from "./generate";
-import "../../App.css";
+import "./grid100.css";
 
 export const Grid100 = ({
   symbol,

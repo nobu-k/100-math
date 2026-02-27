@@ -6,7 +6,7 @@ import { generateCarryChainProblem } from "./add";
 import { HissanAddSubProblem } from "./HissanAddSubProblem";
 import { cx } from "./render-utils";
 import { useHissanState } from "./useHissanState";
-import "../../App.css";
+import "./hissan.css";
 
 export interface AddConfig {
   minDigits: number;

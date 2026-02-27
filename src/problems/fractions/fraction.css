@@ -1,0 +1,132 @@
+/* Fraction (分数) styles */
+.fraction-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px 32px;
+}
+
+.fraction-problem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.fraction-number {
+  font-size: 14px;
+  color: #555;
+  width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.fraction-frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 28px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.fraction-numerator {
+  border-bottom: 2px solid #000;
+  padding: 0 4px;
+  min-width: 1.2em;
+  text-align: center;
+}
+
+.fraction-denominator {
+  padding: 0 4px;
+  min-width: 1.2em;
+  text-align: center;
+}
+
+.fraction-operator {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.fraction-equals {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.fraction-answer {
+  color: red;
+}
+
+.fraction-answer .fraction-numerator {
+  border-bottom-color: red;
+}
+
+.fraction-hidden {
+  visibility: hidden;
+}
+
+.fraction-symbol {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.fraction-int {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.fraction-cd-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fraction-cd-answers {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fraction-guide {
+  margin-left: 28px;
+}
+
+.fraction-guide-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fraction-guide .fraction-frac {
+  font-size: 20px;
+}
+
+.fraction-guide .fraction-int {
+  font-size: 20px;
+}
+
+.fraction-guide-sym {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+@media print {
+  .fraction-frac {
+    font-size: 20px;
+  }
+
+  .fraction-operator,
+  .fraction-equals,
+  .fraction-symbol,
+  .fraction-int {
+    font-size: 20px;
+  }
+
+  .fraction-guide .fraction-frac {
+    font-size: 14px;
+  }
+
+  .fraction-guide .fraction-int,
+  .fraction-guide-sym {
+    font-size: 14px;
+  }
+}

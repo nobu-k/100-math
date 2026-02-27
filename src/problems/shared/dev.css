@@ -1,0 +1,163 @@
+/* ============================================================
+   Shared dev-grade text-based problems
+   ============================================================ */
+
+.dev-text-page {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.dev-text-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.dev-text-q {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.dev-text-arrow {
+  font-size: 22px;
+  color: #888;
+}
+
+.dev-text-a {
+  font-size: 22px;
+  font-weight: bold;
+  color: red;
+  margin-left: 4px;
+}
+
+/* ============================================================
+   Shared dev-grade fraction display
+   ============================================================ */
+
+.dev-frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  margin: 0 4px;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1.1;
+}
+
+.dev-frac-num {
+  border-bottom: 2px solid #000;
+  padding: 0 6px 2px;
+}
+
+.dev-frac-den {
+  padding: 2px 6px 0;
+}
+
+.dev-frac-ans {
+  color: red;
+}
+
+/* ============================================================
+   Shared dev-grade fraction row
+   ============================================================ */
+
+.dev-frac-row {
+  align-items: center;
+}
+
+/* ============================================================
+   Proportion table (Grade 6)
+   ============================================================ */
+
+.dev-fig-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  width: 100%;
+}
+
+.dev-prop-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dev-prop-block svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.dev-prop-label {
+  font-size: 16px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.dev-prop-table {
+  border-collapse: collapse;
+}
+
+.dev-prop-table th,
+.dev-prop-table td {
+  border: 2px solid #000;
+  padding: 6px 16px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  min-width: 48px;
+}
+
+.dev-prop-table th {
+  background: #f0f0f0;
+}
+
+.dev-prop-blank {
+  background: #fff;
+  min-width: 48px;
+  min-height: 32px;
+}
+
+@media print {
+  .dev-text-page {
+    gap: 2px;
+  }
+
+  .dev-text-q {
+    font-size: 16px;
+  }
+
+  .dev-text-a {
+    font-size: 16px;
+  }
+
+  .dev-text-arrow {
+    font-size: 16px;
+  }
+
+  .dev-fig-page {
+    gap: 4px 12px;
+    padding-left: 2mm;
+  }
+
+  .dev-prop-block svg {
+    height: auto;
+  }
+
+  .line-chart {
+    width: 300px;
+    height: auto;
+  }
+
+  .dev-prop-label {
+    font-size: 13px;
+  }
+
+  .dev-prop-table th,
+  .dev-prop-table td {
+    font-size: 14px;
+    padding: 3px 10px;
+  }
+}

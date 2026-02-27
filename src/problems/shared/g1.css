@@ -1,0 +1,238 @@
+/* ============================================================
+   Grade 1 (g1-) styles
+   ============================================================ */
+
+/* Shared grid page */
+.g1-page {
+  display: grid;
+  gap: 18px 32px;
+}
+
+.g1-cols-2 {
+  grid-template-columns: auto auto;
+}
+
+.g1-cols-3 {
+  grid-template-columns: auto auto auto;
+}
+
+.g1-cols-4 {
+  grid-template-columns: auto auto auto auto;
+}
+
+/* Individual problem row */
+.g1-problem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.g1-problem-expr {
+  align-items: flex-start;
+}
+
+
+.g1-expr-page {
+  grid-template-columns: 1fr 1fr;
+  gap: 24px 32px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.g1-num {
+  font-size: 18px;
+  color: #555;
+  flex-shrink: 0;
+  width: 36px;
+  text-align: right;
+}
+
+/* Expression layout */
+.g1-expr {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.g1-expr-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.g1-eq-answer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 48px;
+}
+
+.g1-val {
+  font-size: 28px;
+  font-weight: bold;
+  min-width: 1.2em;
+  text-align: center;
+}
+
+.g1-op {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+/* Blank box */
+.g1-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 2px solid #000;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.g1-box-val {
+  font-size: 28px;
+  font-weight: bold;
+  color: red;
+}
+
+.g1-hidden {
+  visibility: hidden;
+}
+
+/* ---- Sequence ---- */
+.g1-seq-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.g1-seq-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.g1-seq-cells {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.g1-seq-cell-wrap {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.g1-seq-arrow {
+  font-size: 20px;
+  color: #888;
+}
+
+.g1-seq-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  font-size: 24px;
+  font-weight: bold;
+  background: #fafafa;
+}
+
+/* ---- Clock ---- */
+.g1-clock-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px 16px;
+  width: 100%;
+}
+
+.g1-clock-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.g1-clock-item .g1-num {
+  width: auto;
+  text-align: center;
+}
+
+.g1-clock-svg {
+  width: 140px;
+  height: 140px;
+}
+
+.g1-clock-answer {
+  font-size: 20px;
+  font-weight: bold;
+  color: red;
+  min-height: 1.5em;
+}
+
+/* ============================================================
+   Grade 1 print overrides
+   ============================================================ */
+@media print {
+  .g1-page {
+    padding: 0 2mm;
+    gap: 14px 12px;
+  }
+
+  .g1-cols-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .g1-val {
+    font-size: 22px;
+  }
+
+  .g1-op {
+    font-size: 22px;
+  }
+
+  .g1-box {
+    width: 11mm;
+    height: 11mm;
+  }
+
+  .g1-box-val {
+    font-size: 20px;
+  }
+
+  .g1-seq-cell {
+    width: 11mm;
+    height: 11mm;
+    font-size: 18px;
+  }
+
+  .g1-seq-arrow {
+    font-size: 16px;
+  }
+
+  .g1-clock-grid {
+    gap: 12px 8px;
+  }
+
+  .g1-clock-svg {
+    width: 32mm;
+    height: 32mm;
+  }
+
+  .g1-clock-answer {
+    font-size: 16px;
+  }
+
+  .g1-num {
+    font-size: 12px;
+  }
+}

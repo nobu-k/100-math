@@ -1,0 +1,38 @@
+.grid {
+  border-collapse: collapse;
+}
+
+.grid th,
+.grid td {
+  border: 2px solid #000;
+  width: 64px;
+  height: 64px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 32px;
+  font-weight: bold;
+  padding: 0;
+}
+
+.corner-cell {
+  position: relative;
+  padding: 0 !important;
+}
+
+
+.header-cell {
+  background: #f5f5f5;
+}
+
+.answer-cell {
+  background: #fff;
+}
+
+@media print {
+  .grid th,
+  .grid td {
+    width: 17mm;
+    height: 17mm;
+    font-size: 28px;
+  }
+}

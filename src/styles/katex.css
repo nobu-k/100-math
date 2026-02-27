@@ -1,0 +1,67 @@
+/* ============================================================
+   KaTeX overrides
+   ============================================================ */
+
+/* Grid problems: match g1-val sizing */
+.g1-problem .katex {
+  font-size: 32px;
+}
+
+/* Text-row problems */
+.dev-text-row .katex {
+  font-size: 22px;
+}
+
+/* Figure-problem answer */
+.dev-prop-block .katex {
+  font-size: 22px;
+}
+
+/* Fraction page */
+.fraction-problem .katex {
+  font-size: 26px;
+}
+
+.fraction-page .katex .frac-line {
+  border-bottom-width: 0.08em !important;
+}
+
+.fraction-page .katex .mfrac > .vlist-t2 > .vlist-r > .vlist > span:first-child,
+.fraction-page .katex .mfrac > .vlist-t2 > .vlist-r > .vlist > span:last-child {
+  padding: 0 0.15em;
+}
+
+.fraction-guide .katex {
+  font-size: 22px;
+}
+
+/* Boxed answer styling */
+.katex .boxed {
+  border: 2px solid #000;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+@media print {
+  .g1-problem .katex {
+    font-size: 20px;
+    white-space: nowrap;
+  }
+
+
+  .dev-text-row .katex {
+    font-size: 18px;
+  }
+
+  .dev-prop-block .katex {
+    font-size: 18px;
+  }
+
+  .fraction-problem .katex {
+    font-size: 22px;
+  }
+
+  .fraction-guide .katex {
+    font-size: 18px;
+  }
+}

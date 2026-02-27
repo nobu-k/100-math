@@ -1,0 +1,124 @@
+/* Integer (整数) styles */
+.integer-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 32px;
+}
+
+.integer-problem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.integer-question {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.integer-number {
+  font-size: 14px;
+  color: #555;
+  flex-shrink: 0;
+}
+
+.integer-text {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.integer-answer-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: red;
+  margin-left: 24px;
+  min-height: 1.5em;
+}
+
+.integer-hidden {
+  visibility: hidden;
+}
+
+.integer-lcm-problem {
+  min-height: 120px;
+}
+
+.integer-ladder-area {
+  margin-left: 24px;
+}
+
+.integer-ladder {
+  border-collapse: collapse;
+  margin-bottom: 4px;
+}
+
+.integer-ladder-cell {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 0;
+  border: 2px dotted #ccc;
+  color: red;
+}
+
+.integer-ladder-div {
+  border: none !important;
+  padding-right: 8px;
+}
+
+.integer-ladder-bracket {
+  position: absolute;
+  left: -9px;
+  top: -2px;
+  bottom: 0;
+  width: 10px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.integer-ladder-val {
+  border-bottom: 3px solid red;
+}
+
+.integer-ladder-val-start::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  bottom: -3px;
+  width: 8px;
+  height: 3px;
+  background: red;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+
+.integer-ladder-bottom {
+  /* no bottom border */
+}
+
+.integer-ladder-hl {
+  background: #fff0f0;
+  border-radius: 50%;
+}
+
+@media print {
+  .integer-text {
+    font-size: 14px;
+  }
+
+  .integer-answer-text {
+    font-size: 14px;
+  }
+
+  .integer-ladder-cell {
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+  }
+}

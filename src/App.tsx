@@ -1,7 +1,10 @@
 import { useState, useCallback, useEffect } from "react";
 import { Outlet, useMatches } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import "./App.css";
+import "./styles/layout.css";
+import "./problems/shared/g1.css";
+import "./problems/shared/dev.css";
+import "./styles/katex.css";
 
 const App = () => {
   const matches = useMatches();

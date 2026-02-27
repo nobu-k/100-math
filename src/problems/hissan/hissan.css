@@ -1,0 +1,497 @@
+/* Hissan (column addition) styles */
+.hissan-page {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 24px 32px;
+}
+
+.hissan-problem {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.hissan-number {
+  font-size: 18px;
+  color: #555;
+  margin-top: 4px;
+  width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.hissan-grid {
+  border-collapse: collapse;
+}
+
+.hissan-cell {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border: 2px dotted #ccc;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 28px;
+  font-weight: bold;
+  padding: 0;
+}
+
+.hissan-cell-carry {
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  font-size: 14px;
+  font-weight: bold;
+  color: red;
+  line-height: 1;
+}
+
+.hissan-operator-row td {
+  border-bottom: 4px solid #000;
+}
+
+.hissan-answer-row td {
+  color: red;
+}
+
+.hissan-carry-row td {
+  font-size: 22px;
+  font-weight: bold;
+  height: 28px;
+  color: red;
+  border: none;
+  text-align: center;
+  vertical-align: bottom;
+  padding: 0;
+}
+
+.hissan-borrow-in::before {
+  content: "1";
+  position: absolute;
+  top: 50%;
+  left: 1px;
+  transform: translateY(-50%);
+  font-size: 28px;
+  font-weight: bold;
+  color: red;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.hissan-slashed {
+  color: #999;
+}
+
+.hissan-slashed::before {
+  content: "";
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  width: 70%;
+  height: 70%;
+  background: linear-gradient(to bottom left,
+      transparent calc(50% - 1px),
+      red calc(50% - 1px),
+      red calc(50% + 1px),
+      transparent calc(50% + 1px));
+  pointer-events: none;
+}
+
+.hissan-mul-operator-row td {
+  border-bottom: 4px solid #000;
+}
+
+.hissan-partial-last-row td {
+  border-bottom: 4px solid #000;
+}
+
+.hissan-mul-wide {
+  grid-template-columns: repeat(2, auto);
+}
+
+.hissan-dec-borrow {
+  color: red;
+}
+
+/* Decimal styles */
+.hissan-dec-wide {
+  grid-template-columns: repeat(2, auto);
+}
+
+.hissan-dot-after {
+  position: relative;
+}
+
+.hissan-dot-after::after {
+  content: ".";
+  position: absolute;
+  right: -6px;
+  bottom: 6px;
+  font-size: 36px;
+  font-weight: bold;
+  line-height: 1;
+  z-index: 1;
+  color: inherit;
+}
+
+/* Division decimal dot (36×36px cells on screen, 9×9mm in print) */
+.hissan-div-dot-after {
+  position: relative;
+}
+
+.hissan-div-dot-after::after {
+  content: ".";
+  position: absolute;
+  right: -3px;
+  bottom: 2px;
+  font-size: 28px;
+  font-weight: bold;
+  line-height: 1;
+  z-index: 1;
+  color: inherit;
+}
+
+/* Slashed decimal dot — original dot crossed out (answer-only) */
+.hissan-div-slashed-dot {
+  position: relative;
+}
+
+.hissan-div-slashed-dot::after {
+  content: ".";
+  position: absolute;
+  right: -3px;
+  bottom: 2px;
+  font-size: 28px;
+  font-weight: bold;
+  line-height: 1;
+  z-index: 1;
+  color: inherit;
+}
+
+.hissan-div-slashed-dot::before {
+  content: "";
+  position: absolute;
+  right: -7px;
+  bottom: 2px;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(to bottom left,
+      transparent calc(50% - 1px),
+      red calc(50% - 1px),
+      red calc(50% + 1px),
+      transparent calc(50% + 1px));
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* New red decimal dot at shifted position (answer-only) */
+.hissan-div-dot-red {
+  position: relative;
+}
+
+.hissan-div-dot-red::after {
+  content: ".";
+  position: absolute;
+  right: -3px;
+  bottom: 2px;
+  font-size: 28px;
+  font-weight: bold;
+  line-height: 1;
+  z-index: 1;
+  color: red;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* Slashed-out leading zero (answer-only, used as <span> inside <td>) */
+.hissan-div-slashed-zero {
+  position: relative;
+  display: inline-block;
+  color: #999;
+}
+
+.hissan-div-slashed-zero::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -2px;
+  width: calc(100% + 4px);
+  height: 100%;
+  background: linear-gradient(to bottom left,
+      transparent calc(50% - 1px),
+      red calc(50% - 1px),
+      red calc(50% + 1px),
+      transparent calc(50% + 1px));
+  pointer-events: none;
+}
+
+/* Red appended zeros for divisor normalization */
+.hissan-div-extra-zero {
+  color: red;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* Division repeating decimal cycle dot (循環小数) */
+.hissan-div-cycle-dot::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background: red;
+  border-radius: 50%;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* Division styles */
+.hissan-div-page {
+  grid-template-columns: repeat(3, auto);
+}
+
+.hissan-div-grid {
+  border-collapse: collapse;
+}
+
+.hissan-div-cell {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 28px;
+  font-weight: bold;
+  padding: 0;
+  border: 2px dotted #ccc;
+}
+
+.hissan-div-bracket-top-line {
+  border-bottom: 3px solid #000;
+}
+
+.hissan-div-bracket-top-start::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  bottom: -3px;
+  width: 8px;
+  height: 3px;
+  background: #000;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.hissan-div-bracket-curve {
+  position: absolute;
+  left: -9px;
+  top: -2px;
+  bottom: -2px;
+  width: 10px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.hissan-div-subtract-line {
+  border-bottom: 2px solid #000;
+}
+
+.hissan-div-outside {
+  border: none !important;
+  padding-right: 8px;
+}
+
+/* Shift dots left to compensate for padding-right on outside cells */
+.hissan-div-outside.hissan-div-dot-after::after,
+.hissan-div-outside.hissan-div-slashed-dot::after {
+  right: 1px;
+}
+
+.hissan-div-outside.hissan-div-slashed-dot::before {
+  right: -3px;
+}
+
+.hissan-div-answer td {
+  color: red;
+}
+
+.hissan-div-work-cell {
+  color: red;
+}
+
+.hissan-div-remainder {
+  font-size: 20px;
+  font-weight: bold;
+  color: red;
+  white-space: nowrap;
+}
+
+.hissan-no-grid .hissan-cell,
+.hissan-no-grid .hissan-div-cell {
+  border-color: transparent;
+}
+
+.hissan-no-grid .hissan-operator-row td {
+  border-bottom-color: #000;
+}
+
+.hissan-no-grid .hissan-mul-operator-row td {
+  border-bottom-color: #000;
+}
+
+.hissan-no-grid .hissan-partial-last-row td {
+  border-bottom-color: #000;
+}
+
+.hissan-no-grid .hissan-div-subtract-line {
+  border-bottom-color: transparent;
+}
+
+.hissan-no-grid .hissan-div-bracket-top-line {
+  border-bottom-color: #000;
+}
+
+.hissan-no-grid .hissan-div-bracket-top-ext {
+  border-bottom-color: transparent;
+}
+
+.hissan-no-grid.hissan-show-answers .hissan-div-subtract-line {
+  border-bottom-color: #000;
+}
+
+.hissan-no-grid.hissan-show-answers .hissan-div-bracket-top-ext {
+  border-bottom-color: #000;
+}
+
+@media print {
+  .hissan-page {
+    gap: 12px 20px;
+  }
+
+  .hissan-cell {
+    width: 12mm;
+    height: 12mm;
+    font-size: 20px;
+  }
+
+  .hissan-carry-row td {
+    font-size: 12px;
+    height: 6mm;
+  }
+
+  .hissan-cell-carry {
+    font-size: 10px;
+  }
+
+  .hissan-mul-wide .hissan-cell {
+    width: 10mm;
+    height: 10mm;
+    font-size: 16px;
+  }
+
+  .hissan-mul-wide .hissan-cell-carry {
+    font-size: 8px;
+  }
+
+  .hissan-dec-wide .hissan-cell {
+    width: 10mm;
+    height: 10mm;
+    font-size: 16px;
+  }
+
+  .hissan-dec-wide .hissan-carry-row td {
+    font-size: 10px;
+    height: 5mm;
+  }
+
+  .hissan-dot-after::after {
+    font-size: 20px;
+    right: -1mm;
+    bottom: 1mm;
+  }
+
+  .hissan-div-cell {
+    width: 9mm;
+    height: 9mm;
+    font-size: 18px;
+  }
+
+  .hissan-dec-wide .hissan-div-cell {
+    width: 6mm;
+    height: 6mm;
+    font-size: 12px;
+  }
+
+  .hissan-div-dot-after::after {
+    font-size: 18px;
+    right: -0.5mm;
+    bottom: 0.5mm;
+  }
+
+  .hissan-dec-wide .hissan-div-dot-after::after {
+    font-size: 12px;
+    right: -0.3mm;
+    bottom: 0.2mm;
+  }
+
+  .hissan-div-slashed-dot::after {
+    font-size: 18px;
+    right: -0.5mm;
+    bottom: 0.5mm;
+  }
+
+  .hissan-div-slashed-dot::before {
+    right: -1mm;
+    bottom: 0.5mm;
+    width: 2.5mm;
+    height: 2.5mm;
+  }
+
+  .hissan-dec-wide .hissan-div-slashed-dot::after {
+    font-size: 12px;
+    right: -0.3mm;
+    bottom: 0.2mm;
+  }
+
+  .hissan-dec-wide .hissan-div-slashed-dot::before {
+    right: -0.6mm;
+    bottom: 0.2mm;
+    width: 1.8mm;
+    height: 1.8mm;
+  }
+
+  .hissan-div-dot-red::after {
+    font-size: 18px;
+    right: -0.5mm;
+    bottom: 0.5mm;
+  }
+
+  .hissan-dec-wide .hissan-div-dot-red::after {
+    font-size: 12px;
+    right: -0.3mm;
+    bottom: 0.2mm;
+  }
+
+  .hissan-div-cycle-dot::before {
+    width: 1.5mm;
+    height: 1.5mm;
+    top: -0.5mm;
+  }
+
+  .hissan-dec-wide .hissan-div-cycle-dot::before {
+    width: 1mm;
+    height: 1mm;
+    top: -0.3mm;
+  }
+
+  .hissan-div-bracket-curve {
+    width: 2.5mm;
+  }
+
+  .hissan-div-remainder {
+    font-size: 14px;
+  }
+}

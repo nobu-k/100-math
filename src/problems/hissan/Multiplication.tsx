@@ -6,7 +6,7 @@ import { generateMultiplicationProblem } from "./mul";
 import { HissanMulProblem } from "./HissanMulProblem";
 import { cx } from "./render-utils";
 import { useHissanState } from "./useHissanState";
-import "../../App.css";
+import "./hissan.css";
 
 export interface MulConfig {
   minDigits: number;
