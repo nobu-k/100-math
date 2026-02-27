@@ -15,7 +15,7 @@ Every worksheet is designed to be printed on a single A4 page. When adding or mo
 
 ## 1. Fit on one A4 page
 
-All problems must fit within a single A4 page (794×1123px at 96 dpi, with `@page { margin: 15mm }`). Nothing should overflow, be clipped, or overlap with the QR code in the bottom-right corner.
+All problems must fit within a single A4 page (794×1123px at 96 dpi, with `@page { margin: 15mm }`). Nothing should overflow, be clipped, or overlap with the QR code.
 
 **Common violations (from `plans/print-layout-fixes.md`):**
 - `data/data-analysis` had 8 problems that filled the entire page — problem (8) was squeezed to the bottom edge and the QR code overlapped problem (7)'s table. Fixed by reducing to 6 problems.
@@ -46,14 +46,16 @@ Students need blank space between and around problems to write answers and show 
 - Problems requiring multi-step work (e.g., simultaneous equations, data analysis): 6–8 problems max. Use a 2-column layout and the `print-spread` class to distribute rows evenly across the full page height.
 - Graph/chart problems with sub-questions: 2–3 graphs per page. Scale down SVGs for print to leave room for answers near each question.
 
-**The `print-spread` class:** Add `print-spread` to any grid container where problems are sparse relative to the page. It sets `min-height: 220mm` (the printable A4 height minus title area) and `align-content: space-between` to distribute grid rows evenly from top to bottom. This ensures that the vertical space between problems grows to fill the page, giving students room to show their work.
+**The `print-spread` class:** Add `print-spread` to any grid container where problems are sparse relative to the page. It sets `min-height: 245mm` and `grid-auto-rows: 1fr` to give each row an equal fraction of the total height. This ensures every row — including the bottom one — has equal writing space below it.
+
+Note: Do NOT use `align-content: space-between` for this purpose. `space-between` places the first row at the top and last row at the bottom, leaving zero writing space below the last row. `grid-auto-rows: 1fr` divides the container equally so every row gets the same vertical space.
 
 ```html
 <div className="dev-fig-page print-spread">
 ```
 
 **Common violations:**
-- `equations/simultaneous-eq` had 8 problems in a 2-column grid packed tightly at the top, leaving the bottom half of the page empty. Fixed by adding `print-spread` to distribute the 4 rows evenly across the full page.
+- `equations/simultaneous-eq` had 8 problems in a 2-column grid packed tightly at the top, leaving the bottom half of the page empty. Fixed by adding `print-spread` to distribute the 4 rows evenly across the full page. Initially used `align-content: space-between`, but this gave bottom-row problems no writing space — switched to `grid-auto-rows: 1fr`.
 - `geometry/scale` had 10 text-only problems as a dense block with single-line spacing and no room for answers.
 - `data/data-analysis` asked students to compute mean/median/mode/range but had no scratch space for calculations.
 

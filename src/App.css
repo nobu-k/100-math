@@ -919,21 +919,30 @@
     display: block;
   }
 
+  .app {
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+  }
+
   .print-title {
     display: block;
     font-size: 24px;
     margin-bottom: 12px;
-  }
-
-  .app {
-    padding: 0;
+    grid-column: 1;
+    grid-row: 1;
   }
 
   .qr-section {
-    position: fixed;
-    bottom: 0;
-    right: 0;
+    position: static;
+    grid-column: 2;
+    grid-row: 1;
     margin-top: 0;
+    align-self: center;
+  }
+
+  .app > *:not(.print-title):not(.qr-section) {
+    grid-column: 1 / -1;
   }
 
   .grid th,
@@ -1491,8 +1500,8 @@
   }
 
   .print-spread {
-    min-height: 220mm;
-    align-content: space-between;
+    min-height: 245mm;
+    grid-auto-rows: 1fr;
   }
 
   .dev-prop-block svg {
