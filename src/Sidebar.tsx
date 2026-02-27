@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo } from "react";
-import { NavLink } from "react-router-dom";
+import { useState, useCallback, useMemo, useEffect } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import "./Sidebar.css";
 import { problemGroups } from "./problems";
 import type { OperatorRoute } from "./problems";
@@ -35,11 +35,44 @@ const CATEGORY_LABELS: [string, string][] = [
 ];
 
 const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
-  const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
+  const location = useLocation();
+  const [collapsed, setCollapsed] = useState<Set<string>>(initCollapsed);
   const [viewMode, setViewMode] = useState<ViewMode>(getInitialViewMode);
+  const [search, setSearch] = useState("");
 
   const gradeView = useMemo(buildGradeView, []);
   const categoryView = useMemo(buildCategoryView, []);
+
+  // Auto-expand the group containing the active route
+  const activeGroupKey = useMemo(() => {
+    const parts = location.pathname.split("/").filter(Boolean);
+    const [groupId, operator] = parts;
+    if (!groupId || !operator) return null;
+
+    if (viewMode === "category") {
+      for (const [catKey, , entries] of categoryView) {
+        if (entries.some((e) => e.groupId === groupId && e.op.operator === operator))
+          return `cat-${catKey}`;
+      }
+    } else {
+      for (const [grade, entries] of gradeView.entries()) {
+        if (entries.some((e) => e.groupId === groupId && e.op.operator === operator))
+          return `grade-${grade}`;
+      }
+    }
+    return null;
+  }, [location.pathname, viewMode, categoryView, gradeView]);
+
+  useEffect(() => {
+    if (activeGroupKey) {
+      setCollapsed((prev) => {
+        if (!prev.has(activeGroupKey)) return prev;
+        const next = new Set(prev);
+        next.delete(activeGroupKey);
+        return next;
+      });
+    }
+  }, [activeGroupKey]);
 
   const toggleGroup = useCallback((groupId: string) => {
     setCollapsed((prev) => {
@@ -52,9 +85,20 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
 
   const switchView = useCallback((mode: ViewMode) => {
     setViewMode(mode);
-    setCollapsed(new Set());
+    setCollapsed(initCollapsed());
     try { localStorage.setItem("sidebar-view", mode); } catch { /* ignore */ }
   }, []);
+
+  const isSearching = search.trim().length > 0;
+  const searchNorm = search.trim().toLowerCase();
+
+  const matchesSearch = (entry: GradeEntry) => {
+    if (!searchNorm) return true;
+    return (
+      entry.op.label.toLowerCase().includes(searchNorm) ||
+      entry.groupLabel.toLowerCase().includes(searchNorm)
+    );
+  };
 
   const renderGradeBadges = (op: OperatorRoute) => {
     if (!op.grades?.length) return null;
@@ -70,7 +114,10 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
   const renderCategoryView = () => (
     <ul className="sidebar-menu">
       {categoryView.map(([catKey, catLabel, entries]) => {
+        const filtered = isSearching ? entries.filter(matchesSearch) : entries;
+        if (isSearching && filtered.length === 0) return null;
         const key = `cat-${catKey}`;
+        const isOpen = isSearching || !collapsed.has(key);
         return (
           <li key={key} className="sidebar-group">
             <div
@@ -79,12 +126,12 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
             >
               <span>{catLabel}</span>
               <span className="sidebar-group-toggle">
-                {collapsed.has(key) ? "▸" : "▾"}
+                {isOpen ? "▾" : "▸"}
               </span>
             </div>
-            {!collapsed.has(key) && (
+            {isOpen && (
               <ul className="sidebar-group-items">
-                {entries.map(({ groupId, groupLabel, op }) => {
+                {filtered.map(({ groupId, groupLabel, op }) => {
                   const needsPrefix = groupId !== catKey;
                   return (
                     <li key={`${groupId}-${op.operator}`} className="sidebar-item">
@@ -111,9 +158,12 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
   const renderGradeView = () => (
     <ul className="sidebar-menu">
       {[...gradeView.entries()].map(([grade, entries]) => {
+        const filtered = isSearching ? entries.filter(matchesSearch) : entries;
+        if (isSearching && filtered.length === 0) return null;
         const key = `grade-${grade}`;
+        const isOpen = isSearching || !collapsed.has(key);
         const dupLabels = new Set(
-          entries.map((e) => e.op.label)
+          filtered.map((e) => e.op.label)
             .filter((l, i, a) => a.indexOf(l) !== i),
         );
         return (
@@ -124,12 +174,12 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
             >
               <span>{GRADE_LABELS[grade] ?? `${grade}年`}</span>
               <span className="sidebar-group-toggle">
-                {collapsed.has(key) ? "▸" : "▾"}
+                {isOpen ? "▾" : "▸"}
               </span>
             </div>
-            {!collapsed.has(key) && (
+            {isOpen && (
               <ul className="sidebar-group-items">
-                {entries.map(({ groupId, groupLabel, op }) => {
+                {filtered.map(({ groupId, groupLabel, op }) => {
                   const needsPrefix = dupLabels.has(op.label)
                     || groupId === "grid100" || groupId === "hissan";
                   const label = needsPrefix
@@ -158,19 +208,29 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
 
   return (
     <nav className={`sidebar no-print${menuOpen ? " menu-open" : ""}`}>
-      <div className="sidebar-view-toggle">
-        <button
-          className={`view-toggle-btn${viewMode === "category" ? " active" : ""}`}
-          onClick={() => switchView("category")}
-        >
-          種類別
-        </button>
-        <button
-          className={`view-toggle-btn${viewMode === "grade" ? " active" : ""}`}
-          onClick={() => switchView("grade")}
-        >
-          学年別
-        </button>
+      <div className="sidebar-header">
+        <div className="sidebar-view-toggle">
+          <button
+            className={`view-toggle-btn${viewMode === "category" ? " active" : ""}`}
+            onClick={() => switchView("category")}
+          >
+            種類別
+          </button>
+          <button
+            className={`view-toggle-btn${viewMode === "grade" ? " active" : ""}`}
+            onClick={() => switchView("grade")}
+          >
+            学年別
+          </button>
+        </div>
+        <div className="sidebar-search">
+          <input
+            type="text"
+            placeholder="検索..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
       </div>
       {viewMode === "category" ? renderCategoryView() : renderGradeView()}
     </nav>
@@ -179,6 +239,13 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
 
 export default Sidebar;
 
+
+const initCollapsed = (): Set<string> => {
+  const all = new Set<string>();
+  for (const [catKey] of CATEGORY_LABELS) all.add(`cat-${catKey}`);
+  for (let g = 1; g <= 12; g++) all.add(`grade-${g}`);
+  return all;
+};
 
 const buildGradeView = (): Map<number, GradeEntry[]> => {
   const map = new Map<number, GradeEntry[]>();
