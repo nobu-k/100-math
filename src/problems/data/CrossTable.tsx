@@ -25,7 +25,7 @@ const CrossTable = () => {
       settingsPanel={null}
       qrUrl={qrUrl}
     >
-      <div className="dev-text-page">
+      <div className="dev-text-page print-spread">
         {problems.map((p, idx) => {
           let ansIdx = 0;
           return (

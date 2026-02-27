@@ -61,7 +61,7 @@ const TableRead = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="dev-text-page">
+      <div className="dev-text-page print-spread">
         {problems.map((tp, idx) => (
           <div key={idx} className="dev-prop-block">
             <div className="dev-prop-label">({idx + 1}) {tp.title}</div>

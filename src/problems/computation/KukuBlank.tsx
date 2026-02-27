@@ -59,7 +59,7 @@ const KukuBlank = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="ws-page ws-cols-3">
+      <div className="ws-page ws-cols-3 print-spread">
         {problems.map((p, i) => {
           const a = p.blankPos === "a" ? texBox(p.a, showAnswers) : String(p.a);
           const b = p.blankPos === "b" ? texBox(p.b, showAnswers) : String(p.b);

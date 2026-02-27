@@ -59,7 +59,7 @@ const Division = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="ws-page ws-cols-3">
+      <div className="ws-page ws-cols-3 print-spread">
         {problems.map((p, i) => {
           const remainder = p.remainder > 0
             ? `\\text{ あまり }${texBox(p.remainder, showAnswers)}`

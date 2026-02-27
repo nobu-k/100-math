@@ -2,7 +2,7 @@ const renderTableProblems = (
   problems: { label: string; xValues: number[]; yValues: (number | null)[]; answers: number[] }[],
   showAnswers: boolean,
 ) => (
-  <div className="dev-text-page">
+  <div className="dev-text-page print-spread">
     {problems.map((p, idx) => {
       let ansIdx = 0;
       return (

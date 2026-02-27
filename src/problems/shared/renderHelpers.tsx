@@ -4,7 +4,7 @@ import type { TextProblem } from "./types";
 import type { FracProblem } from "../fractions/types";
 
 export const renderTextProblems = (items: TextProblem[], showAnswers: boolean) => (
-  <div className="dev-text-page">
+  <div className="dev-text-page print-spread">
     {items.map((p, i) => (
       <div key={i} className="dev-text-row">
         <span className="ws-num">({i + 1})</span>
@@ -16,7 +16,7 @@ export const renderTextProblems = (items: TextProblem[], showAnswers: boolean) =
 );
 
 export const renderArrowTextProblems = (items: TextProblem[], showAnswers: boolean) => (
-  <div className="dev-text-page">
+  <div className="dev-text-page print-spread">
     {items.map((p, i) => (
       <div key={i} className="dev-text-row">
         <span className="ws-num">({i + 1})</span>
@@ -33,7 +33,7 @@ export const renderFracProblems = (
   opSymbol: string,
   showAnswers: boolean,
 ) => (
-  <div className="ws-page ws-cols-2">
+  <div className="ws-page ws-cols-2 print-spread">
     {problems.map((p, i) => (
       <div key={i} className="ws-problem">
         <span className="ws-num">({i + 1})</span>

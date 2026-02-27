@@ -87,7 +87,7 @@ const Sequence = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="ws-seq-page">
+      <div className="ws-seq-page print-spread">
         {problems.map((p, i) => (
           <div key={i} className="ws-seq-row">
             <span className="ws-num">({i + 1})</span>

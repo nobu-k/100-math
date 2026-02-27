@@ -119,7 +119,7 @@ const Addition = () => {
           </label>
         </div>
       )}
-      <div className="fraction-page">
+      <div className="fraction-page print-spread">
         {problems.map((p, i) => (
           <div key={i} className="fraction-problem">
             <span className="fraction-number">({i + 1})</span>

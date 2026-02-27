@@ -59,7 +59,7 @@ const AbsoluteValue = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="dev-text-page">
+      <div className="dev-text-page print-spread">
         {problems.map((p, i) => {
           if (p.mode === "find") {
             return (

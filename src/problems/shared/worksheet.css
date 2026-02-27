@@ -219,6 +219,10 @@
     font-size: 16px;
   }
 
+  .ws-seq-page.print-spread {
+    display: grid;
+  }
+
   .ws-clock-grid {
     gap: 12px 8px;
   }

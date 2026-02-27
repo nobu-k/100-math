@@ -8,19 +8,19 @@ import {
 const seeds = [1, 2, 42, 100, 999];
 
 describe("generateDataAnalysis", () => {
-  it("representative mode returns 6 problems", () => {
+  it("representative mode returns 4 problems", () => {
     const problems = generateDataAnalysis(42, "representative");
-    expect(problems).toHaveLength(6);
+    expect(problems).toHaveLength(4);
   });
 
-  it("frequency mode returns 6 problems", () => {
+  it("frequency mode returns 4 problems", () => {
     const problems = generateDataAnalysis(42, "frequency");
-    expect(problems).toHaveLength(6);
+    expect(problems).toHaveLength(4);
   });
 
-  it("mixed mode returns 6 problems", () => {
+  it("mixed mode returns 4 problems", () => {
     const problems = generateDataAnalysis(42, "mixed");
-    expect(problems).toHaveLength(6);
+    expect(problems).toHaveLength(4);
   });
 
   it("defaults to mixed mode", () => {

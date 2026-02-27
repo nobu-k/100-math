@@ -120,7 +120,7 @@ const Factors = () => {
           </label>
         </div>
       )}
-      <div className="integer-page">
+      <div className="integer-page print-spread">
         {problems.map((p, i) => (
           <div key={i} className="integer-problem">
             <div className="integer-question">

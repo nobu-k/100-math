@@ -65,7 +65,7 @@ const Representative = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="dev-text-page">
+      <div className="dev-text-page print-spread">
         {problems.map((p, i) => (
           <div key={i} className="dev-prop-block">
             <div className="dev-prop-label">({i + 1}) データ: {p.data.join(", ")}</div>

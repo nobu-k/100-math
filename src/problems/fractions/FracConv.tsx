@@ -59,7 +59,7 @@ const FracConv = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="dev-text-page">
+      <div className="dev-text-page print-spread">
         {problems.map((p, i) => {
           const [fromTex, toTex] = buildFracConvTex(p, showAnswers);
           return (

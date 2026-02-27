@@ -58,7 +58,7 @@ const PosNegAddSub = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="ws-page ws-cols-2">
+      <div className="ws-page ws-cols-2 print-spread">
         {problems.map((p, i) => {
           const parts = p.terms.map((t, j) => {
             const sign = j === 0 ? "" : (t >= 0 ? "+" : "-");

@@ -23,7 +23,7 @@ const PosNegMixed = () => {
       settingsPanel={null}
       qrUrl={qrUrl}
     >
-      <div className="ws-page ws-cols-2">
+      <div className="ws-page ws-cols-2 print-spread">
         {problems.map((p, i) => (
           <div key={i} className="ws-problem">
             <span className="ws-num">({i + 1})</span>

@@ -23,7 +23,7 @@ const SectorFig = ({ problem }: { problem: SectorProblem }) => {
   const arcLy = cy - (arcR + 12) * Math.sin(toRad(arcLabelAngle));
 
   return (
-    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: "block", margin: "8px 0" }}>
+    <svg width={W + 15} height={H} viewBox={`-15 0 ${W + 15} ${H}`} style={{ display: "block", margin: "8px 0" }}>
       {/* Filled sector for area type */}
       {p.type === "area" && (
         <path d={sectorPath} fill="#e3f2fd" stroke="none" />

@@ -63,7 +63,7 @@ const DataAnalysis = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="dev-text-page">
+      <div className="dev-text-page print-spread">
         {problems.map((p: DataAnalysisProblem, i: number) => {
           if (p.mode === "representative") {
             return (

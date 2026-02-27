@@ -277,7 +277,7 @@ const Division = () => {
         </div>
       )}
       <div className={cx(
-        "hissan-page",
+        "hissan-page print-spread",
         [!cfg.showGrid, "hissan-no-grid"],
         [showAnswers, "hissan-show-answers"],
         [!cfg.useDecimals, "hissan-div-page"],

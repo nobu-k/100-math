@@ -65,7 +65,7 @@ const ProportionEq = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="dev-text-page">
+      <div className="dev-text-page print-spread">
         {problems.map((p, i) => (
           <div key={i} className="dev-text-row">
             <span className="ws-num">({i + 1})</span>

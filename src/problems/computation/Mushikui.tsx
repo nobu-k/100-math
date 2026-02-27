@@ -82,7 +82,7 @@ const Mushikui = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="ws-page ws-cols-2">
+      <div className="ws-page ws-cols-2 print-spread">
         {problems.map((p, i) => {
           const left = p.left !== null ? String(p.left) : texBox(p.answer, showAnswers);
           const right = p.right !== null ? String(p.right) : texBox(p.answer, showAnswers);

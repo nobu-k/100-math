@@ -60,7 +60,7 @@ const MentalMath = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="ws-page ws-cols-4">
+      <div className="ws-page ws-cols-4 print-spread">
         {problems.map((p, i) => (
           <div key={i} className="ws-problem">
             <span className="ws-num">({i + 1})</span>
