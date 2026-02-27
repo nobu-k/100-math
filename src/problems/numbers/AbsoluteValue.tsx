@@ -63,8 +63,8 @@ const AbsoluteValue = () => {
         {problems.map((p, i) => {
           if (p.mode === "find") {
             return (
-              <div key={i} className="g1-problem">
-                <span className="g1-num">({i + 1})</span>
+              <div key={i} className="ws-problem">
+                <span className="ws-num">({i + 1})</span>
                 <M tex={`\\lvert ${p.number} \\rvert = ${texAns(p.answer!, showAnswers)}`} />
               </div>
             );
@@ -72,11 +72,11 @@ const AbsoluteValue = () => {
           if (p.mode === "list") {
             return (
               <div key={i} className="dev-text-row">
-                <span className="g1-num">({i + 1})</span>
+                <span className="ws-num">({i + 1})</span>
                 <span className="dev-text-q">
                   絶対値が {p.threshold} 以下の整数をすべて書きなさい
                 </span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>
                   {p.listAnswer!.join(", ")}
                 </span>
               </div>
@@ -84,9 +84,9 @@ const AbsoluteValue = () => {
           }
           return (
             <div key={i} className="dev-text-row">
-              <span className="g1-num">({i + 1})</span>
+              <span className="ws-num">({i + 1})</span>
               <span className="dev-text-q">|x| = {p.eqValue} のとき x = ?</span>
-              <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+              <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>
                 x = ±{p.eqValue}
               </span>
             </div>

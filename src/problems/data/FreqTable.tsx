@@ -39,7 +39,7 @@ const FreqTable = () => {
                     if (freq !== null) return (<tr key={j}><td>{cls}</td><td>{freq}</td></tr>);
                     const ans = p.answers[ansIdx++];
                     return (<tr key={j}><td>{cls}</td><td className="dev-prop-blank">
-                      <span className={showAnswers ? "dev-frac-ans" : "g1-hidden"}>{ans}</span>
+                      <span className={showAnswers ? "dev-frac-ans" : "ws-hidden"}>{ans}</span>
                     </td></tr>);
                   })}
                 </tbody>

@@ -60,10 +60,10 @@ const MentalMath = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="g1-page g1-cols-4">
+      <div className="ws-page ws-cols-4">
         {problems.map((p, i) => (
-          <div key={i} className="g1-problem">
-            <span className="g1-num">({i + 1})</span>
+          <div key={i} className="ws-problem">
+            <span className="ws-num">({i + 1})</span>
             <M tex={`${p.left} ${p.op === "+" ? "+" : "-"} ${p.right} = ${texBox(p.answer, showAnswers)}`} />
           </div>
         ))}

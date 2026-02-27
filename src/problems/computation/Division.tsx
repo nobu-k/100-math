@@ -59,14 +59,14 @@ const Division = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="g1-page g1-cols-3">
+      <div className="ws-page ws-cols-3">
         {problems.map((p, i) => {
           const remainder = p.remainder > 0
             ? `\\text{ あまり }${texBox(p.remainder, showAnswers)}`
             : "";
           return (
-            <div key={i} className="g1-problem">
-              <span className="g1-num">({i + 1})</span>
+            <div key={i} className="ws-problem">
+              <span className="ws-num">({i + 1})</span>
               <M tex={`${p.dividend} \\div ${p.divisor} = ${texBox(p.quotient, showAnswers)}${remainder}`} />
             </div>
           );

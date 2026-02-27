@@ -70,7 +70,7 @@ const Prime = () => {
                 <div className="dev-text-q" style={{ fontSize: "1.1em" }}>
                   {p.numbers!.join(", ")}
                 </div>
-                <div className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                <div className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>
                   {p.primes!.join(", ")}
                 </div>
               </div>
@@ -78,9 +78,9 @@ const Prime = () => {
           }
           return (
             <div key={i} className="dev-text-row">
-              <span className="g1-num">({i + 1})</span>
+              <span className="ws-num">({i + 1})</span>
               <span className="dev-text-q">{p.target} を素因数分解しなさい</span>
-              <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+              <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>
                 <M tex={texRed(unicodeToLatex(p.factorExpr!))} />
               </span>
             </div>

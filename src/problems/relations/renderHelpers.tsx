@@ -18,7 +18,7 @@ const renderTableProblems = (
                   const ans = p.answers[ansIdx++];
                   return (
                     <td key={j} className="dev-prop-blank">
-                      <span className={showAnswers ? "dev-frac-ans" : "g1-hidden"}>{ans}</span>
+                      <span className={showAnswers ? "dev-frac-ans" : "ws-hidden"}>{ans}</span>
                     </td>
                   );
                 })}

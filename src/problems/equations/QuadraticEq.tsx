@@ -96,13 +96,13 @@ const QuadraticEq = () => {
             <M tex={"x = \\dfrac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}"} />
           </div>
         )}
-        <div className={`g1-page g1-cols-2 ${qeformula ? "print-spread-short" : "print-spread"}`}>
+        <div className={`ws-page ws-cols-2 ${qeformula ? "print-spread-short" : "print-spread"}`}>
           {problems.map((p, i) => (
-            <div key={i} className="g1-problem">
-              <span className="g1-num">({i + 1})</span>
-              <span className="g1-expr">
+            <div key={i} className="ws-problem">
+              <span className="ws-num">({i + 1})</span>
+              <span className="ws-expr">
                 <M tex={unicodeToLatex(p.equation)} />
-                <span className={`${showAnswers ? "" : "g1-hidden"}`} style={{ marginLeft: "1em" }}>
+                <span className={`${showAnswers ? "" : "ws-hidden"}`} style={{ marginLeft: "1em" }}>
                   <M tex={texRed(unicodeToLatex(p.answerDisplay))} />
                 </span>
               </span>

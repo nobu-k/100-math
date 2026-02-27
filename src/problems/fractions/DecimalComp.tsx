@@ -59,10 +59,10 @@ const DecimalComp = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="g1-page g1-cols-3">
+      <div className="ws-page ws-cols-3">
         {problems.map((p, i) => (
-          <div key={i} className="g1-problem">
-            <span className="g1-num">({i + 1})</span>
+          <div key={i} className="ws-problem">
+            <span className="ws-num">({i + 1})</span>
             <M tex={`${p.left} ${texBox(p.answer, showAnswers)} ${p.right}`} />
           </div>
         ))}

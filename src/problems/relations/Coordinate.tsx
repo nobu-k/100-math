@@ -123,7 +123,7 @@ const Coordinate = () => {
                     ? `点 (${p.x}, ${p.y}) は第何象限？`
                     : <><M tex={unicodeToLatex(p.formula!)} /> のグラフは点 ({p.x}, {p.y}) を通るか？</>}
                 </span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{p.answerDisplay}</span>
+                <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.answerDisplay}</span>
               </div>
             </div>
           </div>

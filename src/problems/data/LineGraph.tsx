@@ -123,7 +123,7 @@ const LineGraph = () => {
               {p.questions.map((q, qi) => (
                 <div key={qi} className="dev-text-row">
                   <span className="dev-text-q">{q.question}</span>
-                  <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                  <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>
                     {q.answer}
                   </span>
                 </div>

@@ -64,7 +64,7 @@ const FracConv = () => {
           const [fromTex, toTex] = buildFracConvTex(p, showAnswers);
           return (
             <div key={i} className="dev-text-row dev-frac-row">
-              <span className="g1-num">({i + 1})</span>
+              <span className="ws-num">({i + 1})</span>
               <M tex={`${fromTex} \\rightarrow ${toTex}`} />
             </div>
           );

@@ -59,14 +59,14 @@ const Decomposition = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="g1-page g1-cols-2">
+      <div className="ws-page ws-cols-2">
         {problems.map((p, i) => {
           const tex = p.position === "left"
             ? `${p.target} = ${p.given} + ${texBox(p.answer, showAnswers)}`
             : `${p.target} = ${texBox(p.answer, showAnswers)} + ${p.given}`;
           return (
-            <div key={i} className="g1-problem">
-              <span className="g1-num">({i + 1})</span>
+            <div key={i} className="ws-problem">
+              <span className="ws-num">({i + 1})</span>
               <M tex={tex} />
             </div>
           );

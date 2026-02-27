@@ -66,9 +66,9 @@ const Sampling = () => {
       <div className="dev-text-page">
         {problems.map((p, i) => (
           <div key={i} className="dev-text-row">
-            <span className="g1-num">({i + 1})</span>
+            <span className="ws-num">({i + 1})</span>
             <span className="dev-text-q">{p.question}</span>
-            <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{p.answerDisplay}</span>
+            <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.answerDisplay}</span>
           </div>
         ))}
       </div>

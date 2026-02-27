@@ -59,10 +59,10 @@ const DiffFrac = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="g1-page g1-cols-2">
+      <div className="ws-page ws-cols-2">
         {problems.map((p, i) => (
-          <div key={i} className="g1-problem">
-            <span className="g1-num">({i + 1})</span>
+          <div key={i} className="ws-problem">
+            <span className="ws-num">({i + 1})</span>
             <M tex={`\\frac{${p.aNum}}{${p.aDen}} ${p.op === "+" ? "+" : "-"} \\frac{${p.bNum}}{${p.bDen}} = ${showAnswers ? texRed(texFrac(p.ansNum, p.ansDen, p.ansWhole, p.ansPartNum)) : texAns("?", false)}`} />
           </div>
         ))}

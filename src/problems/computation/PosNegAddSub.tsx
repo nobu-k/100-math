@@ -58,7 +58,7 @@ const PosNegAddSub = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="g1-page g1-cols-2">
+      <div className="ws-page ws-cols-2">
         {problems.map((p, i) => {
           const parts = p.terms.map((t, j) => {
             const sign = j === 0 ? "" : (t >= 0 ? "+" : "-");
@@ -68,8 +68,8 @@ const PosNegAddSub = () => {
             return `${sign} ${val}`;
           }).join(" ");
           return (
-            <div key={i} className="g1-problem">
-              <span className="g1-num">({i + 1})</span>
+            <div key={i} className="ws-problem">
+              <span className="ws-num">({i + 1})</span>
               <M tex={`${parts} = ${texAns(p.answer, showAnswers)}`} />
             </div>
           );

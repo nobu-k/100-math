@@ -67,9 +67,9 @@ const Probability = () => {
       <div className="dev-text-page">
         {problems.map((p, i) => (
           <div key={i} className="dev-text-row">
-            <span className="g1-num">({i + 1})</span>
+            <span className="ws-num">({i + 1})</span>
             <span className="dev-text-q">{p.question}</span>
-            <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`} style={{ alignItems: "center" }}>
+            <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`} style={{ alignItems: "center" }}>
               <M tex={texRed(p.ansDen === 1 ? String(p.ansNum) : `\\frac{${p.ansNum}}{${p.ansDen}}`)} />
             </span>
           </div>

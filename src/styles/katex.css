@@ -2,8 +2,8 @@
    KaTeX overrides
    ============================================================ */
 
-/* Grid problems: match g1-val sizing */
-.g1-problem .katex {
+/* Grid problems: match ws-val sizing */
+.ws-problem .katex {
   font-size: 32px;
 }
 
@@ -43,7 +43,7 @@
 }
 
 @media print {
-  .g1-problem .katex {
+  .ws-problem .katex {
     font-size: 20px;
     white-space: nowrap;
   }

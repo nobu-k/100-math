@@ -62,10 +62,10 @@ const PosNegMulDiv = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="g1-page g1-cols-2">
+      <div className="ws-page ws-cols-2">
         {problems.map((p, i) => (
-          <div key={i} className="g1-problem">
-            <span className="g1-num">({i + 1})</span>
+          <div key={i} className="ws-problem">
+            <span className="ws-num">({i + 1})</span>
             <M tex={`${unicodeToLatex(p.expr)} = ${texAns(p.answer, showAnswers)}`} />
           </div>
         ))}

@@ -70,7 +70,7 @@ const SimultaneousEq = () => {
           <div key={i} className="dev-prop-block">
             <div className="dev-prop-label">({i + 1})</div>
             <M tex={`\\begin{cases} ${unicodeToLatex(p.eq1)} \\\\ ${unicodeToLatex(p.eq2)} \\end{cases}`} />
-            <div className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+            <div className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>
               <M tex={texRed(`x = ${p.answerX},\\, y = ${p.answerY}`)} />
             </div>
           </div>

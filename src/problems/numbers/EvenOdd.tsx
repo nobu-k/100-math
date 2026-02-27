@@ -61,9 +61,9 @@ const EvenOdd = () => {
       <div className="dev-text-page">
         {problems.map((p, i) => (
           <div key={i} className="dev-text-row">
-            <span className="g1-num">({i + 1})</span>
+            <span className="ws-num">({i + 1})</span>
             <span className="dev-text-q">{p.numbers.join("\u3001")}</span>
-            <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+            <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>
               偶数: {p.evenAnswers.join("\u3001")} ／ 奇数: {p.oddAnswers.join("\u3001")}
             </span>
           </div>

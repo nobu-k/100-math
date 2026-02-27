@@ -72,19 +72,19 @@ const Representative = () => {
             {(repfind === "mean" || repfind === "mixed") && (
               <div className="dev-text-row">
                 <span className="dev-text-q">平均値:</span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{p.meanAnswer}</span>
+                <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.meanAnswer}</span>
               </div>
             )}
             {(repfind === "median" || repfind === "mixed") && (
               <div className="dev-text-row">
                 <span className="dev-text-q">中央値:</span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{p.medianAnswer}</span>
+                <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.medianAnswer}</span>
               </div>
             )}
             {(repfind === "mode" || repfind === "mixed") && (
               <div className="dev-text-row">
                 <span className="dev-text-q">最頻値:</span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{p.modeAnswer}</span>
+                <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.modeAnswer}</span>
               </div>
             )}
           </div>

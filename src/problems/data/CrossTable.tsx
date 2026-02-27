@@ -41,7 +41,7 @@ const CrossTable = () => {
                         if (cell !== null) return <td key={c}>{cell}</td>;
                         const ans = p.answers[ansIdx++];
                         return (<td key={c} className="dev-prop-blank">
-                          <span className={showAnswers ? "dev-frac-ans" : "g1-hidden"}>{ans}</span>
+                          <span className={showAnswers ? "dev-frac-ans" : "ws-hidden"}>{ans}</span>
                         </td>);
                       })}
                     </tr>

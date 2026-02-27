@@ -71,7 +71,7 @@ const BarGraph = () => {
               {bp.questions.map((q, j) => (
                 <div key={j} className="dev-text-row">
                   <span className="dev-text-q">{q.question}</span>
-                  <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{q.answer}</span>
+                  <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>{q.answer}</span>
                 </div>
               ))}
             </div>

@@ -72,7 +72,7 @@ const SolidVolume = () => {
             <div style={{ marginTop: 8 }}>
               <div className="dev-text-row">
                 <span className="dev-text-q">{buildQuestion(p)}</span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>
                   <M tex={texRed(unicodeToLatex(p.answerDisplay))} />
                 </span>
               </div>

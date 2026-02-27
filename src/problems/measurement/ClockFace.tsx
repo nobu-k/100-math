@@ -12,7 +12,7 @@ const ClockFace = ({ hour, minute }: { hour: number; minute: number }) => {
   };
 
   return (
-    <svg className="g1-clock-svg" viewBox="0 0 200 200">
+    <svg className="ws-clock-svg" viewBox="0 0 200 200">
       <circle cx={cx} cy={cy} r={r} fill="#fff" stroke="#000" strokeWidth="3" />
       {Array.from({ length: 12 }, (_, i) => {
         const a = ((i * 30 - 90) * Math.PI) / 180;

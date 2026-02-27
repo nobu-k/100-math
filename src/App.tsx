@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { Outlet, useMatches } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import "./styles/layout.css";
-import "./problems/shared/g1.css";
+import "./problems/shared/worksheet.css";
 import "./problems/shared/dev.css";
 import "./styles/katex.css";
 

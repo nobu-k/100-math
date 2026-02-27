@@ -69,10 +69,10 @@ const DataAnalysis = () => {
             return (
               <div key={i} className="dev-prop-block">
                 <div className="dev-prop-label">({i + 1}) データ: {p.data.join(", ")}</div>
-                <div className="dev-text-row"><span className="dev-text-q">平均値:</span><span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{p.mean}</span></div>
-                <div className="dev-text-row"><span className="dev-text-q">中央値:</span><span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{p.median}</span></div>
-                <div className="dev-text-row"><span className="dev-text-q">最頻値:</span><span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{p.modeValue}</span></div>
-                <div className="dev-text-row"><span className="dev-text-q">範囲:</span><span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{p.range}</span></div>
+                <div className="dev-text-row"><span className="dev-text-q">平均値:</span><span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.mean}</span></div>
+                <div className="dev-text-row"><span className="dev-text-q">中央値:</span><span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.median}</span></div>
+                <div className="dev-text-row"><span className="dev-text-q">最頻値:</span><span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.modeValue}</span></div>
+                <div className="dev-text-row"><span className="dev-text-q">範囲:</span><span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.range}</span></div>
               </div>
             );
           }
@@ -89,7 +89,7 @@ const DataAnalysis = () => {
                       <tr key={j}>
                         <td>{cls[0]}以上{cls[1]}未満</td>
                         <td className={hidden ? "dev-prop-blank" : ""}>
-                          {hidden ? (<span className={showAnswers ? "dev-frac-ans" : "g1-hidden"}>{p.frequencies[j]}</span>) : p.frequencies[j]}
+                          {hidden ? (<span className={showAnswers ? "dev-frac-ans" : "ws-hidden"}>{p.frequencies[j]}</span>) : p.frequencies[j]}
                         </td>
                         <td>{p.relativeFrequencies[j].toFixed(2)}</td>
                         <td>{p.cumulativeFrequencies[j]}</td>

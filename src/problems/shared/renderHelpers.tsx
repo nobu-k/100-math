@@ -7,9 +7,9 @@ export const renderTextProblems = (items: TextProblem[], showAnswers: boolean) =
   <div className="dev-text-page">
     {items.map((p, i) => (
       <div key={i} className="dev-text-row">
-        <span className="g1-num">({i + 1})</span>
+        <span className="ws-num">({i + 1})</span>
         <span className="dev-text-q">{p.question}</span>
-        <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{p.answer}</span>
+        <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.answer}</span>
       </div>
     ))}
   </div>
@@ -19,10 +19,10 @@ export const renderArrowTextProblems = (items: TextProblem[], showAnswers: boole
   <div className="dev-text-page">
     {items.map((p, i) => (
       <div key={i} className="dev-text-row">
-        <span className="g1-num">({i + 1})</span>
+        <span className="ws-num">({i + 1})</span>
         <span className="dev-text-q">{p.question}</span>
         <span className="dev-text-arrow">&rarr;</span>
-        <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>{p.answer}</span>
+        <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.answer}</span>
       </div>
     ))}
   </div>
@@ -33,10 +33,10 @@ export const renderFracProblems = (
   opSymbol: string,
   showAnswers: boolean,
 ) => (
-  <div className="g1-page g1-cols-2">
+  <div className="ws-page ws-cols-2">
     {problems.map((p, i) => (
-      <div key={i} className="g1-problem">
-        <span className="g1-num">({i + 1})</span>
+      <div key={i} className="ws-problem">
+        <span className="ws-num">({i + 1})</span>
         <M tex={`\\frac{${p.aNum}}{${p.aDen}} ${unicodeToLatex(opSymbol)} \\frac{${p.bNum}}{${p.bDen}} = ${showAnswers ? texRed(texFrac(p.ansNum, p.ansDen, p.ansWhole, p.ansPartNum)) : texAns("?", false)}`} />
       </div>
     ))}

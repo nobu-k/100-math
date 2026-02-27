@@ -87,21 +87,21 @@ const Sequence = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="g1-seq-page">
+      <div className="ws-seq-page">
         {problems.map((p, i) => (
-          <div key={i} className="g1-seq-row">
-            <span className="g1-num">({i + 1})</span>
-            <span className="g1-seq-cells">
+          <div key={i} className="ws-seq-row">
+            <span className="ws-num">({i + 1})</span>
+            <span className="ws-seq-cells">
               {p.cells.map((c, j) => {
                 const blankIdx =
                   c === null
                     ? p.cells.slice(0, j).filter((x) => x === null).length
                     : -1;
                 return (
-                  <span key={j} className="g1-seq-cell-wrap">
-                    {j > 0 && <span className="g1-seq-arrow">&rarr;</span>}
+                  <span key={j} className="ws-seq-cell-wrap">
+                    {j > 0 && <span className="ws-seq-arrow">&rarr;</span>}
                     {c !== null ? (
-                      <span className="g1-seq-cell">{c}</span>
+                      <span className="ws-seq-cell">{c}</span>
                     ) : (
                       <M tex={texBox(p.answers[blankIdx], showAnswers)} />
                     )}

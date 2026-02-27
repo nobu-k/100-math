@@ -68,12 +68,12 @@ const Clock = () => {
 };
 
 const renderClockProblems = (items: ClockProblem[], showAnswers: boolean) => (
-  <div className="g1-clock-grid">
+  <div className="ws-clock-grid">
     {items.map((p, i) => (
-      <div key={i} className="g1-clock-item">
-        <span className="g1-num">({i + 1})</span>
+      <div key={i} className="ws-clock-item">
+        <span className="ws-num">({i + 1})</span>
         <ClockFace hour={p.hour} minute={p.minute} />
-        <span className={`g1-clock-answer${showAnswers ? "" : " g1-hidden"}`}>
+        <span className={`ws-clock-answer${showAnswers ? "" : " ws-hidden"}`}>
           {p.minute === 0 ? `${p.hour}時` : `${p.hour}時${p.minute}分`}
         </span>
       </div>

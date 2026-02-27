@@ -72,7 +72,7 @@ const Sector = () => {
                   {"半径 "}{p.radius}{"cm、中心角 "}{p.angle}{"° のおうぎ形の"}
                   {p.type === "arc" ? "弧の長さ" : "面積"}{"は？"}
                 </span>
-                <span className={`dev-text-a${showAnswers ? "" : " g1-hidden"}`}>
+                <span className={`dev-text-a${showAnswers ? "" : " ws-hidden"}`}>
                   <M tex={texRed(`${p.answerCoefficient === 1 ? "" : p.answerCoefficient}\\pi \\text{ ${p.unit}}`)} />
                 </span>
               </div>
