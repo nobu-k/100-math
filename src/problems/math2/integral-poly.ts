@@ -80,7 +80,8 @@ const generateIndefinite = (rng: () => number): IntegralPolyProblem | null => {
         const isFirst = parts.length === 0;
         const sign = num > 0 ? (isFirst ? "" : "+ ") : (isFirst ? "−" : "− ");
         const absNum = Math.abs(num);
-        parts.push(`${sign}${absNum === 1 && den > 0 ? "" : absNum}${powerStr(i)}/${den}`);
+        const numStr = `${absNum === 1 && den > 0 ? "" : absNum}${powerStr(i)}`;
+        parts.push(`${sign}(${numStr})/${den}`);
       }
     }
     const answerExpr = `${parts.join(" ")} + C`;
