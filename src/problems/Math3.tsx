@@ -7,8 +7,8 @@ export const math3: ProblemGroup = {
   id: "math3",
   label: "数学III",
   operators: [
-    { operator: "seq-limit", label: "数列の極限", grades: [12], category: "math3", Component: SeqLimit },
-    { operator: "differentiation", label: "微分法", grades: [12], category: "math3", Component: Differentiation },
-    { operator: "integration", label: "積分法", grades: [12], category: "math3", Component: Integration },
+    { operator: "seq-limit", label: "数列の極限", grades: [14], category: "hs-sequence", subcategory: "極限", Component: SeqLimit },
+    { operator: "differentiation", label: "微分法", grades: [14], category: "hs-diff", subcategory: "微分法", Component: Differentiation },
+    { operator: "integration", label: "積分法", grades: [14], category: "hs-integral", subcategory: "積分法", Component: Integration },
   ],
 };

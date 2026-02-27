@@ -6,7 +6,7 @@ export const mathC: ProblemGroup = {
   id: "mathC",
   label: "数学C",
   operators: [
-    { operator: "vector-calc", label: "ベクトルの演算", grades: [12], category: "mathC", Component: VectorCalc },
-    { operator: "complex-plane", label: "複素数平面", grades: [12], category: "mathC", Component: ComplexPlane },
+    { operator: "vector-calc", label: "ベクトルの演算", grades: [15], category: "hs-geometry", subcategory: "ベクトル", Component: VectorCalc },
+    { operator: "complex-plane", label: "複素数平面", grades: [15], category: "hs-complex", subcategory: "複素数平面", Component: ComplexPlane },
   ],
 };

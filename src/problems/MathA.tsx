@@ -8,9 +8,9 @@ export const mathA: ProblemGroup = {
   id: "mathA",
   label: "数学A",
   operators: [
-    { operator: "permutation-combination", label: "順列・組合せ", grades: [10], category: "mathA", Component: PermutationCombination },
-    { operator: "probability", label: "確率", grades: [10], category: "mathA", Component: Probability },
-    { operator: "euclidean-gcd", label: "ユークリッドの互除法", grades: [10], category: "mathA", Component: EuclideanGcd },
-    { operator: "base-conversion", label: "n進法", grades: [10], category: "mathA", Component: BaseConversion },
+    { operator: "permutation-combination", label: "順列・組合せ", grades: [11], category: "hs-prob", subcategory: "場合の数・確率", Component: PermutationCombination },
+    { operator: "probability", label: "確率", grades: [11], category: "hs-prob", subcategory: "場合の数・確率", Component: Probability },
+    { operator: "euclidean-gcd", label: "ユークリッドの互除法", grades: [11], category: "hs-integer", subcategory: "整数の性質", Component: EuclideanGcd },
+    { operator: "base-conversion", label: "n進法", grades: [11], category: "hs-integer", subcategory: "整数の性質", Component: BaseConversion },
   ],
 };

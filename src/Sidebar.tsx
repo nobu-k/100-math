@@ -19,7 +19,8 @@ interface SidebarProps {
 
 const GRADE_LABELS: Record<number, string> = {
   1: "小1", 2: "小2", 3: "小3", 4: "小4", 5: "小5", 6: "小6",
-  7: "中1", 8: "中2", 9: "中3", 10: "高1", 11: "高2", 12: "高3",
+  7: "中1", 8: "中2", 9: "中3",
+  10: "数I", 11: "数A", 12: "数II", 13: "数B", 14: "数III", 15: "数C",
 };
 
 const CATEGORY_LABELS: [string, string][] = [
@@ -32,12 +33,18 @@ const CATEGORY_LABELS: [string, string][] = [
   ["measurement", "測定"],
   ["relations", "変化と関係"],
   ["data", "データ・統計"],
-  ["math1", "数学I"],
-  ["mathA", "数学A"],
-  ["math2", "数学II"],
-  ["mathB", "数学B"],
-  ["math3", "数学III"],
-  ["mathC", "数学C"],
+  ["hs-expr", "式の計算"],
+  ["hs-equation", "方程式・不等式"],
+  ["hs-function", "関数"],
+  ["hs-trig", "三角関数"],
+  ["hs-diff", "微分"],
+  ["hs-integral", "積分"],
+  ["hs-prob", "場合の数・確率"],
+  ["hs-integer", "整数"],
+  ["hs-sequence", "数列・極限"],
+  ["hs-statistics", "統計"],
+  ["hs-geometry", "座標・ベクトル"],
+  ["hs-complex", "複素数平面"],
 ];
 
 const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
@@ -138,7 +145,8 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
             {isOpen && (
               <ul className="sidebar-group-items">
                 {filtered.map(({ groupId, groupLabel, op }) => {
-                  const needsPrefix = groupId !== catKey;
+                  const isHighSchool = (op.grades?.[0] ?? 0) >= 10;
+                  const needsPrefix = !isHighSchool && groupId !== catKey;
                   return (
                     <li key={`${groupId}-${op.operator}`} className="sidebar-item">
                       <NavLink
@@ -161,6 +169,45 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
     </ul>
   );
 
+  const renderGradeItems = (filtered: GradeEntry[], grade: number) => {
+    const dupLabels = new Set(
+      filtered.map((e) => e.op.label)
+        .filter((l, i, a) => a.indexOf(l) !== i),
+    );
+    const isHighSchool = grade >= 10;
+    const items: React.ReactNode[] = [];
+    let lastSubcat: string | undefined;
+
+    for (const { groupId, groupLabel, op } of filtered) {
+      if (isHighSchool && op.subcategory && op.subcategory !== lastSubcat) {
+        lastSubcat = op.subcategory;
+        items.push(
+          <li key={`subcat-${op.subcategory}`} className="sidebar-subcategory">
+            {op.subcategory}
+          </li>,
+        );
+      }
+      const needsPrefix = dupLabels.has(op.label)
+        || groupId === "grid100" || groupId === "hissan";
+      const label = needsPrefix
+        ? `${op.label}（${groupLabel}）`
+        : op.label;
+      items.push(
+        <li key={`${groupId}-${op.operator}`} className="sidebar-item">
+          <NavLink
+            to={`/${groupId}/${op.operator}`}
+            onClick={onClose}
+          >
+            <span className="sidebar-item-label">
+              {label}
+            </span>
+          </NavLink>
+        </li>,
+      );
+    }
+    return items;
+  };
+
   const renderGradeView = () => (
     <ul className="sidebar-menu">
       {[...gradeView.entries()].map(([grade, entries]) => {
@@ -168,10 +215,6 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
         if (isSearching && filtered.length === 0) return null;
         const key = `grade-${grade}`;
         const isOpen = isSearching || !collapsed.has(key);
-        const dupLabels = new Set(
-          filtered.map((e) => e.op.label)
-            .filter((l, i, a) => a.indexOf(l) !== i),
-        );
         return (
           <li key={key} className="sidebar-group">
             <div
@@ -185,25 +228,7 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
             </div>
             {isOpen && (
               <ul className="sidebar-group-items">
-                {filtered.map(({ groupId, groupLabel, op }) => {
-                  const needsPrefix = dupLabels.has(op.label)
-                    || groupId === "grid100" || groupId === "hissan";
-                  const label = needsPrefix
-                    ? `${op.label}（${groupLabel}）`
-                    : op.label;
-                  return (
-                    <li key={`${groupId}-${op.operator}`} className="sidebar-item">
-                      <NavLink
-                        to={`/${groupId}/${op.operator}`}
-                        onClick={onClose}
-                      >
-                        <span className="sidebar-item-label">
-                          {label}
-                        </span>
-                      </NavLink>
-                    </li>
-                  );
-                })}
+                {renderGradeItems(filtered, grade)}
               </ul>
             )}
           </li>
@@ -249,7 +274,7 @@ export default Sidebar;
 const initCollapsed = (): Set<string> => {
   const all = new Set<string>();
   for (const [catKey] of CATEGORY_LABELS) all.add(`cat-${catKey}`);
-  for (let g = 1; g <= 12; g++) all.add(`grade-${g}`);
+  for (let g = 1; g <= 15; g++) all.add(`grade-${g}`);
   return all;
 };
 
