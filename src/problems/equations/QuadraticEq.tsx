@@ -44,7 +44,7 @@ const QuadraticEq = () => {
   );
 
   const problems = useMemo(
-    () => generateQuadEq(seed, qemode, qeformula ? 10 : 12),
+    () => generateQuadEq(seed, qemode, qeformula ? 6 : 8),
     [seed, qemode, qeformula],
   );
 
@@ -96,7 +96,7 @@ const QuadraticEq = () => {
             <M tex={"x = \\dfrac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}"} />
           </div>
         )}
-        <div className="g1-page g1-cols-2">
+        <div className={`g1-page g1-cols-2 ${qeformula ? "print-spread-short" : "print-spread"}`}>
           {problems.map((p, i) => (
             <div key={i} className="g1-problem">
               <span className="g1-num">({i + 1})</span>

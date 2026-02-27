@@ -1305,9 +1305,12 @@
    ============================================================ */
 @media print {
   .g1-page {
-    justify-content: center;
     padding: 0 2mm;
     gap: 14px 12px;
+  }
+
+  .g1-cols-2 {
+    grid-template-columns: 1fr 1fr;
   }
 
   .g1-val {
@@ -1352,6 +1355,26 @@
 
   .g1-num {
     font-size: 12px;
+  }
+
+  .formula-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 0;
+    padding: 4px 0;
+    margin-bottom: 8px;
+  }
+
+  .formula-box > * {
+    padding: 0 12px;
+  }
+
+  .formula-box > *:nth-child(odd) {
+    border-right: 1px solid #ccc;
+  }
+
+  .formula-box .katex {
+    font-size: 14px;
   }
 }
 
@@ -1501,6 +1524,11 @@
 
   .print-spread {
     min-height: 210mm;
+    grid-auto-rows: 1fr;
+  }
+
+  .print-spread-short {
+    min-height: 150mm;
     grid-auto-rows: 1fr;
   }
 

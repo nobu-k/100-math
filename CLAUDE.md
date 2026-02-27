@@ -26,9 +26,13 @@ All problems must fit within a single A4 page (794×1123px at 96 dpi, with `@pag
 
 Problems must not be clipped at the left or right edges. Multi-column layouts must fit within the printable width with adequate padding.
 
-**Rules of thumb:**
-- Add `padding: 0 2mm` to grid containers (`g1-page`) in print CSS.
-- Add `padding-left: 2mm` to figure grids (`dev-fig-page`) in print CSS.
+**Standard print padding (consistent across all worksheets):**
+- `g1-page`: `padding: 0 2mm` (both sides)
+- `dev-fig-page`: `padding-left: 2mm`
+
+**2-column layouts must use `1fr 1fr` columns in print.** The `g1-cols-2` class overrides its screen `auto auto` columns to `1fr 1fr` in print, spreading content across the full page width. Without this, `auto auto` with `justify-content: center` clusters content in the center with excessive side margins.
+
+**Other rules:**
 - For 3-column grids, verify the total width (columns + gaps) fits within ~680px (A4 minus 15mm margins at 96 dpi). Reduce font size or gap if needed.
 - SVGs with fixed `width`/`height` attributes should also include `viewBox` so they can be scaled via CSS for print.
 
