@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { M, texBox } from "../shared/M";
+import { M } from "../shared/M";
 import { unicodeToLatex } from "../shared/katex-utils";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
@@ -65,17 +65,20 @@ const BoxEq = () => {
       qrUrl={qrUrl}
     >
       <div className="ws-page ws-cols-2 print-spread">
-        {problems.map((p, i) => (
-          <div key={i} className="ws-problem">
-            <span className="ws-num">({i + 1})</span>
-            <span className="ws-expr">
-              <M tex={unicodeToLatex(p.display)} />
-              <span style={{ marginLeft: 8 }}>
-                <M tex={texBox(p.answer, showAnswers)} />
+        {problems.map((p, i) => {
+          const box = showAnswers
+            ? `\\boxed{\\textcolor{red}{${p.answer}}}`
+            : `\\boxed{\\phantom{00}}`;
+          const tex = unicodeToLatex(p.display).replace("□", box);
+          return (
+            <div key={i} className="ws-problem">
+              <span className="ws-num">({i + 1})</span>
+              <span className="ws-expr">
+                <M tex={tex} />
               </span>
-            </span>
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
     </ProblemPageLayout>
   );
