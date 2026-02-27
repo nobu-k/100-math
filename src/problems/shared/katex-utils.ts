@@ -28,6 +28,7 @@ export const unicodeToLatex = (text: string): string => {
   // Superscripts
   s = s.replace(/²/g, "^{2}");
   s = s.replace(/³/g, "^{3}");
+  s = s.replace(/⁴/g, "^{4}");
 
   // Operators and symbols
   s = s.replace(/×/g, "\\times ");
@@ -35,6 +36,11 @@ export const unicodeToLatex = (text: string): string => {
   s = s.replace(/±/g, "\\pm ");
   s = s.replace(/π/g, "\\pi ");
   s = s.replace(/°/g, "^{\\circ}");
+
+  // Inequality signs
+  s = s.replace(/≥/g, "\\geq ");
+  s = s.replace(/≤/g, "\\leq ");
+  s = s.replace(/≠/g, "\\neq ");
 
   // Minus sign (U+2212) → LaTeX hyphen-minus
   s = s.replace(/−/g, "-");

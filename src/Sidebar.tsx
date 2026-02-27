@@ -32,6 +32,12 @@ const CATEGORY_LABELS: [string, string][] = [
   ["measurement", "測定"],
   ["relations", "変化と関係"],
   ["data", "データ・統計"],
+  ["math1", "数学I"],
+  ["mathA", "数学A"],
+  ["math2", "数学II"],
+  ["mathB", "数学B"],
+  ["math3", "数学III"],
+  ["mathC", "数学C"],
 ];
 
 const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
