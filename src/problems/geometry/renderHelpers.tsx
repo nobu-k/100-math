@@ -29,7 +29,7 @@ export const renderFigProblemsQA = <T extends { question: string; answerDisplay:
   FigComponent: React.ComponentType<{ problem: T }>,
   showAnswers: boolean,
 ) => (
-  <div className="dev-fig-page">
+  <div className="dev-fig-page print-spread">
     {items.map((p, i) => (
       <div key={i} className="dev-prop-block">
         <div className="dev-prop-label">({i + 1})</div>

@@ -17,19 +17,21 @@ Identified by visual inspection of all 104 worksheet screenshots (A4, 794x1123px
 
 ---
 
-## No Issues (37 worksheets)
+## No Issues (33 worksheets)
 
 These worksheets have good print layout -- no overflow, no clipping, good vertical distribution.
 
 - `grid100/addition`, `grid100/subtraction`, `grid100/multiplication`
 - `hissan/addition`, `hissan/subtraction`, `hissan/multiplication`
 - `integer/lcm`, `integer/gcd`
-- `numbers/even-odd`, `numbers/prime`, `numbers/square-root`
+- `numbers/even-odd`, `numbers/prime`
 - `fractions/common-denominator`
-- `equations/simultaneous-eq`, `equations/expansion`, `equations/factoring`, `equations/quadratic-eq`
+- `equations/simultaneous-eq`, `equations/quadratic-eq`
 - `geometry/circle-rd`, `geometry/area`, `geometry/angle`, `geometry/area-formula`, `geometry/volume`, `geometry/circumference`, `geometry/circle-area`, `geometry/prism-volume`, `geometry/solid-volume`, `geometry/polygon-angle`, `geometry/triangle-angle`, `geometry/parallel-angle`, `geometry/parallelogram`, `geometry/similarity`, `geometry/circle-angle`, `geometry/pythagorean`
 - `relations/coordinate`
 - `data/bar-graph`, `data/line-graph`, `data/freq-table`
+
+Note: `numbers/square-root`, `equations/expansion`, `equations/factoring` were originally listed here but actually needed `print-spread` (problems packed at top 25-55% of page). Fixed in follow-up pass.
 
 ---
 
