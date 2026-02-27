@@ -29,6 +29,10 @@
 }
 
 @media print {
+  .grid {
+    margin-top: 3mm;
+  }
+
   .grid th,
   .grid td {
     width: 17mm;

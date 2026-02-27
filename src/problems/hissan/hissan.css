@@ -153,6 +153,7 @@
 
 @media print {
   .hissan-page {
+    margin-top: 3mm;
     gap: 12px 20px;
   }
 
