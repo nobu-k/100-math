@@ -43,26 +43,26 @@ const generateOne = (rng: () => number): SetsLogicProblem | null => {
 const generateIntersection = (rng: () => number): SetsLogicProblem | null => {
   const [a, b] = makeTwoSets(rng);
   const inter = a.filter((x) => b.includes(x)).sort((x, y) => x - y);
-  const expr = `A = {${a.join(", ")}}, B = {${b.join(", ")}} のとき，A ∩ B`;
-  const answerExpr = inter.length === 0 ? "∅" : `{${inter.join(", ")}}`;
+  const expr = `A = ${setStr(a)}, B = ${setStr(b)} のとき，A ∩ B`;
+  const answerExpr = inter.length === 0 ? "∅" : setStr(inter);
   return { expr, answerExpr, isNL: true };
 };
 
 const generateUnion = (rng: () => number): SetsLogicProblem | null => {
   const [a, b] = makeTwoSets(rng);
   const union = [...new Set([...a, ...b])].sort((x, y) => x - y);
-  const expr = `A = {${a.join(", ")}}, B = {${b.join(", ")}} のとき，A ∪ B`;
-  const answerExpr = `{${union.join(", ")}}`;
+  const expr = `A = ${setStr(a)}, B = ${setStr(b)} のとき，A ∪ B`;
+  const answerExpr = setStr(union);
   return { expr, answerExpr, isNL: true };
 };
 
 const generateComplement = (rng: () => number): SetsLogicProblem | null => {
   const u = makeUniversal(rng);
   const aSize = Math.floor(rng() * 3) + 2;
-  const a = pickSubset(rng, u, aSize);
+  const a = pickSubset(rng, u, aSize).sort((x, y) => x - y);
   const comp = u.filter((x) => !a.includes(x)).sort((x, y) => x - y);
-  const expr = `全体集合 U = {${u.join(", ")}}, A = {${a.join(", ")}} のとき，Ā`;
-  const answerExpr = comp.length === 0 ? "∅" : `{${comp.join(", ")}}`;
+  const expr = `全体集合 U = ${setStr(u)}, A = ${setStr(a)} のとき，Ā`;
+  const answerExpr = comp.length === 0 ? "∅" : setStr(comp);
   return { expr, answerExpr, isNL: true };
 };
 
@@ -104,6 +104,9 @@ const makeUniversal = (rng: () => number): number[] => {
   const size = Math.floor(rng() * 3) + 6;
   return Array.from({ length: size }, (_, i) => start + i);
 };
+
+// Use LaTeX-escaped braces so KaTeX renders them as visible { }
+const setStr = (items: number[]): string => `\\{${items.join(", ")}\\}`;
 
 const pickSubset = (rng: () => number, pool: number[], size: number): number[] => {
   const copy = [...pool];
