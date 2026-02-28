@@ -9,7 +9,8 @@ import "./styles/katex.css";
 const App = () => {
   const matches = useMatches();
   const handle = matches[matches.length - 1]?.handle as
-    { groupLabel: string; opLabel: string } | undefined;
+    { groupLabel?: string; opLabel?: string; isExam?: boolean } | undefined;
+  const isExam = handle?.isExam === true;
   const [menuOpen, setMenuOpen] = useState(false);
   const [controlsOpen, setControlsOpen] = useState(false);
 
@@ -42,6 +43,8 @@ const App = () => {
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 
+  if (isExam) return <Outlet />;
+
   return (
     <div className={`layout${controlsOpen ? " controls-open" : ""}`}>
       <div className="mobile-toolbar no-print">
@@ -60,7 +63,7 @@ const App = () => {
       </div>
       <Sidebar menuOpen={menuOpen} onClose={closeMenu} />
       <div className="app">
-        {handle && (
+        {handle?.groupLabel && handle?.opLabel && (
           <h1 className="print-title">{handle.groupLabel} {handle.opLabel}</h1>
         )}
         <Outlet />

@@ -1,0 +1,432 @@
+/* ============================================================
+   Exam Builder — two-panel layout
+   ============================================================ */
+
+.exam-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* --- Config panel (left) --- */
+
+.exam-config {
+  width: 320px;
+  flex-shrink: 0;
+  background: #f8f8f8;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.exam-config-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.exam-title-input {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 16px;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.exam-title-input:focus {
+  outline: none;
+  border-color: #1a73e8;
+}
+
+/* Section cards */
+
+.exam-section-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.exam-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.exam-section-number {
+  font-size: 15px;
+  font-weight: 700;
+  color: #333;
+}
+
+.exam-section-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #999;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.exam-section-delete:hover {
+  color: #e53935;
+}
+
+.exam-section-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.exam-section-row label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  flex-shrink: 0;
+  width: 50px;
+}
+
+.exam-section-row select {
+  flex: 1;
+  font-size: 13px;
+  padding: 4px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.exam-count-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.exam-count-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.exam-count-btn:hover {
+  background: #f0f0f0;
+}
+
+.exam-count-val {
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* Bottom controls */
+
+.exam-config-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.exam-add-btn,
+.exam-action-btn {
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.exam-add-btn:hover,
+.exam-action-btn:hover {
+  background: #f0f0f0;
+}
+
+.exam-action-row {
+  display: flex;
+  gap: 8px;
+}
+
+.exam-action-row > button {
+  flex: 1;
+}
+
+/* --- Preview panel (right) --- */
+
+.exam-preview-panel {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.exam-preview {
+  width: 100%;
+  max-width: 720px;
+}
+
+/* Exam header */
+
+.exam-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #333;
+  padding-bottom: 8px;
+}
+
+.exam-header-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.exam-name-line {
+  font-size: 14px;
+  color: #555;
+}
+
+.exam-name-blank {
+  display: inline-block;
+  width: 120px;
+  border-bottom: 1px solid #333;
+  margin-left: 4px;
+}
+
+/* Section rendering */
+
+.exam-section {
+  margin-bottom: 24px;
+}
+
+.exam-section-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.exam-section-title-num {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.exam-section-title-inst {
+  font-size: 15px;
+}
+
+/* Exam grids (compact, no print-spread) */
+
+.exam-grid {
+  display: grid;
+  gap: 14px 24px;
+}
+
+.exam-cols-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.exam-cols-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.exam-problem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.exam-problem-expr {
+  align-items: flex-start;
+}
+
+.exam-num {
+  font-size: 14px;
+  color: #555;
+  flex-shrink: 0;
+  width: 30px;
+  text-align: right;
+}
+
+.exam-expr-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.exam-eq-answer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 32px;
+}
+
+.exam-expr-nl {
+  flex: 1;
+  align-self: stretch;
+  min-height: 80px;
+}
+
+.exam-nl-answer {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.exam-nl-label {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.exam-nl-line {
+  flex: 1;
+  border-bottom: 1px solid #000;
+  min-width: 60px;
+  height: 1em;
+}
+
+/* Simultaneous equation blocks */
+
+.exam-sim-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Text problems */
+
+.exam-text-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.exam-text-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.exam-text-q {
+  font-size: 15px;
+}
+
+.exam-text-a {
+  font-size: 15px;
+  font-weight: bold;
+  color: red;
+  margin-left: 4px;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .exam-layout {
+    flex-direction: column;
+  }
+
+  .exam-config {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+    max-height: 50vh;
+  }
+
+  .exam-preview-panel {
+    padding: 12px;
+  }
+}
+
+/* ============================================================
+   Print
+   ============================================================ */
+
+@media print {
+  .exam-config {
+    display: none !important;
+  }
+
+  .exam-layout {
+    display: block;
+  }
+
+  .exam-preview-panel {
+    padding: 0;
+    overflow: visible;
+  }
+
+  .exam-preview {
+    max-width: none;
+  }
+
+  .exam-header {
+    margin-bottom: 12px;
+    padding-bottom: 4px;
+  }
+
+  .exam-header-title {
+    font-size: 20px;
+  }
+
+  .exam-section {
+    margin-bottom: 16px;
+  }
+
+  .exam-section-title {
+    margin-bottom: 6px;
+  }
+
+  .exam-section-title-num {
+    font-size: 15px;
+  }
+
+  .exam-section-title-inst {
+    font-size: 13px;
+  }
+
+  .exam-grid {
+    gap: 10px 16px;
+  }
+
+  .exam-num {
+    font-size: 12px;
+    width: 24px;
+  }
+
+  .exam-eq-answer {
+    margin-bottom: 24px;
+  }
+
+  .exam-text-q {
+    font-size: 13px;
+  }
+
+  .exam-text-a {
+    font-size: 13px;
+  }
+
+  .exam-sim-block {
+    gap: 1px;
+  }
+}

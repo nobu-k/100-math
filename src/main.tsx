@@ -5,6 +5,7 @@ import 'katex/dist/katex.min.css'
 import './index.css'
 import App from './App.tsx'
 import { problemGroups } from './problems'
+import ExamPage from './exam/ExamPage'
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
           handle: { groupLabel: group.label, opLabel: op.label },
         }))
       ),
+      { path: 'exam', element: <ExamPage />, handle: { isExam: true } },
     ],
   },
 ], { basename: import.meta.env.BASE_URL })

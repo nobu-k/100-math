@@ -240,6 +240,9 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
   return (
     <nav className={`sidebar no-print${menuOpen ? " menu-open" : ""}`}>
       <div className="sidebar-header">
+        <NavLink to="/exam" className="sidebar-exam-link" onClick={onClose}>
+          試験作成
+        </NavLink>
         <div className="sidebar-view-toggle">
           <button
             className={`view-toggle-btn${viewMode === "category" ? " active" : ""}`}
