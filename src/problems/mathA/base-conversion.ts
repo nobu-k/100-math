@@ -85,8 +85,8 @@ const generateBinaryArith = (rng: () => number): BaseConversionProblem | null =>
 
   if (isAdd) {
     const result = a + b;
-    const expr = `${aBin}₍₂₎ + ${bBin}₍₂₎ を2進法で計算せよ`;
-    const answerExpr = `${result.toString(2)}₍₂₎`;
+    const expr = `${aBin}_{(2)} + ${bBin}_{(2)} を2進法で計算せよ`;
+    const answerExpr = `${result.toString(2)}_{(2)}`;
     return { expr, answerExpr, isNL: true };
   }
 
@@ -95,15 +95,9 @@ const generateBinaryArith = (rng: () => number): BaseConversionProblem | null =>
   const bigBin = big.toString(2);
   const smallBin = small.toString(2);
   const result = big - small;
-  const expr = `${bigBin}₍₂₎ − ${smallBin}₍₂₎ を2進法で計算せよ`;
-  const answerExpr = `${result.toString(2)}₍₂₎`;
+  const expr = `${bigBin}_{(2)} − ${smallBin}_{(2)} を2進法で計算せよ`;
+  const answerExpr = `${result.toString(2)}_{(2)}`;
   return { expr, answerExpr, isNL: true };
 };
 
-const subscript = (base: number): string => {
-  const subDigits: Record<string, string> = {
-    "0": "₀", "1": "₁", "2": "₂", "3": "₃", "4": "₄",
-    "5": "₅", "6": "₆", "7": "₇", "8": "₈", "9": "₉",
-  };
-  return "₍" + `${base}`.split("").map((d) => subDigits[d] ?? d).join("") + "₎";
-};
+const subscript = (base: number): string => `_{(${base})}`;
