@@ -22,9 +22,9 @@ export const unicodeToLatex = (text: string): string => {
     return `\\sum\\limits_{${fromPart}}^{${toTex}}`;
   });
 
-  // Limit notation: lim[n→∞] → \lim\limits_{n \to \infty}
-  s = s.replace(/lim\[(\w+)→([^\]]+)\]/g, (_, v, to) => {
-    const toTex = to === "∞" ? "\\infty" : to;
+  // Limit notation: lim[n→∞] or lim(x→0) → \lim\limits_{n \to \infty}
+  s = s.replace(/lim[\[(](\w+)→([^\])]*)[\])]/g, (_, v, to) => {
+    const toTex = unicodeToLatex(to);
     return `\\lim\\limits_{${v} \\to ${toTex}}`;
   });
 

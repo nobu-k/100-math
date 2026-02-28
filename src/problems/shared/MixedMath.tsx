@@ -29,9 +29,10 @@ const needsKatex = (text: string): boolean =>
  * Complex math passes through unicodeToLatex → KaTeX.
  */
 export const MixedMath = ({ text, red }: { text: string; red?: boolean }) => {
-  // Fast path: no CJK at all → render entirely as KaTeX
+  // Fast path: no CJK at all → render entirely as KaTeX (display style
+  // so fractions and limits are full-sized rather than inline-squished)
   if (!CJK_RE.test(text)) {
-    const tex = unicodeToLatex(text);
+    const tex = `\\displaystyle ${unicodeToLatex(text)}`;
     return <M tex={red ? texRed(tex) : tex} />;
   }
 

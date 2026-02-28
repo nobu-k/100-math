@@ -46,8 +46,9 @@ const generateRational = (rng: () => number): FuncLimitProblem | null => {
   const result = 2 * a;
 
   const a2 = a * a;
-  const expr = `lim(x→${fmt(a)}) (x² − ${a2})/(x − ${fmt(a)})`;
-  const answerExpr = `= lim(x→${fmt(a)}) (x+${fmt(a)})(x−${fmt(a)})/(x−${fmt(a)}) = ${fmt(a)} + ${fmt(a)} = ${fmt(result)}`;
+  const xMinusA = a > 0 ? `x − ${a}` : `x + ${-a}`;
+  const expr = `lim(x→${fmt(a)}) (x² − ${a2})/(${xMinusA})`;
+  const answerExpr = `${fmt(result)}`;
   return { expr, answerExpr, isNL: true };
 };
 
@@ -67,7 +68,7 @@ const generateInfinity = (rng: () => number): FuncLimitProblem | null => {
   const ansStr = rd === 1 ? `${rn}` : `${rn}/${rd}`;
 
   const expr = `lim(x→∞) (${numStr})/(${denStr})`;
-  const answerExpr = `最高次で割ると ${ansStr}`;
+  const answerExpr = ansStr;
   return { expr, answerExpr, isNL: true };
 };
 
@@ -85,7 +86,7 @@ const generateSinLimit = (rng: () => number): FuncLimitProblem | null => {
   const denArg = b === 1 ? "x" : `${b}x`;
 
   const expr = `lim(x→0) sin(${sinArg})/(${denArg})`;
-  const answerExpr = `= ${ansStr}`;
+  const answerExpr = ansStr;
   return { expr, answerExpr, isNL: true };
 };
 
@@ -103,7 +104,7 @@ const generateExpLimit = (rng: () => number): FuncLimitProblem | null => {
   const denArg = b === 1 ? "x" : `${b}x`;
 
   const expr = `lim(x→0) (e^(${expArg}) − 1)/(${denArg})`;
-  const answerExpr = `= ${ansStr}`;
+  const answerExpr = ansStr;
   return { expr, answerExpr, isNL: true };
 };
 
