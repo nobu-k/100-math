@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, ComponentType } from "react";
 import type { ExamOperatorDef } from "./types";
 import { M, texAns, texRed, texFrac } from "../problems/shared/M";
 import { MixedMath } from "../problems/shared/MixedMath";
@@ -53,6 +53,62 @@ import { generatePolygonAngle } from "../problems/geometry/polygon-angle";
 import { generateCircumference } from "../problems/geometry/circumference";
 import { generateCircleArea } from "../problems/geometry/circle-area";
 import { generatePythagorean } from "../problems/geometry/pythagorean";
+import { generateAngle } from "../problems/geometry/angle";
+import { generateArea } from "../problems/geometry/area";
+import { generateAreaFormula } from "../problems/geometry/area-formula";
+import { generateVolume } from "../problems/geometry/volume";
+import { generateCircleRD } from "../problems/geometry/circle-rd";
+import { generateTriAngle } from "../problems/geometry/triangle-angle";
+import { generateParallelAngle } from "../problems/geometry/parallel-angle";
+import { generateParallelogram } from "../problems/geometry/parallelogram";
+import { generateSimilarity } from "../problems/geometry/similarity";
+import { generateCircleAngle } from "../problems/geometry/circle-angle";
+import { generateSolid } from "../problems/geometry/solid-volume";
+import { generatePrismVolume } from "../problems/geometry/prism-volume";
+import { generateScale } from "../problems/geometry/scale";
+import { generateAreaUnit } from "../problems/geometry/area-unit";
+import { generateTableRead } from "../problems/data/table-read";
+import { generateBarGraph } from "../problems/data/bar-graph";
+import { generateLineGraph } from "../problems/data/line-graph";
+import { generateCrossTable } from "../problems/data/cross-table";
+import { generateFreqTable } from "../problems/data/freq-table";
+import { generateDataAnalysis } from "../problems/data/data-analysis";
+import { generateRepresentative } from "../problems/data/representative";
+
+// --- figure components ---
+import AngleFig from "../problems/geometry/figures/angle-fig";
+import AreaFig from "../problems/geometry/figures/area-fig";
+import AreaFormulaFig from "../problems/geometry/figures/area-formula-fig";
+import VolumeFig from "../problems/geometry/figures/volume-fig";
+import CircleRDFig from "../problems/geometry/figures/circle-rd-fig";
+import CircumferenceFig from "../problems/geometry/figures/circumference-fig";
+import CircleAreaFig from "../problems/geometry/figures/circle-area-fig";
+import SectorFig from "../problems/geometry/figures/sector-fig";
+import PolygonAngleFig from "../problems/geometry/figures/polygon-angle-fig";
+import PythagoreanFig from "../problems/geometry/figures/pythagorean-fig";
+import TriangleAngleFig from "../problems/geometry/figures/triangle-angle-fig";
+import ParallelAngleFig from "../problems/geometry/figures/parallel-angle-fig";
+import ParallelogramFig from "../problems/geometry/figures/parallelogram-fig";
+import SimilarityFig from "../problems/geometry/figures/similarity-fig";
+import CircleAngleFig from "../problems/geometry/figures/circle-angle-fig";
+import SolidVolumeFig from "../problems/geometry/figures/solid-volume-fig";
+import PrismVolumeFig from "../problems/geometry/figures/prism-volume-fig";
+
+// --- chart render helpers ---
+import { renderBarChart } from "../problems/data/BarGraph";
+import { renderLineChart } from "../problems/data/LineGraph";
+
+// --- data types ---
+import type { AngleProblem } from "../problems/geometry/angle";
+import type { SectorProblem } from "../problems/geometry/sector";
+import type { SolidProblem } from "../problems/geometry/solid-volume";
+import type { TableReadProblem } from "../problems/data/table-read";
+import type { BarGraphProblem } from "../problems/data/bar-graph";
+import type { LineGraphProblem } from "../problems/data/line-graph";
+import type { CrossTableProblem } from "../problems/data/cross-table";
+import type { FreqTableProblem } from "../problems/data/freq-table";
+import type { DataAnalysisProblem } from "../problems/data/data-analysis";
+import type { RepresentativeProblem } from "../problems/data/representative";
 import { generateIrrationalCalc } from "../problems/math1/irrational-calc";
 import { generateQuadraticFactor } from "../problems/math1/quadratic-factor";
 import { generateQuadraticFunc } from "../problems/math1/quadratic-func";
@@ -273,6 +329,61 @@ const simEqOperator = (
   ),
 });
 
+/** Template: figure-based problems with SVG + Q/A */
+const figOperator = <T,>(
+  opts: Omit<ExamOperatorDef, "generate" | "render"> & {
+    gen: (seed: number, count: number) => T[];
+    FigComponent: ComponentType<{ problem: T }>;
+    renderQA: (p: T, showAnswers: boolean) => ReactNode;
+  },
+): ExamOperatorDef => ({
+  ...opts,
+  generate: opts.gen,
+  render: (problems, showAnswers) => (
+    <div className="exam-fig-list">
+      {(problems as T[]).map((p, i) => (
+        <div key={i} className="exam-fig-block">
+          <span className="exam-num">({i + 1})</span>
+          <opts.FigComponent problem={p} />
+          <div className="exam-fig-qa">{opts.renderQA(p, showAnswers)}</div>
+        </div>
+      ))}
+    </div>
+  ),
+});
+
+/** renderQA for { question, answer } (text answers) */
+const figQA = (p: { question: string; answer: string }, showAnswers: boolean): ReactNode => (
+  <>
+    <span className="exam-text-q">{p.question}</span>
+    <span className={`exam-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.answer}</span>
+  </>
+);
+
+/** renderQA for { question, answerDisplay } (KaTeX answers) */
+const figQADisplay = (p: { question: string; answerDisplay: string }, showAnswers: boolean): ReactNode => (
+  <>
+    <span className="exam-text-q">{p.question}</span>
+    <span className={`exam-text-a${showAnswers ? "" : " ws-hidden"}`}>
+      <M tex={texRed(unicodeToLatex(p.answerDisplay))} />
+    </span>
+  </>
+);
+
+/** Build question text for SolidProblem */
+const solidQuestion = (p: SolidProblem): string => {
+  if (p.solidType === "cylinder")
+    return `底面の半径 ${p.radius}cm、高さ ${p.height}cm の円柱の${p.calcType === "volume" ? "体積" : "表面積"}は？`;
+  if (p.solidType === "cone") {
+    if (p.calcType === "volume")
+      return `底面の半径 ${p.radius}cm、高さ ${p.height}cm の円錐の体積は？`;
+    return `底面の半径 ${p.radius}cm、母線の長さ ${p.slantHeight}cm の円錐の表面積は？`;
+  }
+  if (p.solidType === "sphere")
+    return `半径 ${p.radius}cm の球の${p.calcType === "volume" ? "体積" : "表面積"}は？`;
+  return `底面の一辺 ${p.baseEdge}cm の${p.baseSides === 4 ? "正四" : "三"}角柱（高さ ${p.height}cm）の体積は？`;
+};
+
 // ============================================================
 // Operator definitions
 // ============================================================
@@ -289,10 +400,7 @@ type QuadEqP = { equation: string; answerDisplay: string };
 type SqrtP = { expr: string; answerDisplay: string };
 type PrimeP = { target: number; factorExpr: string };
 type ProbabilityP = { question: string; ansNum: number; ansDen: number };
-type SectorP = { type: string; radius: number; angle: number; answerCoefficient: number; unit: string };
 type DecimalCompP = { left: string; right: string; answer: string };
-type CircumferenceP = { question: string; answer: string };
-type CircleAreaP = { question: string; answer: string };
 
 const formatPosNegTerms = (terms: number[]): string =>
   terms.map((t, j) => {
@@ -643,29 +751,88 @@ const definitions: ExamOperatorDef[] = [
   // ============================================================
   // 図形
   // ============================================================
-  textOperator({
+  figOperator({
+    key: "geometry/angle",
+    label: "角度",
+    groupLabel: "図形",
+    instruction: "次の角度を求めなさい。",
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generateAngle(seed).slice(0, count),
+    FigComponent: AngleFig,
+    renderQA: (p: AngleProblem, show) => (
+      <>
+        <M tex={`${unicodeToLatex(p.display)} = ${texAns(p.answer + "^{\\circ}", show)}`} />
+      </>
+    ),
+  }),
+  figOperator({
+    key: "geometry/area",
+    label: "面積（長方形）",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generateArea(seed, "mixed").slice(0, count),
+    FigComponent: AreaFig,
+    renderQA: figQA,
+  }),
+  figOperator({
+    key: "geometry/area-formula",
+    label: "面積の公式",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generateAreaFormula(seed, "mixed").slice(0, count),
+    FigComponent: AreaFormulaFig,
+    renderQA: figQA,
+  }),
+  figOperator({
+    key: "geometry/volume",
+    label: "体積（直方体）",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generateVolume(seed, "mixed").slice(0, count),
+    FigComponent: VolumeFig,
+    renderQA: figQA,
+  }),
+  figOperator({
     key: "geometry/circumference",
     label: "円周",
     groupLabel: "図形",
     instruction: "次の問題に答えなさい。",
     defaultCount: 4,
     maxCount: 6,
-    gen: (seed, count) => generateCircumference(seed, "mixed").slice(0, count).map((p: CircumferenceP) => ({
-      question: p.question, answer: p.answer,
-    })),
+    gen: (seed, count) => generateCircumference(seed, "mixed").slice(0, count),
+    FigComponent: CircumferenceFig,
+    renderQA: figQA,
   }),
-  textOperator({
+  figOperator({
     key: "geometry/circle-area",
     label: "円の面積",
     groupLabel: "図形",
     instruction: "次の問題に答えなさい。",
     defaultCount: 4,
     maxCount: 6,
-    gen: (seed, count) => generateCircleArea(seed, "mixed").slice(0, count).map((p: CircleAreaP) => ({
-      question: p.question, answer: p.answer,
-    })),
+    gen: (seed, count) => generateCircleArea(seed, "mixed").slice(0, count),
+    FigComponent: CircleAreaFig,
+    renderQA: figQA,
   }),
-  katexOperator({
+  figOperator({
+    key: "geometry/circle-rd",
+    label: "半径と直径",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generateCircleRD(seed).slice(0, count),
+    FigComponent: CircleRDFig,
+    renderQA: figQA,
+  }),
+  figOperator({
     key: "geometry/sector",
     label: "おうぎ形",
     groupLabel: "図形",
@@ -673,32 +840,139 @@ const definitions: ExamOperatorDef[] = [
     defaultCount: 4,
     maxCount: 6,
     gen: (seed, count) => generateSector(seed, "mixed").slice(0, count),
-    renderItem: (p, show) => {
-      const s = p as SectorP;
-      const label = s.type === "arc" ? "弧の長さ" : "面積";
-      const ans = show
-        ? texRed(`${s.answerCoefficient === 1 ? "" : s.answerCoefficient}\\pi \\text{ ${s.unit}}`)
-        : texAns("?", false);
-      return `\\text{半径 ${s.radius}cm、中心角 ${s.angle}° の${label}} = ${ans}`;
-    },
+    FigComponent: SectorFig,
+    renderQA: (p: SectorProblem, show) => (
+      <>
+        <span className="exam-text-q">{p.type === "arc" ? "弧の長さは？" : "面積は？"}</span>
+        <span className={`exam-text-a${show ? "" : " ws-hidden"}`}>
+          <M tex={texRed(unicodeToLatex(p.answerDisplay))} />
+        </span>
+      </>
+    ),
   }),
-  qaOperator({
+  figOperator({
     key: "geometry/polygon-angle",
     label: "多角形の角",
     groupLabel: "図形",
     instruction: "次の問題に答えなさい。",
     defaultCount: 5,
     maxCount: 10,
-    gen: (seed, count) => generatePolygonAngle(seed).slice(0, count) as { question: string; answerDisplay: string }[],
+    gen: (seed, count) => generatePolygonAngle(seed).slice(0, count),
+    FigComponent: PolygonAngleFig,
+    renderQA: figQADisplay,
   }),
-  qaOperator({
+  figOperator({
+    key: "geometry/triangle-angle",
+    label: "三角形の角",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generateTriAngle(seed).slice(0, count),
+    FigComponent: TriangleAngleFig,
+    renderQA: figQADisplay,
+  }),
+  figOperator({
+    key: "geometry/parallel-angle",
+    label: "平行線と角",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generateParallelAngle(seed).slice(0, count),
+    FigComponent: ParallelAngleFig,
+    renderQA: figQADisplay,
+  }),
+  figOperator({
+    key: "geometry/parallelogram",
+    label: "平行四辺形",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generateParallelogram(seed).slice(0, count),
+    FigComponent: ParallelogramFig,
+    renderQA: figQADisplay,
+  }),
+  figOperator({
+    key: "geometry/similarity",
+    label: "相似",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generateSimilarity(seed).slice(0, count),
+    FigComponent: SimilarityFig,
+    renderQA: figQADisplay,
+  }),
+  figOperator({
+    key: "geometry/circle-angle",
+    label: "円周角",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generateCircleAngle(seed).slice(0, count),
+    FigComponent: CircleAngleFig,
+    renderQA: figQADisplay,
+  }),
+  figOperator({
     key: "geometry/pythagorean",
     label: "三平方の定理",
     groupLabel: "図形",
     instruction: "次の問題に答えなさい。",
-    defaultCount: 6,
-    maxCount: 12,
-    gen: (seed, count) => generatePythagorean(seed).slice(0, count) as { question: string; answerDisplay: string }[],
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generatePythagorean(seed).slice(0, count),
+    FigComponent: PythagoreanFig,
+    renderQA: figQADisplay,
+  }),
+  figOperator({
+    key: "geometry/solid-volume",
+    label: "立体の体積",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generateSolid(seed).slice(0, count),
+    FigComponent: SolidVolumeFig,
+    renderQA: (p: SolidProblem, show) => (
+      <>
+        <span className="exam-text-q">{solidQuestion(p)}</span>
+        <span className={`exam-text-a${show ? "" : " ws-hidden"}`}>
+          <M tex={texRed(unicodeToLatex(p.answerDisplay))} />
+        </span>
+      </>
+    ),
+  }),
+  figOperator({
+    key: "geometry/prism-volume",
+    label: "角柱・円柱の体積",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generatePrismVolume(seed, "mixed").slice(0, count),
+    FigComponent: PrismVolumeFig,
+    renderQA: figQA,
+  }),
+  textOperator({
+    key: "geometry/scale",
+    label: "縮尺",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateScale(seed).slice(0, count),
+  }),
+  textOperator({
+    key: "geometry/area-unit",
+    label: "面積の単位",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateAreaUnit(seed, "mixed").slice(0, count),
   }),
 
   // ============================================================
@@ -860,6 +1134,239 @@ const definitions: ExamOperatorDef[] = [
     maxCount: 10,
     gen: (seed, count) => generateSampling(seed).slice(0, count) as { question: string; answerDisplay: string }[],
   }),
+  {
+    key: "data/table-read",
+    label: "表の読み取り",
+    groupLabel: "データ・統計",
+    instruction: "表を見て、次の問題に答えなさい。",
+    defaultCount: 3,
+    maxCount: 3,
+    generate: (seed, count) => generateTableRead(seed, 4).slice(0, count),
+    render: (problems, showAnswers) => (
+      <div className="exam-text-list">
+        {(problems as TableReadProblem[]).map((p, i) => (
+          <div key={i} className="exam-data-block">
+            <span className="exam-num">({i + 1}) {p.title}</span>
+            <table className="exam-data-table">
+              <thead><tr>{p.categories.map((c, j) => <th key={j}>{c}</th>)}</tr></thead>
+              <tbody><tr>{p.values.map((v, j) => <td key={j}>{v}</td>)}</tr></tbody>
+            </table>
+            {p.questions.map((q, j) => (
+              <div key={j} className="exam-data-sub">
+                <span className="exam-text-q">{q.question}</span>
+                <span className={`exam-text-a${showAnswers ? "" : " ws-hidden"}`}>{q.answer}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    key: "data/bar-graph",
+    label: "棒グラフ",
+    groupLabel: "データ・統計",
+    instruction: "グラフを見て、次の問題に答えなさい。",
+    defaultCount: 2,
+    maxCount: 3,
+    generate: (seed, count) => generateBarGraph(seed, 4).slice(0, count),
+    render: (problems, showAnswers) => (
+      <div className="exam-text-list">
+        {(problems as BarGraphProblem[]).map((p, i) => (
+          <div key={i} className="exam-data-block">
+            <span className="exam-num">({i + 1}) {p.title}</span>
+            {renderBarChart(p)}
+            {p.questions.map((q, j) => (
+              <div key={j} className="exam-data-sub">
+                <span className="exam-text-q">{q.question}</span>
+                <span className={`exam-text-a${showAnswers ? "" : " ws-hidden"}`}>{q.answer}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    key: "data/line-graph",
+    label: "折れ線グラフ",
+    groupLabel: "データ・統計",
+    instruction: "グラフを見て、次の問題に答えなさい。",
+    defaultCount: 2,
+    maxCount: 3,
+    generate: (seed, count) => generateLineGraph(seed).slice(0, count),
+    render: (problems, showAnswers) => (
+      <div className="exam-text-list">
+        {(problems as LineGraphProblem[]).map((p, i) => (
+          <div key={i} className="exam-data-block">
+            <span className="exam-num">({i + 1}) {p.title}</span>
+            {renderLineChart(p)}
+            {p.questions.map((q, j) => (
+              <div key={j} className="exam-data-sub">
+                <span className="exam-text-q">{q.question}</span>
+                <span className={`exam-text-a${showAnswers ? "" : " ws-hidden"}`}>{q.answer}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    key: "data/cross-table",
+    label: "クロス集計表",
+    groupLabel: "データ・統計",
+    instruction: "表の空欄をうめなさい。",
+    defaultCount: 3,
+    maxCount: 4,
+    generate: (seed, count) => generateCrossTable(seed).slice(0, count),
+    render: (problems, showAnswers) => (
+      <div className="exam-text-list">
+        {(problems as CrossTableProblem[]).map((p, i) => {
+          let ansIdx = 0;
+          return (
+            <div key={i} className="exam-data-block">
+              <span className="exam-num">({i + 1}) {p.title}</span>
+              <table className="exam-data-table">
+                <thead><tr><th></th>{p.colLabels.map((col, j) => <th key={j}>{col}</th>)}</tr></thead>
+                <tbody>
+                  {p.rowLabels.map((row, r) => (
+                    <tr key={r}>
+                      <td><strong>{row}</strong></td>
+                      {p.cells[r].map((cell, c) => {
+                        if (cell !== null) return <td key={c}>{cell}</td>;
+                        const ans = p.answers[ansIdx++];
+                        return (
+                          <td key={c} className="exam-data-blank">
+                            <span className={showAnswers ? "" : "ws-hidden"}>
+                              <span className="exam-text-a">{ans}</span>
+                            </span>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        })}
+      </div>
+    ),
+  },
+  {
+    key: "data/freq-table",
+    label: "度数分布表",
+    groupLabel: "データ・統計",
+    instruction: "度数分布表の空欄をうめなさい。",
+    defaultCount: 3,
+    maxCount: 4,
+    generate: (seed, count) => generateFreqTable(seed).slice(0, count),
+    render: (problems, showAnswers) => (
+      <div className="exam-text-list">
+        {(problems as FreqTableProblem[]).map((p, i) => {
+          let ansIdx = 0;
+          return (
+            <div key={i} className="exam-data-block">
+              <span className="exam-num">({i + 1}) データ: {p.data.join(", ")}</span>
+              <table className="exam-data-table">
+                <thead><tr><th>階級</th><th>度数</th></tr></thead>
+                <tbody>
+                  {p.classes.map((cls, j) => {
+                    const freq = p.frequencies[j];
+                    if (freq !== null) return <tr key={j}><td>{cls}</td><td>{freq}</td></tr>;
+                    const ans = p.answers[ansIdx++];
+                    return (
+                      <tr key={j}>
+                        <td>{cls}</td>
+                        <td className="exam-data-blank">
+                          <span className={showAnswers ? "" : "ws-hidden"}>
+                            <span className="exam-text-a">{ans}</span>
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          );
+        })}
+      </div>
+    ),
+  },
+  {
+    key: "data/data-analysis",
+    label: "データの分析",
+    groupLabel: "データ・統計",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 3,
+    maxCount: 4,
+    generate: (seed, count) => generateDataAnalysis(seed, "mixed").slice(0, count),
+    render: (problems, showAnswers) => (
+      <div className="exam-text-list">
+        {(problems as DataAnalysisProblem[]).map((p, i) => {
+          if (p.mode === "representative") {
+            return (
+              <div key={i} className="exam-data-block">
+                <span className="exam-num">({i + 1}) データ: {p.data.join(", ")}</span>
+                <div className="exam-data-sub"><span className="exam-text-q">平均値:</span><span className={`exam-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.mean}</span></div>
+                <div className="exam-data-sub"><span className="exam-text-q">中央値:</span><span className={`exam-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.median}</span></div>
+                <div className="exam-data-sub"><span className="exam-text-q">最頻値:</span><span className={`exam-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.modeValue}</span></div>
+                <div className="exam-data-sub"><span className="exam-text-q">範囲:</span><span className={`exam-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.range}</span></div>
+              </div>
+            );
+          }
+          return (
+            <div key={i} className="exam-data-block">
+              <span className="exam-num">({i + 1}) 度数分布表を完成させなさい（合計 {p.total} 人）</span>
+              <table className="exam-data-table">
+                <thead><tr><th>階級</th><th>度数</th><th>相対度数</th><th>累積度数</th></tr></thead>
+                <tbody>
+                  {p.classes.map((cls, j) => {
+                    const hidden = p.hiddenIndices.includes(j);
+                    return (
+                      <tr key={j}>
+                        <td>{cls[0]}以上{cls[1]}未満</td>
+                        <td className={hidden ? "exam-data-blank" : ""}>
+                          {hidden
+                            ? <span className={showAnswers ? "" : "ws-hidden"}><span className="exam-text-a">{p.frequencies[j]}</span></span>
+                            : p.frequencies[j]}
+                        </td>
+                        <td>{p.relativeFrequencies[j].toFixed(2)}</td>
+                        <td>{p.cumulativeFrequencies[j]}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          );
+        })}
+      </div>
+    ),
+  },
+  {
+    key: "data/representative",
+    label: "代表値",
+    groupLabel: "データ・統計",
+    instruction: "次のデータの代表値を求めなさい。",
+    defaultCount: 4,
+    maxCount: 8,
+    generate: (seed, count) => generateRepresentative(seed).slice(0, count),
+    render: (problems, showAnswers) => (
+      <div className="exam-text-list">
+        {(problems as RepresentativeProblem[]).map((p, i) => (
+          <div key={i} className="exam-data-block">
+            <span className="exam-num">({i + 1}) データ: {p.data.join(", ")}</span>
+            <div className="exam-data-sub"><span className="exam-text-q">平均値:</span><span className={`exam-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.meanAnswer}</span></div>
+            <div className="exam-data-sub"><span className="exam-text-q">中央値:</span><span className={`exam-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.medianAnswer}</span></div>
+            <div className="exam-data-sub"><span className="exam-text-q">最頻値:</span><span className={`exam-text-a${showAnswers ? "" : " ws-hidden"}`}>{p.modeAnswer}</span></div>
+          </div>
+        ))}
+      </div>
+    ),
+  },
 
   // ============================================================
   // 数学I

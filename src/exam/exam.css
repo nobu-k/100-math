@@ -337,6 +337,72 @@
   margin-left: 4px;
 }
 
+/* Figure-based problems */
+
+.exam-fig-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.exam-fig-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.exam-fig-block svg {
+  flex-shrink: 0;
+  max-width: 140px;
+  height: auto;
+}
+
+.exam-fig-qa {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+/* Data problems */
+
+.exam-data-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.exam-data-table {
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 4px 0;
+}
+
+.exam-data-table th,
+.exam-data-table td {
+  border: 1px solid #999;
+  padding: 3px 8px;
+  text-align: center;
+}
+
+.exam-data-table th {
+  background: #f0f0f0;
+  font-weight: 600;
+}
+
+.exam-data-blank {
+  min-width: 40px;
+  min-height: 1.2em;
+}
+
+.exam-data-sub {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 14px;
+}
+
 /* ============================================================
    Responsive
    ============================================================ */
@@ -428,5 +494,35 @@
 
   .exam-sim-block {
     gap: 1px;
+  }
+
+  .exam-fig-list {
+    gap: 8px;
+  }
+
+  .exam-fig-block svg {
+    max-width: 110px;
+  }
+
+  .exam-fig-qa {
+    font-size: 13px;
+  }
+
+  .exam-data-table {
+    font-size: 11px;
+  }
+
+  .exam-data-table th,
+  .exam-data-table td {
+    padding: 2px 5px;
+  }
+
+  .exam-data-sub {
+    font-size: 12px;
+  }
+
+  .exam-data-block svg {
+    max-width: 240px;
+    height: auto;
   }
 }

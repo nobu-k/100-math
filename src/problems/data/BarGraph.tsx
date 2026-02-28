@@ -82,7 +82,7 @@ const BarGraph = () => {
   );
 };
 
-const renderBarChart = (bp: BarGraphProblem) => {
+export const renderBarChart = (bp: BarGraphProblem) => {
   const chartWidth = 300; const chartHeight = 200;
   const marginLeft = 40; const marginBottom = 40; const marginTop = 10; const marginRight = 10;
   const plotWidth = chartWidth - marginLeft - marginRight;
