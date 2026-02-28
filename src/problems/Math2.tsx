@@ -15,6 +15,9 @@ import PointDistance from "./math2/PointDistance";
 import SectionPoint from "./math2/SectionPoint";
 import LineEquation from "./math2/LineEquation";
 import PointLineDistance from "./math2/PointLineDistance";
+import ProofIneq from "./math2/ProofIneq";
+import CircleEq from "./math2/CircleEq";
+import RegionIneq from "./math2/RegionIneq";
 
 export const math2: ProblemGroup = {
   id: "math2",
@@ -36,5 +39,8 @@ export const math2: ProblemGroup = {
     { operator: "section-point", label: "内分点", grades: [12], category: "hs-geometry", subcategory: "図形と方程式", Component: SectionPoint },
     { operator: "line-equation", label: "直線の方程式", grades: [12], category: "hs-geometry", subcategory: "図形と方程式", Component: LineEquation },
     { operator: "point-line-distance", label: "点と直線の距離", grades: [12], category: "hs-geometry", subcategory: "図形と方程式", Component: PointLineDistance },
+    { operator: "proof-ineq", label: "等式・不等式の証明", grades: [12], category: "hs-expr", subcategory: "式と証明", Component: ProofIneq },
+    { operator: "circle-eq", label: "円の方程式", grades: [12], category: "hs-geometry", subcategory: "図形と方程式", Component: CircleEq },
+    { operator: "region-ineq", label: "領域と不等式", grades: [12], category: "hs-geometry", subcategory: "図形と方程式", Component: RegionIneq },
   ],
 };
