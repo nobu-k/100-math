@@ -44,6 +44,9 @@ export const unicodeToLatex = (text: string): string => {
   s = s.replace(/1\/√x/g, "\\frac{1}{\\sqrt{x}}");
   s = s.replace(/1\/x(?![²³⁴⁵⁶⁷⁸⁹\w])/g, "\\frac{1}{x}");
 
+  // Parenthesized fraction with exponent: (a/b)ⁿ → \left(\frac{a}{b}\right)ⁿ
+  s = s.replace(/\((−?\d+)\/(\d+)\)(?=[⁰¹²³⁴⁵⁶⁷⁸⁹ⁿˣ^])/g, "\\left(\\frac{$1}{$2}\\right)");
+
   // Parenthesized simple fraction: (a/b) → \frac{a}{b}  (cosmetic grouping)
   s = s.replace(/\((\d+)\/(\d+)\)/g, "\\frac{$1}{$2}");
 
