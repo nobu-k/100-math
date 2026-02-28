@@ -5,6 +5,7 @@ import { MixedMath } from "../problems/shared/MixedMath";
 import { unicodeToLatex } from "../problems/shared/katex-utils";
 import type { TextProblem } from "../problems/shared/types";
 import type { FracProblem } from "../problems/fractions/types";
+import type { FracCalcProblem } from "../problems/fractions/diff-frac";
 
 // --- generators ---
 import { generateDivision } from "../problems/computation/division";
@@ -15,18 +16,85 @@ import { generatePosNegMixed } from "../problems/computation/pos-neg-mixed";
 import { generatePolyAddSub } from "../problems/computation/poly-add-sub";
 import { generateMonoMulDiv } from "../problems/computation/mono-mul-div";
 import { generateFracMixedCalc } from "../problems/computation/frac-mixed-calc";
+import { generateDivCheck } from "../problems/computation/div-check";
+import { generateCalcTrick } from "../problems/computation/calc-trick";
+import { generateEstimate } from "../problems/computation/estimate";
 import { generateFracMul } from "../problems/fractions/frac-mul";
+import { generateFracDiv } from "../problems/fractions/frac-div";
+import { generateDiffFrac } from "../problems/fractions/diff-frac";
+import { generateLinearExpr } from "../problems/equations/linear-expr";
+import { generateExprValue } from "../problems/equations/expr-value";
+import { generateBoxEq } from "../problems/equations/box-eq";
+import { generateLiteralExpr } from "../problems/equations/literal-expr";
 import { generateLinearEq } from "../problems/equations/linear-eq";
 import { generateSimEq } from "../problems/equations/simultaneous-eq";
 import { generateExpansion } from "../problems/equations/expansion";
 import { generateFactoring } from "../problems/equations/factoring";
 import { generateQuadEq } from "../problems/equations/quadratic-eq";
 import { generateSqrt } from "../problems/numbers/square-root";
+import { generatePrime } from "../problems/numbers/prime";
 import { generateSpeed } from "../problems/measurement/speed";
+import { generateUnitConv } from "../problems/measurement/unit-conv";
+import { generateUnitConv3 } from "../problems/measurement/unit-conv3";
+import { generateTimeCalc } from "../problems/measurement/time-calc";
+import { generateTimeCalc3 } from "../problems/measurement/time-calc3";
+import { generateUnitAmount } from "../problems/measurement/unit-amount";
+import { generateAverage } from "../problems/measurement/average";
+import { generatePercent } from "../problems/relations/percent";
+import { generateRatio } from "../problems/relations/ratio";
+import { generateProportion } from "../problems/relations/proportion-eq";
+import { generateLinearFunc } from "../problems/relations/linear-func";
+import { generateQuadFunc } from "../problems/relations/quadratic-func";
+import { generateCounting } from "../problems/data/counting";
+import { generateProbability } from "../problems/data/probability";
+import { generateSampling } from "../problems/data/sampling";
+import { generateSector } from "../problems/geometry/sector";
+import { generatePolygonAngle } from "../problems/geometry/polygon-angle";
+import { generateCircumference } from "../problems/geometry/circumference";
+import { generateCircleArea } from "../problems/geometry/circle-area";
+import { generatePythagorean } from "../problems/geometry/pythagorean";
 import { generateIrrationalCalc } from "../problems/math1/irrational-calc";
+import { generateQuadraticFactor } from "../problems/math1/quadratic-factor";
+import { generateQuadraticFunc } from "../problems/math1/quadratic-func";
+import { generateLinearInequality } from "../problems/math1/linear-inequality";
+import { generateQuadraticEqIneq } from "../problems/math1/quadratic-eq-ineq";
+import { generateTrigRatio } from "../problems/math1/trig-ratio";
+import { generateCubicExpandFactor } from "../problems/math2/cubic-expand-factor";
+import { generateComplexNumber } from "../problems/math2/complex-number";
+import { generateExponent } from "../problems/math2/exponent";
 import { generateLogCalc } from "../problems/math2/log-calc";
+import { generateRadian } from "../problems/math2/radian";
+import { generateGeneralAngle } from "../problems/math2/general-angle";
+import { generateAdditionFormula } from "../problems/math2/addition-formula";
+import { generateDoubleAngle } from "../problems/math2/double-angle";
+import { generateTrigSynthesis } from "../problems/math2/trig-synthesis";
 import { generateDerivativePoly } from "../problems/math2/derivative-poly";
+import { generateTangentLine } from "../problems/math2/tangent-line";
 import { generateIntegralPoly } from "../problems/math2/integral-poly";
+import { generatePointDistance } from "../problems/math2/point-distance";
+import { generateSectionPoint } from "../problems/math2/section-point";
+import { generateLineEquation } from "../problems/math2/line-equation";
+import { generatePointLineDistance } from "../problems/math2/point-line-distance";
+import { generatePermComb } from "../problems/mathA/permutation-combination";
+import { generateProbability as generateProbabilityA } from "../problems/mathA/probability";
+import { generateEuclideanGcd } from "../problems/mathA/euclidean-gcd";
+import { generateBaseConversion } from "../problems/mathA/base-conversion";
+import { generateArithmeticSeq } from "../problems/mathB/arithmetic-seq";
+import { generateGeometricSeq } from "../problems/mathB/geometric-seq";
+import { generateSigmaSum } from "../problems/mathB/sigma-sum";
+import { generateBinomialDist } from "../problems/mathB/binomial-dist";
+import { generateNormalDist } from "../problems/mathB/normal-dist";
+import { generateSeqLimit } from "../problems/math3/seq-limit";
+import { generateProductQuotientDiff } from "../problems/math3/product-quotient-diff";
+import { generateChainRuleDiff } from "../problems/math3/chain-rule-diff";
+import { generateBasicDerivative } from "../problems/math3/basic-derivative";
+import { generateBasicIntegral } from "../problems/math3/basic-integral";
+import { generateSubstitutionIntegral } from "../problems/math3/substitution-integral";
+import { generateByPartsIntegral } from "../problems/math3/by-parts-integral";
+import { generateVectorCalc } from "../problems/mathC/vector-calc";
+import { generateComplexPlane } from "../problems/mathC/complex-plane";
+import { generateDecimalComp } from "../problems/fractions/decimal-comp";
+import { generateDecimalShift } from "../problems/fractions/decimal-shift";
 
 // ============================================================
 // Template helpers
@@ -138,6 +206,29 @@ const textOperator = (
   ),
 });
 
+/** Template: { question, answerDisplay } with LaTeX answer */
+const qaOperator = (
+  opts: Omit<ExamOperatorDef, "generate" | "render"> & {
+    gen: (seed: number, count: number) => { question: string; answerDisplay: string }[];
+  },
+): ExamOperatorDef => ({
+  ...opts,
+  generate: opts.gen,
+  render: (problems, showAnswers) => (
+    <div className="exam-text-list">
+      {(problems as { question: string; answerDisplay: string }[]).map((p, i) => (
+        <div key={i} className="exam-text-row">
+          <span className="exam-num">({i + 1})</span>
+          <span className="exam-text-q">{p.question}</span>
+          <span className={`exam-text-a${showAnswers ? "" : " ws-hidden"}`}>
+            <M tex={texRed(unicodeToLatex(p.answerDisplay))} />
+          </span>
+        </div>
+      ))}
+    </div>
+  ),
+});
+
 /** Template: FracProblem[] with op symbol */
 const fracOperator = (
   opts: Omit<ExamOperatorDef, "generate" | "render"> & {
@@ -191,9 +282,17 @@ type MixedCalcP = { display: string; answer: number };
 type PosNegAddSubP = { terms: number[]; answer: number };
 type PosNegMulDivP = { expr: string; answer: number };
 type PosNegMixedP = { expr: string; answer: number };
+type BoxEqP = { display: string; answer: number };
+type ExprValueP = { expr: string; varDisplay: string; answer: number };
 type LinearEqP = { equation: string; answer: number; isFraction: boolean; fracNum?: number; fracDen?: number };
 type QuadEqP = { equation: string; answerDisplay: string };
 type SqrtP = { expr: string; answerDisplay: string };
+type PrimeP = { target: number; factorExpr: string };
+type ProbabilityP = { question: string; ansNum: number; ansDen: number };
+type SectorP = { type: string; radius: number; angle: number; answerCoefficient: number; unit: string };
+type DecimalCompP = { left: string; right: string; answer: string };
+type CircumferenceP = { question: string; answer: string };
+type CircleAreaP = { question: string; answer: string };
 
 const formatPosNegTerms = (terms: number[]): string =>
   terms.map((t, j) => {
@@ -205,6 +304,9 @@ const formatPosNegTerms = (terms: number[]): string =>
   }).join(" ");
 
 const definitions: ExamOperatorDef[] = [
+  // ============================================================
+  // 計算
+  // ============================================================
   katexOperator({
     key: "computation/division",
     label: "わり算",
@@ -255,8 +357,7 @@ const definitions: ExamOperatorDef[] = [
     maxCount: 15,
     gen: (seed, count) =>
       generatePosNegMulDiv(seed).slice(0, count).map((p: PosNegMulDivP) => ({
-        expr: p.expr,
-        answerExpr: String(p.answer),
+        expr: p.expr, answerExpr: String(p.answer),
       })),
   }),
   exprOperator({
@@ -268,8 +369,7 @@ const definitions: ExamOperatorDef[] = [
     maxCount: 15,
     gen: (seed, count) =>
       generatePosNegMixed(seed).slice(0, count).map((p: PosNegMixedP) => ({
-        expr: p.expr,
-        answerExpr: String(p.answer),
+        expr: p.expr, answerExpr: String(p.answer),
       })),
   }),
   exprOperator({
@@ -300,6 +400,37 @@ const definitions: ExamOperatorDef[] = [
     opSymbol: "",
     gen: (seed, count) => generateFracMixedCalc(seed).slice(0, count),
   }),
+  textOperator({
+    key: "computation/div-check",
+    label: "わり算の検算",
+    groupLabel: "計算",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateDivCheck(seed).slice(0, count),
+  }),
+  textOperator({
+    key: "computation/calc-trick",
+    label: "計算のくふう",
+    groupLabel: "計算",
+    instruction: "くふうして計算しなさい。",
+    defaultCount: 4,
+    maxCount: 8,
+    gen: (seed, count) => generateCalcTrick(seed).slice(0, count),
+  }),
+  textOperator({
+    key: "computation/estimate",
+    label: "見積もり",
+    groupLabel: "計算",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateEstimate(seed, 100).slice(0, count),
+  }),
+
+  // ============================================================
+  // 分数
+  // ============================================================
   fracOperator({
     key: "fractions/frac-mul",
     label: "分数のかけ算",
@@ -310,10 +441,119 @@ const definitions: ExamOperatorDef[] = [
     opSymbol: "×",
     gen: (seed, count) => generateFracMul(seed).slice(0, count),
   }),
+  fracOperator({
+    key: "fractions/frac-div",
+    label: "分数のわり算",
+    groupLabel: "分数",
+    instruction: "次の計算をしなさい。",
+    defaultCount: 6,
+    maxCount: 12,
+    opSymbol: "÷",
+    gen: (seed, count) => generateFracDiv(seed).slice(0, count),
+  }),
+  {
+    key: "fractions/diff-frac",
+    label: "異分母分数の加減",
+    groupLabel: "分数",
+    instruction: "次の計算をしなさい。",
+    defaultCount: 6,
+    maxCount: 12,
+    generate: (seed, count) => generateDiffFrac(seed, "mixed").slice(0, count),
+    render: (problems, showAnswers) => (
+      <div className="exam-grid exam-cols-2">
+        {(problems as FracCalcProblem[]).map((p, i) => (
+          <div key={i} className="exam-problem">
+            <span className="exam-num">({i + 1})</span>
+            <M tex={`\\frac{${p.aNum}}{${p.aDen}} ${p.op === "+" ? "+" : "-"} \\frac{${p.bNum}}{${p.bDen}} = ${showAnswers ? texRed(texFrac(p.ansNum, p.ansDen, p.ansWhole, p.ansPartNum)) : texAns("?", false)}`} />
+          </div>
+        ))}
+      </div>
+    ),
+  },
+
+  // ============================================================
+  // 小数
+  // ============================================================
+  katexOperator({
+    key: "decimals/decimal-comp",
+    label: "小数の大小比較",
+    groupLabel: "小数",
+    instruction: "□にあてはまる記号（＞、＜、＝）を書きなさい。",
+    defaultCount: 6,
+    maxCount: 15,
+    gen: (seed, count) => generateDecimalComp(seed, 10).slice(0, count),
+    renderItem: (p, show) => {
+      const d = p as DecimalCompP;
+      const sym = show
+        ? `\\boxed{\\textcolor{red}{${d.answer}}}`
+        : `\\boxed{\\phantom{＞}}`;
+      return `${d.left} ${sym} ${d.right}`;
+    },
+  }),
+  textOperator({
+    key: "decimals/decimal-shift",
+    label: "小数点の移動",
+    groupLabel: "小数",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateDecimalShift(seed).slice(0, count),
+  }),
+
+  // ============================================================
+  // 式・方程式
+  // ============================================================
+  katexOperator({
+    key: "equations/box-eq",
+    label: "□を使った式",
+    groupLabel: "式・方程式",
+    instruction: "□にあてはまる数を求めなさい。",
+    defaultCount: 6,
+    maxCount: 12,
+    gen: (seed, count) => generateBoxEq(seed, "all").slice(0, count),
+    renderItem: (p, show) => {
+      const b = p as BoxEqP;
+      const tex = b.display.replace("□", show
+        ? `\\boxed{\\textcolor{red}{${b.answer}}}`
+        : `\\boxed{\\phantom{${b.answer}}}`);
+      return unicodeToLatex(tex);
+    },
+  }),
+  textOperator({
+    key: "equations/literal-expr",
+    label: "文字式の値",
+    groupLabel: "式・方程式",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateLiteralExpr(seed).slice(0, count),
+  }),
+  exprOperator({
+    key: "equations/linear-expr",
+    label: "一次式の計算",
+    groupLabel: "式・方程式",
+    instruction: "次の計算をしなさい。",
+    defaultCount: 6,
+    maxCount: 12,
+    gen: (seed, count) => generateLinearExpr(seed).slice(0, count),
+  }),
+  katexOperator({
+    key: "equations/expr-value",
+    label: "式の値",
+    groupLabel: "式・方程式",
+    instruction: "次の式の値を求めなさい。",
+    defaultCount: 6,
+    maxCount: 12,
+    gen: (seed, count) => generateExprValue(seed).slice(0, count),
+    renderItem: (p, show) => {
+      const ev = p as ExprValueP;
+      return `${unicodeToLatex(ev.varDisplay)} \\text{ のとき } ${unicodeToLatex(ev.expr)} = ${texAns(ev.answer, show)}`;
+    },
+  }),
   katexOperator({
     key: "equations/linear-eq",
     label: "1次方程式",
-    groupLabel: "方程式",
+    groupLabel: "式・方程式",
     instruction: "次の方程式を解きなさい。",
     defaultCount: 6,
     maxCount: 12,
@@ -329,7 +569,7 @@ const definitions: ExamOperatorDef[] = [
   simEqOperator({
     key: "equations/simultaneous-eq",
     label: "連立方程式",
-    groupLabel: "方程式",
+    groupLabel: "式・方程式",
     instruction: "次の連立方程式を解きなさい。",
     defaultCount: 4,
     maxCount: 8,
@@ -338,7 +578,7 @@ const definitions: ExamOperatorDef[] = [
   exprOperator({
     key: "equations/expansion",
     label: "展開",
-    groupLabel: "方程式",
+    groupLabel: "式・方程式",
     instruction: "次の式を展開しなさい。",
     defaultCount: 6,
     maxCount: 12,
@@ -347,7 +587,7 @@ const definitions: ExamOperatorDef[] = [
   exprOperator({
     key: "equations/factoring",
     label: "因数分解",
-    groupLabel: "方程式",
+    groupLabel: "式・方程式",
     instruction: "次の式を因数分解しなさい。",
     defaultCount: 6,
     maxCount: 12,
@@ -356,7 +596,7 @@ const definitions: ExamOperatorDef[] = [
   katexOperator({
     key: "equations/quadratic-eq",
     label: "2次方程式",
-    groupLabel: "方程式",
+    groupLabel: "式・方程式",
     instruction: "次の方程式を解きなさい。",
     defaultCount: 6,
     maxCount: 12,
@@ -367,6 +607,10 @@ const definitions: ExamOperatorDef[] = [
       return `${unicodeToLatex(q.equation)}${ans}`;
     },
   }),
+
+  // ============================================================
+  // 数の性質
+  // ============================================================
   katexOperator({
     key: "numbers/square-root",
     label: "平方根",
@@ -381,6 +625,121 @@ const definitions: ExamOperatorDef[] = [
       return `${unicodeToLatex(sq.expr)} =${ans}`;
     },
   }),
+  katexOperator({
+    key: "numbers/prime",
+    label: "素因数分解",
+    groupLabel: "数の性質",
+    instruction: "次の数を素因数分解しなさい。",
+    defaultCount: 6,
+    maxCount: 10,
+    gen: (seed, count) => generatePrime(seed, "factorize").slice(0, count),
+    renderItem: (p, show) => {
+      const pr = p as PrimeP;
+      const ans = show ? `= ${texRed(unicodeToLatex(pr.factorExpr))}` : "=";
+      return `${pr.target} ${ans}`;
+    },
+  }),
+
+  // ============================================================
+  // 図形
+  // ============================================================
+  textOperator({
+    key: "geometry/circumference",
+    label: "円周",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generateCircumference(seed, "mixed").slice(0, count).map((p: CircumferenceP) => ({
+      question: p.question, answer: p.answer,
+    })),
+  }),
+  textOperator({
+    key: "geometry/circle-area",
+    label: "円の面積",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generateCircleArea(seed, "mixed").slice(0, count).map((p: CircleAreaP) => ({
+      question: p.question, answer: p.answer,
+    })),
+  }),
+  katexOperator({
+    key: "geometry/sector",
+    label: "おうぎ形",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 6,
+    gen: (seed, count) => generateSector(seed, "mixed").slice(0, count),
+    renderItem: (p, show) => {
+      const s = p as SectorP;
+      const label = s.type === "arc" ? "弧の長さ" : "面積";
+      const ans = show
+        ? texRed(`${s.answerCoefficient === 1 ? "" : s.answerCoefficient}\\pi \\text{ ${s.unit}}`)
+        : texAns("?", false);
+      return `\\text{半径 ${s.radius}cm、中心角 ${s.angle}° の${label}} = ${ans}`;
+    },
+  }),
+  qaOperator({
+    key: "geometry/polygon-angle",
+    label: "多角形の角",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generatePolygonAngle(seed).slice(0, count) as { question: string; answerDisplay: string }[],
+  }),
+  qaOperator({
+    key: "geometry/pythagorean",
+    label: "三平方の定理",
+    groupLabel: "図形",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 6,
+    maxCount: 12,
+    gen: (seed, count) => generatePythagorean(seed).slice(0, count) as { question: string; answerDisplay: string }[],
+  }),
+
+  // ============================================================
+  // 測定
+  // ============================================================
+  textOperator({
+    key: "measurement/unit-conv",
+    label: "単位の換算（2年）",
+    groupLabel: "測定",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 8,
+    gen: (seed, count) => generateUnitConv(seed, "mixed").slice(0, count),
+  }),
+  textOperator({
+    key: "measurement/unit-conv3",
+    label: "単位の換算（3年）",
+    groupLabel: "測定",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 8,
+    gen: (seed, count) => generateUnitConv3(seed, "mixed").slice(0, count),
+  }),
+  textOperator({
+    key: "measurement/time-calc",
+    label: "時刻と時間",
+    groupLabel: "測定",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 8,
+    gen: (seed, count) => generateTimeCalc(seed, "mixed").slice(0, count),
+  }),
+  textOperator({
+    key: "measurement/time-calc3",
+    label: "時刻と時間（3年）",
+    groupLabel: "測定",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 8,
+    gen: (seed, count) => generateTimeCalc3(seed, "mixed").slice(0, count),
+  }),
   textOperator({
     key: "measurement/speed",
     label: "速さ",
@@ -390,6 +749,121 @@ const definitions: ExamOperatorDef[] = [
     maxCount: 10,
     gen: (seed, count) => generateSpeed(seed, "mixed").slice(0, count),
   }),
+  textOperator({
+    key: "measurement/unit-amount",
+    label: "単位量あたり",
+    groupLabel: "測定",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 8,
+    gen: (seed, count) => generateUnitAmount(seed).slice(0, count),
+  }),
+  textOperator({
+    key: "measurement/average",
+    label: "平均",
+    groupLabel: "測定",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 8,
+    gen: (seed, count) => generateAverage(seed, 5).slice(0, count),
+  }),
+
+  // ============================================================
+  // 変化と関係
+  // ============================================================
+  textOperator({
+    key: "relations/percent",
+    label: "割合と百分率",
+    groupLabel: "変化と関係",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generatePercent(seed, "mixed").slice(0, count),
+  }),
+  textOperator({
+    key: "relations/ratio",
+    label: "比",
+    groupLabel: "変化と関係",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 6,
+    maxCount: 12,
+    gen: (seed, count) => generateRatio(seed, "mixed").slice(0, count),
+  }),
+  qaOperator({
+    key: "relations/proportion-eq",
+    label: "比例・反比例",
+    groupLabel: "変化と関係",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateProportion(seed).slice(0, count) as { question: string; answerDisplay: string }[],
+  }),
+  qaOperator({
+    key: "relations/linear-func",
+    label: "一次関数",
+    groupLabel: "変化と関係",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 12,
+    gen: (seed, count) => generateLinearFunc(seed).slice(0, count) as { question: string; answerDisplay: string }[],
+  }),
+  qaOperator({
+    key: "relations/quadratic-func",
+    label: "関数 y=ax²",
+    groupLabel: "変化と関係",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateQuadFunc(seed).slice(0, count) as { question: string; answerDisplay: string }[],
+  }),
+
+  // ============================================================
+  // データ・統計
+  // ============================================================
+  textOperator({
+    key: "data/counting",
+    label: "場合の数",
+    groupLabel: "データ・統計",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 8,
+    gen: (seed, count) => generateCounting(seed).slice(0, count),
+  }),
+  {
+    key: "data/probability",
+    label: "確率",
+    groupLabel: "データ・統計",
+    instruction: "次の確率を求めなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    generate: (seed, count) => generateProbability(seed).slice(0, count),
+    render: (problems, showAnswers) => (
+      <div className="exam-text-list">
+        {(problems as ProbabilityP[]).map((p, i) => (
+          <div key={i} className="exam-text-row">
+            <span className="exam-num">({i + 1})</span>
+            <span className="exam-text-q">{p.question}</span>
+            <span className={`exam-text-a${showAnswers ? "" : " ws-hidden"}`}>
+              <M tex={texRed(p.ansDen === 1 ? String(p.ansNum) : `\\frac{${p.ansNum}}{${p.ansDen}}`)} />
+            </span>
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  qaOperator({
+    key: "data/sampling",
+    label: "標本調査",
+    groupLabel: "データ・統計",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateSampling(seed).slice(0, count) as { question: string; answerDisplay: string }[],
+  }),
+
+  // ============================================================
+  // 数学I
+  // ============================================================
   exprOperator({
     key: "math1/irrational-calc",
     label: "無理数の計算",
@@ -398,6 +872,122 @@ const definitions: ExamOperatorDef[] = [
     defaultCount: 6,
     maxCount: 12,
     gen: (seed, count) => generateIrrationalCalc(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "math1/quadratic-factor",
+    label: "展開と因数分解",
+    groupLabel: "数学I",
+    instruction: "次の計算をしなさい。",
+    defaultCount: 6,
+    maxCount: 12,
+    gen: (seed, count) => generateQuadraticFactor(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "math1/quadratic-func",
+    label: "二次関数",
+    groupLabel: "数学I",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 8,
+    gen: (seed, count) => generateQuadraticFunc(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "math1/linear-inequality",
+    label: "一次不等式",
+    groupLabel: "数学I",
+    instruction: "次の不等式を解きなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateLinearInequality(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "math1/quadratic-eq-ineq",
+    label: "二次方程式・不等式",
+    groupLabel: "数学I",
+    instruction: "次の問題を解きなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateQuadraticEqIneq(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "math1/trig-ratio",
+    label: "三角比",
+    groupLabel: "数学I",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 6,
+    maxCount: 12,
+    gen: (seed, count) => generateTrigRatio(seed, "mixed", count),
+  }),
+
+  // ============================================================
+  // 数学A
+  // ============================================================
+  exprOperator({
+    key: "mathA/permutation-combination",
+    label: "順列・組合せ",
+    groupLabel: "数学A",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 6,
+    maxCount: 12,
+    gen: (seed, count) => generatePermComb(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "mathA/probability",
+    label: "確率",
+    groupLabel: "数学A",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 8,
+    gen: (seed, count) => generateProbabilityA(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "mathA/euclidean-gcd",
+    label: "ユークリッドの互除法",
+    groupLabel: "数学A",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 8,
+    gen: (seed, count) => generateEuclideanGcd(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "mathA/base-conversion",
+    label: "n進法",
+    groupLabel: "数学A",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 6,
+    maxCount: 12,
+    gen: (seed, count) => generateBaseConversion(seed, "mixed", count),
+  }),
+
+  // ============================================================
+  // 数学II
+  // ============================================================
+  exprOperator({
+    key: "math2/cubic-expand-factor",
+    label: "三次式の展開・因数分解",
+    groupLabel: "数学II",
+    instruction: "次の計算をしなさい。",
+    defaultCount: 6,
+    maxCount: 12,
+    gen: (seed, count) => generateCubicExpandFactor(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "math2/complex-number",
+    label: "複素数と方程式",
+    groupLabel: "数学II",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateComplexNumber(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "math2/exponent",
+    label: "指数の拡張",
+    groupLabel: "数学II",
+    instruction: "次の計算をしなさい。",
+    defaultCount: 6,
+    maxCount: 12,
+    gen: (seed, count) => generateExponent(seed, "mixed", count),
   }),
   exprOperator({
     key: "math2/log-calc",
@@ -409,8 +999,53 @@ const definitions: ExamOperatorDef[] = [
     gen: (seed, count) => generateLogCalc(seed, "mixed", count),
   }),
   exprOperator({
+    key: "math2/radian",
+    label: "弧度法",
+    groupLabel: "数学II",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 6,
+    maxCount: 12,
+    gen: (seed, count) => generateRadian(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "math2/general-angle",
+    label: "一般角",
+    groupLabel: "数学II",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateGeneralAngle(seed, count),
+  }),
+  exprOperator({
+    key: "math2/addition-formula",
+    label: "加法定理",
+    groupLabel: "数学II",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateAdditionFormula(seed, count),
+  }),
+  exprOperator({
+    key: "math2/double-angle",
+    label: "倍角公式",
+    groupLabel: "数学II",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateDoubleAngle(seed, count),
+  }),
+  exprOperator({
+    key: "math2/trig-synthesis",
+    label: "三角関数の合成",
+    groupLabel: "数学II",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateTrigSynthesis(seed, count),
+  }),
+  exprOperator({
     key: "math2/derivative-poly",
-    label: "微分",
+    label: "微分計算・極値",
     groupLabel: "数学II",
     instruction: "次の問題に答えなさい。",
     defaultCount: 5,
@@ -418,13 +1053,196 @@ const definitions: ExamOperatorDef[] = [
     gen: (seed, count) => generateDerivativePoly(seed, "mixed", count),
   }),
   exprOperator({
+    key: "math2/tangent-line",
+    label: "接線の方程式",
+    groupLabel: "数学II",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateTangentLine(seed, "mixed", count),
+  }),
+  exprOperator({
     key: "math2/integral-poly",
-    label: "積分",
+    label: "多項式の積分",
     groupLabel: "数学II",
     instruction: "次の問題に答えなさい。",
     defaultCount: 5,
     maxCount: 10,
     gen: (seed, count) => generateIntegralPoly(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "math2/point-distance",
+    label: "2点間の距離",
+    groupLabel: "数学II",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generatePointDistance(seed, count),
+  }),
+  exprOperator({
+    key: "math2/section-point",
+    label: "内分点",
+    groupLabel: "数学II",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateSectionPoint(seed, count),
+  }),
+  exprOperator({
+    key: "math2/line-equation",
+    label: "直線の方程式",
+    groupLabel: "数学II",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateLineEquation(seed, count),
+  }),
+  exprOperator({
+    key: "math2/point-line-distance",
+    label: "点と直線の距離",
+    groupLabel: "数学II",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generatePointLineDistance(seed, count),
+  }),
+
+  // ============================================================
+  // 数学B
+  // ============================================================
+  exprOperator({
+    key: "mathB/arithmetic-seq",
+    label: "等差数列",
+    groupLabel: "数学B",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateArithmeticSeq(seed, count),
+  }),
+  exprOperator({
+    key: "mathB/geometric-seq",
+    label: "等比数列",
+    groupLabel: "数学B",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateGeometricSeq(seed, count),
+  }),
+  exprOperator({
+    key: "mathB/sigma-sum",
+    label: "Σ計算",
+    groupLabel: "数学B",
+    instruction: "次の計算をしなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateSigmaSum(seed, count),
+  }),
+  exprOperator({
+    key: "mathB/binomial-dist",
+    label: "二項分布",
+    groupLabel: "数学B",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 8,
+    gen: (seed, count) => generateBinomialDist(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "mathB/normal-dist",
+    label: "正規分布",
+    groupLabel: "数学B",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 4,
+    maxCount: 8,
+    gen: (seed, count) => generateNormalDist(seed, "mixed", count),
+  }),
+
+  // ============================================================
+  // 数学III
+  // ============================================================
+  exprOperator({
+    key: "math3/seq-limit",
+    label: "数列の極限",
+    groupLabel: "数学III",
+    instruction: "次の極限を求めなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateSeqLimit(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "math3/basic-derivative",
+    label: "基本微分",
+    groupLabel: "数学III",
+    instruction: "次の関数を微分しなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateBasicDerivative(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "math3/product-quotient-diff",
+    label: "積・商の微分",
+    groupLabel: "数学III",
+    instruction: "次の関数を微分しなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateProductQuotientDiff(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "math3/chain-rule-diff",
+    label: "合成関数の微分",
+    groupLabel: "数学III",
+    instruction: "次の関数を微分しなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateChainRuleDiff(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "math3/basic-integral",
+    label: "基本積分",
+    groupLabel: "数学III",
+    instruction: "次の不定積分を求めなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateBasicIntegral(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "math3/substitution-integral",
+    label: "置換積分",
+    groupLabel: "数学III",
+    instruction: "次の不定積分を求めなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateSubstitutionIntegral(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "math3/by-parts-integral",
+    label: "部分積分",
+    groupLabel: "数学III",
+    instruction: "次の不定積分を求めなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateByPartsIntegral(seed, "mixed", count),
+  }),
+
+  // ============================================================
+  // 数学C
+  // ============================================================
+  exprOperator({
+    key: "mathC/vector-calc",
+    label: "ベクトルの演算",
+    groupLabel: "数学C",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateVectorCalc(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "mathC/complex-plane",
+    label: "複素数平面",
+    groupLabel: "数学C",
+    instruction: "次の問題に答えなさい。",
+    defaultCount: 5,
+    maxCount: 10,
+    gen: (seed, count) => generateComplexPlane(seed, "mixed", count),
   }),
 ];
 
