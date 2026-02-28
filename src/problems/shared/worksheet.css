@@ -206,6 +206,41 @@
 }
 
 /* ============================================================
+   Worksheet mobile overrides
+   ============================================================ */
+@media screen and (max-width: 768px) {
+  .ws-cols-2,
+  .ws-cols-3,
+  .ws-cols-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .ws-page {
+    gap: 14px 0;
+  }
+
+  .ws-box {
+    width: 36px;
+    height: 36px;
+  }
+
+  .ws-num {
+    width: 28px;
+    font-size: 15px;
+  }
+
+  .ws-clock-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ws-seq-cell {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
+}
+
+/* ============================================================
    Worksheet print overrides
    ============================================================ */
 @media print {

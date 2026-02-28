@@ -120,6 +120,17 @@
   min-height: 32px;
 }
 
+@media screen and (max-width: 768px) {
+  .dev-fig-page {
+    grid-template-columns: 1fr;
+  }
+
+  .dev-fig-page svg {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
 @media print {
   .dev-text-page {
     gap: 2px;

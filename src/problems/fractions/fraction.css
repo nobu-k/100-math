@@ -109,6 +109,12 @@
   font-weight: bold;
 }
 
+@media screen and (max-width: 768px) {
+  .fraction-page {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media print {
   .fraction-frac {
     font-size: 20px;

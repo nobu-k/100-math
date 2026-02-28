@@ -151,6 +151,12 @@
   border-bottom-color: #000;
 }
 
+@media screen and (max-width: 768px) {
+  .hissan-page {
+    grid-template-columns: repeat(2, auto);
+  }
+}
+
 @media print {
   .hissan-page {
     margin-top: 3mm;

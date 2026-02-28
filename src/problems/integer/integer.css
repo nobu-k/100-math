@@ -107,6 +107,12 @@
   border-radius: 50%;
 }
 
+@media screen and (max-width: 768px) {
+  .integer-page {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media print {
   .integer-text {
     font-size: 14px;
