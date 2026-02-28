@@ -5,6 +5,7 @@ export type QuadraticEqIneqMode = "equation" | "inequality" | "discriminant" | "
 export interface QuadraticEqIneqProblem {
   expr: string;
   answerExpr: string;
+  isNL?: boolean;
 }
 
 export const generateQuadraticEqIneq = (
@@ -94,7 +95,7 @@ const generateRationalEquation = (rng: () => number): QuadraticEqIneqProblem | n
     .map((r) => r.str);
 
   const answerExpr = `x = ${sortedRoots.join(", ")}`;
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const generateIrrationalEquation = (rng: () => number): QuadraticEqIneqProblem | null => {
@@ -135,7 +136,7 @@ const generateIrrationalEquation = (rng: () => number): QuadraticEqIneqProblem |
       : `x = (${-b} ± ${dOuter === 1 ? "" : dOuter}√${dInner})/${den}`;
   }
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 /* ================================================================
@@ -162,7 +163,7 @@ const generateInequality = (rng: () => number): QuadraticEqIneqProblem | null =>
 
   const answerExpr = formatInequalityAnswer(r1, r2, ineq);
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 const formatInequalityAnswer = (
@@ -211,7 +212,7 @@ const generateDiscriminant = (rng: () => number): QuadraticEqIneqProblem | null 
 
   const answerExpr = `D = ${formatSigned(D)}，${classification}`;
 
-  return { expr, answerExpr };
+  return { expr, answerExpr, isNL: true };
 };
 
 /* ================================================================

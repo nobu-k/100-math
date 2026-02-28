@@ -7,6 +7,11 @@
   font-size: 32px;
 }
 
+/* NL problems: match surrounding Japanese text */
+.ws-problem .ws-expr-nl .katex {
+  font-size: 1.15em;
+}
+
 /* Text-row problems */
 .dev-text-row .katex {
   font-size: 22px;
@@ -46,6 +51,10 @@
   .ws-problem .katex {
     font-size: 20px;
     white-space: nowrap;
+  }
+
+  .ws-problem .ws-expr-nl .katex {
+    font-size: 1.15em;
   }
 
 
