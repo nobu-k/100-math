@@ -16,16 +16,16 @@ export const unicodeToLatex = (text: string): string => {
   s = s.replace(/∫\[([^\]→]+)→([^\]]+)\]/g, (_, a, b) =>
     `\\int_{${unicodeToLatex(a)}}^{${unicodeToLatex(b)}}`);
 
-  // Sigma notation: Σ[k=1→n] → \sum_{k=1}^{n}
+  // Sigma notation: Σ[k=1→n] → \sum\limits_{k=1}^{n}
   s = s.replace(/Σ\[(\w+=\d+)→([^\]]+)\]/g, (_, fromPart, to) => {
     const toTex = to === "∞" ? "\\infty" : to;
-    return `\\sum_{${fromPart}}^{${toTex}}`;
+    return `\\sum\\limits_{${fromPart}}^{${toTex}}`;
   });
 
-  // Limit notation: lim[n→∞] → \lim_{n \to \infty}
+  // Limit notation: lim[n→∞] → \lim\limits_{n \to \infty}
   s = s.replace(/lim\[(\w+)→([^\]]+)\]/g, (_, v, to) => {
     const toTex = to === "∞" ? "\\infty" : to;
-    return `\\lim_{${v} \\to ${toTex}}`;
+    return `\\lim\\limits_{${v} \\to ${toTex}}`;
   });
 
   // Bare integral sign
