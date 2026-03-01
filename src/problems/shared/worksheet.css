@@ -220,6 +220,11 @@
 }
 
 /* ---- ws-large (first-grade enlarged text) ---- */
+.ws-large .ws-problem,
+.ws-large .ws-seq-row {
+  gap: 12px;
+}
+
 .ws-large .ws-num {
   font-size: 24px;
 }
