@@ -59,11 +59,19 @@ const Comparison = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
+      <p className="ws-instruction">
+        □に &gt; か &lt; か = をかきましょう。
+        <span className="ws-instruction-examples">
+          おおきい &gt; ちいさい（れい：5 &gt; 3）
+          ちいさい &lt; おおきい（れい：3 &lt; 5）
+          おなじ = おなじ（れい：4 = 4）
+        </span>
+      </p>
       <div className="ws-page ws-cols-3 print-spread ws-large">
         {problems.map((p, i) => (
           <div key={i} className="ws-problem">
             <span className="ws-num">({i + 1})</span>
-            <M tex={`${p.left} ${texBox(p.answer, showAnswers)} ${p.right}`} />
+            <M tex={`${p.left} \\quad ${texBox(p.answer, showAnswers)} \\quad ${p.right}`} />
           </div>
         ))}
       </div>
