@@ -67,11 +67,13 @@ const Comparison = () => {
           おなじ = おなじ（れい：4 = 4）
         </span>
       </p>
-      <div className="ws-page ws-cols-3 print-spread ws-large">
+      <div className="ws-cmp-grid print-spread ws-large">
         {problems.map((p, i) => (
-          <div key={i} className="ws-problem">
+          <div key={i} className="ws-problem ws-cmp-item">
             <span className="ws-num">({i + 1})</span>
-            <M tex={`${p.left} \\quad ${texBox(p.answer, showAnswers)} \\quad ${p.right}`} />
+            <M className="ws-cmp-val-l" tex={String(p.left)} />
+            <M tex={texBox(p.answer, showAnswers)} />
+            <M className="ws-cmp-val-r" tex={String(p.right)} />
           </div>
         ))}
       </div>

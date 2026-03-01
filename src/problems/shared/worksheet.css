@@ -196,6 +196,27 @@
   color: red;
 }
 
+/* ---- Comparison ---- */
+.ws-cmp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, auto auto auto 1fr);
+  column-gap: 8px;
+  row-gap: 20px;
+  align-items: center;
+}
+
+.ws-cmp-item {
+  display: contents;
+}
+
+.ws-cmp-val-l {
+  text-align: right;
+}
+
+.ws-cmp-val-r {
+  text-align: left;
+}
+
 /* ---- Clock ---- */
 .ws-clock-grid {
   display: grid;
@@ -300,6 +321,11 @@
     height: 48px;
     font-size: 28px;
   }
+
+  .ws-cmp-grid {
+    grid-template-columns: repeat(1, auto auto auto 1fr);
+    row-gap: 14px;
+  }
 }
 
 /* ============================================================
@@ -323,6 +349,12 @@
 
   .ws-cols-2 {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .ws-cmp-grid {
+    padding: 0 2mm;
+    column-gap: 6px;
+    row-gap: 14px;
   }
 
   .ws-val {
