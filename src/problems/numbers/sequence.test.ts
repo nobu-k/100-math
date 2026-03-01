@@ -55,15 +55,32 @@ describe("generateSequence", () => {
     }
   });
 
-  it("all values are positive", () => {
+  it("all values are positive for all step/max combos", () => {
     for (const seed of seeds) {
-      const problems = generateSequence(seed, 2, 20);
-      for (const p of problems) {
-        let ansIdx = 0;
-        for (const c of p.cells) {
-          const v = c !== null ? c : p.answers[ansIdx++];
-          expect(v).toBeGreaterThan(0);
+      for (const step of [0, 1, 2, 5, 10]) {
+        for (const max of [20, 50, 100]) {
+          const problems = generateSequence(seed, step, max);
+          for (const p of problems) {
+            let ansIdx = 0;
+            for (const c of p.cells) {
+              const v = c !== null ? c : p.answers[ansIdx++];
+              expect(v).toBeGreaterThan(0);
+            }
+          }
         }
+      }
+    }
+  });
+
+  it("no duplicate sequences within a worksheet", () => {
+    for (const seed of seeds) {
+      for (const step of [0, 1, 2, 5, 10]) {
+        const problems = generateSequence(seed, step, 100);
+        const seqs = problems.map((p) => {
+          let ansIdx = 0;
+          return p.cells.map((c) => c !== null ? c : p.answers[ansIdx++]).join(",");
+        });
+        expect(new Set(seqs).size).toBe(seqs.length);
       }
     }
   });
