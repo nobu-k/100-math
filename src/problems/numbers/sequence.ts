@@ -5,6 +5,8 @@ export interface SequenceProblem {
   answers: number[];
 }
 
+const STEP_CHOICES = [1, 2, 5, 10];
+
 export const generateSequence = (
   seed: number,
   step: number,
@@ -15,30 +17,33 @@ export const generateSequence = (
   const length = 8;
 
   for (let i = 0; i < 6; i++) {
+    const rowStep = step === 0
+      ? STEP_CHOICES[Math.floor(rng() * STEP_CHOICES.length)]
+      : step;
     const ascending = rng() < 0.7;
     let start: number;
     if (ascending) {
-      const maxStart = max - step * (length - 1);
+      const maxStart = max - rowStep * (length - 1);
       if (maxStart < 1) {
-        start = step;
+        start = rowStep;
       } else {
         start = 1 + Math.floor(rng() * maxStart);
-        if (step > 1) start = Math.max(step, Math.ceil(start / step) * step);
+        if (rowStep > 1) start = Math.max(rowStep, Math.ceil(start / rowStep) * rowStep);
       }
     } else {
-      const minStart = step * (length - 1) + 1;
+      const minStart = rowStep * (length - 1) + 1;
       if (minStart > max) {
         start = max;
       } else {
         start = minStart + Math.floor(rng() * (max - minStart + 1));
-        if (step > 1) start = Math.floor(start / step) * step;
+        if (rowStep > 1) start = Math.floor(start / rowStep) * rowStep;
         if (start < minStart) start = minStart;
       }
     }
 
     const allNums: number[] = [];
     for (let j = 0; j < length; j++) {
-      allNums.push(ascending ? start + step * j : start - step * j);
+      allNums.push(ascending ? start + rowStep * j : start - rowStep * j);
     }
 
     // pick 3 blanks (not first or last)

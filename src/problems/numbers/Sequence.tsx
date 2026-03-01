@@ -3,14 +3,16 @@ import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { generateSequence } from "./sequence";
 
-const DEF = { step: 2, smax: 20 };
+const DEF = { step: 0, smax: 20 };
 const PARAM_KEYS = ["step", "smax"];
 
 const Sequence = () => {
   const [step, setStep] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    const v = parseInt(p.get("step") ?? String(DEF.step), 10) || DEF.step;
-    return Math.max(1, Math.min(10, v));
+    const raw = p.get("step");
+    if (raw === null) return DEF.step;
+    const v = parseInt(raw, 10);
+    return Number.isNaN(v) ? DEF.step : Math.max(0, Math.min(10, v));
   });
   const [smax, setSmax] = useState(() => {
     const p = new URLSearchParams(window.location.search);
@@ -55,6 +57,7 @@ const Sequence = () => {
           value={step}
           onChange={(e) => onStepChange(Number(e.target.value))}
         >
+          <option value={0}>ランダム</option>
           <option value={1}>1</option>
           <option value={2}>2</option>
           <option value={5}>5</option>

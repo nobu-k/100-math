@@ -73,4 +73,22 @@ describe("generateSequence", () => {
     const b = generateSequence(42, 2, 20);
     expect(a).toEqual(b);
   });
+
+  it("step=0 (random) picks varying steps from [1,2,5,10]", () => {
+    const stepsUsed = new Set<number>();
+    for (const seed of [1, 2, 42, 100, 999, 7, 13, 77]) {
+      const problems = generateSequence(seed, 0, 100);
+      for (const p of problems) {
+        const full: number[] = [];
+        let ansIdx = 0;
+        for (const c of p.cells) {
+          full.push(c !== null ? c : p.answers[ansIdx++]);
+        }
+        const diff = Math.abs(full[1] - full[0]);
+        expect([1, 2, 5, 10]).toContain(diff);
+        stepsUsed.add(diff);
+      }
+    }
+    expect(stepsUsed.size).toBeGreaterThan(1);
+  });
 });
