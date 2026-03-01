@@ -68,7 +68,7 @@ const Clock = () => {
 };
 
 const renderClockProblems = (items: ClockProblem[], showAnswers: boolean) => (
-  <div className="ws-clock-grid print-spread">
+  <div className="ws-clock-grid print-spread ws-large">
     {items.map((p, i) => (
       <div key={i} className="ws-clock-item">
         <span className="ws-num">({i + 1})</span>

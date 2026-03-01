@@ -59,7 +59,7 @@ const Decomposition = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="ws-page ws-cols-2 print-spread">
+      <div className="ws-page ws-cols-2 print-spread ws-large">
         {problems.map((p, i) => {
           const tex = p.position === "left"
             ? `${p.target} = ${p.given} + ${texBox(p.answer, showAnswers)}`

@@ -81,7 +81,7 @@ const FillBlank = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="ws-page ws-cols-2 print-spread">
+      <div className="ws-page ws-cols-2 print-spread ws-large">
         {problems.map((p, i) => {
           const left = p.left !== null ? String(p.left) : texBox(p.answer, showAnswers);
           const right = p.right !== null ? String(p.right) : texBox(p.answer, showAnswers);

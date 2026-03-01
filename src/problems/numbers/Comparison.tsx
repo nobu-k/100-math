@@ -59,7 +59,7 @@ const Comparison = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="ws-page ws-cols-3 print-spread">
+      <div className="ws-page ws-cols-3 print-spread ws-large">
         {problems.map((p, i) => (
           <div key={i} className="ws-problem">
             <span className="ws-num">({i + 1})</span>

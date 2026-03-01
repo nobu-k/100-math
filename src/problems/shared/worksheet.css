@@ -205,6 +205,30 @@
   min-height: 1.5em;
 }
 
+/* ---- ws-large (first-grade enlarged text) ---- */
+.ws-large .ws-num {
+  font-size: 24px;
+}
+
+.ws-large .ws-seq-cell {
+  width: 56px;
+  height: 56px;
+  font-size: 32px;
+}
+
+.ws-large .ws-seq-arrow {
+  font-size: 26px;
+}
+
+.ws-large .ws-clock-svg {
+  width: 180px;
+  height: 180px;
+}
+
+.ws-large .ws-clock-answer {
+  font-size: 28px;
+}
+
 /* ============================================================
    Worksheet mobile overrides
    ============================================================ */
@@ -237,6 +261,16 @@
     width: 36px;
     height: 36px;
     font-size: 20px;
+  }
+
+  .ws-large .ws-num {
+    font-size: 20px;
+  }
+
+  .ws-large .ws-seq-cell {
+    width: 48px;
+    height: 48px;
+    font-size: 28px;
   }
 }
 
@@ -299,6 +333,29 @@
 
   .ws-num {
     font-size: 12px;
+  }
+
+  .ws-large .ws-num {
+    font-size: 16px;
+  }
+
+  .ws-large .ws-seq-cell {
+    width: 14mm;
+    height: 14mm;
+    font-size: 24px;
+  }
+
+  .ws-large .ws-seq-arrow {
+    font-size: 20px;
+  }
+
+  .ws-large .ws-clock-svg {
+    width: 40mm;
+    height: 40mm;
+  }
+
+  .ws-large .ws-clock-answer {
+    font-size: 22px;
   }
 
   .ws-expr-nl {

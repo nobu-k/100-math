@@ -7,6 +7,10 @@
   font-size: 32px;
 }
 
+.ws-large .ws-problem .katex {
+  font-size: 44px;
+}
+
 /* NL problems: match surrounding Japanese text */
 .ws-problem .ws-expr-nl .katex {
   font-size: 1.15em;
@@ -61,6 +65,10 @@
   .ws-problem .katex {
     font-size: 20px;
     white-space: nowrap;
+  }
+
+  .ws-large .ws-problem .katex {
+    font-size: 28px;
   }
 
   .ws-problem .ws-expr-nl .katex {
