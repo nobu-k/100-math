@@ -115,6 +115,10 @@
   }
 }
 
+.fraction-guide .katex {
+  font-size: 22px;
+}
+
 @media print {
   .fraction-frac {
     font-size: 20px;
@@ -134,5 +138,9 @@
   .fraction-guide .fraction-int,
   .fraction-guide-sym {
     font-size: 14px;
+  }
+
+  .fraction-guide .katex {
+    font-size: 18px;
   }
 }

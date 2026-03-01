@@ -1,0 +1,110 @@
+/* ---- Clock (時計) ---- */
+.ws-clock-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px 16px;
+  width: 100%;
+}
+
+.ws-clock-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.ws-clock-item .ws-num {
+  width: auto;
+  text-align: center;
+}
+
+.ws-clock-svg {
+  width: 140px;
+  height: 140px;
+}
+
+.ws-clock-answer-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  width: 100%;
+}
+
+.ws-clock-label {
+  font-size: 18px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ws-clock-line {
+  flex: 1;
+  border-bottom: 2px solid #000;
+  min-height: 1.8em;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.ws-clock-answer {
+  font-size: 20px;
+  font-weight: bold;
+  color: red;
+}
+
+/* ---- ws-large ---- */
+.ws-large .ws-clock-svg {
+  width: 180px;
+  height: 180px;
+}
+
+.ws-large .ws-clock-label {
+  font-size: 24px;
+}
+
+.ws-large .ws-clock-line {
+  min-height: 2.2em;
+}
+
+.ws-large .ws-clock-answer {
+  font-size: 28px;
+}
+
+/* ---- Mobile ---- */
+@media screen and (max-width: 768px) {
+  .ws-clock-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---- Print ---- */
+@media print {
+  .ws-clock-grid {
+    gap: 12px 8px;
+  }
+
+  .ws-clock-svg {
+    width: 32mm;
+    height: 32mm;
+  }
+
+  .ws-clock-label {
+    font-size: 14px;
+  }
+
+  .ws-clock-answer {
+    font-size: 16px;
+  }
+
+  .ws-large .ws-clock-svg {
+    width: 40mm;
+    height: 40mm;
+  }
+
+  .ws-large .ws-clock-label {
+    font-size: 18px;
+  }
+
+  .ws-large .ws-clock-answer {
+    font-size: 22px;
+  }
+}

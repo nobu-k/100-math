@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { generateSequence } from "./sequence";
+import "./sequence.css";
 
 const DEF = { step: 0, smax: 20 };
 const PARAM_KEYS = ["step", "smax"];

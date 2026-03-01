@@ -2,20 +2,6 @@
    Worksheet (ws-) shared layout styles
    ============================================================ */
 
-/* Brief instruction line above the problem grid */
-.ws-instruction {
-  font-size: 20px;
-  margin: 0 0 8px;
-}
-
-.ws-instruction-examples {
-  display: flex;
-  gap: 24px;
-  margin-top: 4px;
-  font-size: 18px;
-  color: #555;
-}
-
 /* Shared grid page */
 .ws-page {
   display: grid;
@@ -108,18 +94,6 @@
   height: 1em;
 }
 
-.ws-val {
-  font-size: 28px;
-  font-weight: bold;
-  min-width: 1.2em;
-  text-align: center;
-}
-
-.ws-op {
-  font-size: 28px;
-  font-weight: bold;
-}
-
 /* Blank box */
 .ws-box {
   display: inline-flex;
@@ -142,169 +116,13 @@
   visibility: hidden;
 }
 
-/* ---- Sequence ---- */
-.ws-seq-page {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 100%;
-}
-
-.ws-seq-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.ws-seq-cells {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 2px;
-}
-
-.ws-seq-cell-wrap {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.ws-seq-arrow {
-  font-size: 20px;
-  color: #888;
-}
-
-.ws-seq-cell {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border: 2px solid #ccc;
-  border-radius: 4px;
-  font-size: 24px;
-  font-weight: bold;
-  background: #fafafa;
-}
-
-.ws-seq-cell-blank {
-  border-color: #000;
-  background: #fff;
-}
-
-.ws-seq-cell-answer {
-  color: red;
-}
-
-/* ---- Comparison ---- */
-.ws-cmp-grid {
-  display: grid;
-  grid-template-columns: repeat(3, auto auto auto 1fr);
-  column-gap: 8px;
-  row-gap: 20px;
-  align-items: center;
-}
-
-.ws-cmp-item {
-  display: contents;
-}
-
-.ws-cmp-val-l {
-  text-align: right;
-}
-
-.ws-cmp-val-r {
-  text-align: left;
-}
-
-/* ---- Clock ---- */
-.ws-clock-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px 16px;
-  width: 100%;
-}
-
-.ws-clock-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.ws-clock-item .ws-num {
-  width: auto;
-  text-align: center;
-}
-
-.ws-clock-svg {
-  width: 140px;
-  height: 140px;
-}
-
-.ws-clock-answer-row {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-  width: 100%;
-}
-
-.ws-clock-label {
-  font-size: 18px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.ws-clock-line {
-  flex: 1;
-  border-bottom: 2px solid #000;
-  min-height: 1.8em;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.ws-clock-answer {
-  font-size: 20px;
-  font-weight: bold;
-  color: red;
-}
-
 /* ---- ws-large (first-grade enlarged text) ---- */
-.ws-large .ws-problem,
-.ws-large .ws-seq-row {
+.ws-large .ws-problem {
   gap: 12px;
 }
 
 .ws-large .ws-num {
   font-size: 24px;
-}
-
-.ws-large .ws-seq-cell {
-  width: 56px;
-  height: 56px;
-  font-size: 32px;
-}
-
-.ws-large .ws-seq-arrow {
-  font-size: 26px;
-}
-
-.ws-large .ws-clock-svg {
-  width: 180px;
-  height: 180px;
-}
-
-.ws-large .ws-clock-label {
-  font-size: 24px;
-}
-
-.ws-large .ws-clock-line {
-  min-height: 2.2em;
-}
-
-.ws-large .ws-clock-answer {
-  font-size: 28px;
 }
 
 /* ============================================================
@@ -331,29 +149,8 @@
     font-size: 15px;
   }
 
-  .ws-clock-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .ws-seq-cell {
-    width: 36px;
-    height: 36px;
-    font-size: 20px;
-  }
-
   .ws-large .ws-num {
     font-size: 20px;
-  }
-
-  .ws-large .ws-seq-cell {
-    width: 48px;
-    height: 48px;
-    font-size: 28px;
-  }
-
-  .ws-cmp-grid {
-    grid-template-columns: repeat(1, auto auto auto 1fr);
-    row-gap: 14px;
   }
 }
 
@@ -361,16 +158,6 @@
    Worksheet print overrides
    ============================================================ */
 @media print {
-  .ws-instruction {
-    font-size: 16px;
-    margin: 0 0 4px;
-  }
-
-  .ws-instruction-examples {
-    font-size: 14px;
-    gap: 16px;
-  }
-
   .ws-page {
     padding: 0 2mm;
     gap: 14px 12px;
@@ -378,20 +165,6 @@
 
   .ws-cols-2 {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .ws-cmp-grid {
-    padding: 0 2mm;
-    column-gap: 6px;
-    row-gap: 14px;
-  }
-
-  .ws-val {
-    font-size: 22px;
-  }
-
-  .ws-op {
-    font-size: 22px;
   }
 
   .ws-box {
@@ -403,66 +176,12 @@
     font-size: 20px;
   }
 
-  .ws-seq-cell {
-    width: 11mm;
-    height: 11mm;
-    font-size: 18px;
-  }
-
-  .ws-seq-arrow {
-    font-size: 16px;
-  }
-
-  .ws-seq-page.print-spread {
-    display: grid;
-  }
-
-  .ws-clock-grid {
-    gap: 12px 8px;
-  }
-
-  .ws-clock-svg {
-    width: 32mm;
-    height: 32mm;
-  }
-
-  .ws-clock-label {
-    font-size: 14px;
-  }
-
-  .ws-clock-answer {
-    font-size: 16px;
-  }
-
   .ws-num {
     font-size: 12px;
   }
 
   .ws-large .ws-num {
     font-size: 16px;
-  }
-
-  .ws-large .ws-seq-cell {
-    width: 14mm;
-    height: 14mm;
-    font-size: 24px;
-  }
-
-  .ws-large .ws-seq-arrow {
-    font-size: 20px;
-  }
-
-  .ws-large .ws-clock-svg {
-    width: 40mm;
-    height: 40mm;
-  }
-
-  .ws-large .ws-clock-label {
-    font-size: 18px;
-  }
-
-  .ws-large .ws-clock-answer {
-    font-size: 22px;
   }
 
   .ws-expr-nl {

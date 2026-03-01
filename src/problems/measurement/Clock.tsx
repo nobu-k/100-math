@@ -4,6 +4,7 @@ import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { generateClock, type ClockProblem } from "./clock";
 import ClockFace from "./ClockFace";
 import { parseEnum } from "../shared/enum-utils";
+import "./clock.css";
 
 type Prec = "hour" | "half" | "5min" | "1min";
 

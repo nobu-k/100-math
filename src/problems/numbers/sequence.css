@@ -1,0 +1,110 @@
+/* ---- Sequence (数列) ---- */
+.ws-seq-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.ws-seq-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ws-seq-cells {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.ws-seq-cell-wrap {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.ws-seq-arrow {
+  font-size: 20px;
+  color: #888;
+}
+
+.ws-seq-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  font-size: 24px;
+  font-weight: bold;
+  background: #fafafa;
+}
+
+.ws-seq-cell-blank {
+  border-color: #000;
+  background: #fff;
+}
+
+.ws-seq-cell-answer {
+  color: red;
+}
+
+/* ---- ws-large ---- */
+.ws-large .ws-seq-row {
+  gap: 12px;
+}
+
+.ws-large .ws-seq-cell {
+  width: 56px;
+  height: 56px;
+  font-size: 32px;
+}
+
+.ws-large .ws-seq-arrow {
+  font-size: 26px;
+}
+
+/* ---- Mobile ---- */
+@media screen and (max-width: 768px) {
+  .ws-seq-cell {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
+
+  .ws-large .ws-seq-cell {
+    width: 48px;
+    height: 48px;
+    font-size: 28px;
+  }
+}
+
+/* ---- Print ---- */
+@media print {
+  .ws-seq-cell {
+    width: 11mm;
+    height: 11mm;
+    font-size: 18px;
+  }
+
+  .ws-seq-arrow {
+    font-size: 16px;
+  }
+
+  .ws-seq-page.print-spread {
+    display: grid;
+  }
+
+  .ws-large .ws-seq-cell {
+    width: 14mm;
+    height: 14mm;
+    font-size: 24px;
+  }
+
+  .ws-large .ws-seq-arrow {
+    font-size: 20px;
+  }
+}

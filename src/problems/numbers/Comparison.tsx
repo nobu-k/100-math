@@ -3,6 +3,7 @@ import { M, texBox } from "../shared/M";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { generateComparison } from "./comparison";
+import "./comparison.css";
 
 const DEF = { max: 20 };
 const PARAM_KEYS = ["max"];
