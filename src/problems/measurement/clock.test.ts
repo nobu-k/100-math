@@ -4,9 +4,9 @@ import { generateClock } from "./clock";
 const seeds = [1, 2, 42, 100, 999];
 
 describe("generateClock", () => {
-  it("returns 8 problems", () => {
+  it("returns 9 problems", () => {
     const problems = generateClock(42, "half");
-    expect(problems).toHaveLength(8);
+    expect(problems).toHaveLength(9);
   });
 
   it("hour precision: all minutes are 0", () => {

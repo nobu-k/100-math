@@ -73,8 +73,15 @@ const renderClockProblems = (items: ClockProblem[], showAnswers: boolean) => (
       <div key={i} className="ws-clock-item">
         <span className="ws-num">({i + 1})</span>
         <ClockFace hour={p.hour} minute={p.minute} />
-        <span className={`ws-clock-answer${showAnswers ? "" : " ws-hidden"}`}>
-          {p.minute === 0 ? `${p.hour}時` : `${p.hour}時${p.minute}分`}
+        <span className="ws-clock-answer-row">
+          <span className="ws-clock-label">こたえ：</span>
+          <span className="ws-clock-line">
+            {showAnswers && (
+              <span className="ws-clock-answer">
+                {p.minute === 0 ? `${p.hour}時` : `${p.hour}時${p.minute}分`}
+              </span>
+            )}
+          </span>
         </span>
       </div>
     ))}

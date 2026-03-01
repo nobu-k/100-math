@@ -11,7 +11,7 @@ export const generateClock = (
 ): ClockProblem[] => {
   const rng = mulberry32(seed);
   const problems: ClockProblem[] = [];
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 9; i++) {
     const hour = 1 + Math.floor(rng() * 12);
     let minute: number;
     switch (precision) {
