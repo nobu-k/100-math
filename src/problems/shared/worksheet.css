@@ -187,6 +187,15 @@
   background: #fafafa;
 }
 
+.ws-seq-cell-blank {
+  border-color: #000;
+  background: #fff;
+}
+
+.ws-seq-cell-answer {
+  color: red;
+}
+
 /* ---- Clock ---- */
 .ws-clock-grid {
   display: grid;

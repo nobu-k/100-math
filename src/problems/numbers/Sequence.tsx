@@ -1,5 +1,4 @@
 import { useState, useCallback, useMemo } from "react";
-import { M, texBox } from "../shared/M";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { generateSequence } from "./sequence";
@@ -103,7 +102,11 @@ const Sequence = () => {
                     {c !== null ? (
                       <span className="ws-seq-cell">{c}</span>
                     ) : (
-                      <M tex={texBox(p.answers[blankIdx], showAnswers)} />
+                      <span className="ws-seq-cell ws-seq-cell-blank">
+                        {showAnswers && (
+                          <span className="ws-seq-cell-answer">{p.answers[blankIdx]}</span>
+                        )}
+                      </span>
                     )}
                   </span>
                 );
