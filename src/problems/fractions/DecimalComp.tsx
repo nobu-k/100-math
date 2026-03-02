@@ -3,6 +3,7 @@ import { M, texBox } from "../shared/M";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { generateDecimalComp } from "./decimal-comp";
+import "../numbers/comparison.css";
 
 const DEF = { dmax: 10 };
 const PARAM_KEYS = ["dmax"];
@@ -59,11 +60,13 @@ const DecimalComp = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      <div className="ws-page ws-cols-3 print-spread">
+      <div className="ws-cmp-grid print-spread">
         {problems.map((p, i) => (
-          <div key={i} className="ws-problem">
+          <div key={i} className="ws-problem ws-cmp-item">
             <span className="ws-num">({i + 1})</span>
-            <M tex={`${p.left} ${texBox(p.answer, showAnswers)} ${p.right}`} />
+            <M className="ws-cmp-val-l" tex={p.left} />
+            <M tex={texBox(p.answer, showAnswers)} />
+            <M className="ws-cmp-val-r" tex={p.right} />
           </div>
         ))}
       </div>
