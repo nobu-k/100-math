@@ -2,6 +2,7 @@ import { mulberry32 } from "../random";
 import type { TextProblem } from "../shared/types";
 
 export type WordProblemMode = "add" | "sub" | "mixed";
+export type WordProblemScript = "kanji" | "hiragana";
 
 type Pick = <T>(arr: readonly T[]) => T;
 
@@ -14,6 +15,7 @@ export const generateAddSub1 = (
   seed: number,
   max: number,
   mode: WordProblemMode,
+  script: WordProblemScript = "kanji",
 ): TextProblem[] => {
   const rng = mulberry32(seed);
   const pick = makePick(rng);
@@ -30,7 +32,38 @@ export const generateAddSub1 = (
     const [a, b] = pickNumbers(rng, kind, max);
     problems.push(template.make(a, b, pick));
   }
-  return problems;
+  return script === "hiragana" ? problems.map(toHiraganaProblem) : problems;
+};
+
+const toHiraganaProblem = (p: TextProblem): TextProblem => ({
+  question: toHiragana(p.question),
+  answer: toHiragana(p.answer),
+});
+
+// Replace kanji that appear in generated questions with hiragana.
+// Ordered longest-first so compound forms (e.g. 黄色くない) match before
+// their shorter prefixes (黄色い).
+const KANJI_PAIRS: [string, string][] = [
+  ["黄色くない", "きいろくない"],
+  ["黄色い", "きいろい"],
+  ["赤くない", "あかくない"],
+  ["青くない", "あおくない"],
+  ["白くない", "しろくない"],
+  ["男の子", "おとこのこ"],
+  ["女の子", "おんなのこ"],
+  ["子ども", "こども"],
+  ["お店", "おみせ"],
+  ["赤い", "あかい"],
+  ["青い", "あおい"],
+  ["白い", "しろい"],
+  ["人", "にん"],
+  ["木", "き"],
+];
+
+const toHiragana = (s: string): string => {
+  let out = s;
+  for (const [k, h] of KANJI_PAIRS) out = out.split(k).join(h);
+  return out;
 };
 
 const chooseKind = (mode: WordProblemMode, rng: () => number): "add" | "sub" => {

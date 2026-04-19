@@ -64,6 +64,13 @@ const useProblemPage = (
     [syncUrl],
   );
 
+  const updateParams = useCallback(
+    (overrides: Record<string, string>) => {
+      syncUrl(seed, showAnswers, overrides);
+    },
+    [seed, showAnswers, syncUrl],
+  );
+
   const qrUrl = useMemo(() => {
     const url = new URL(window.location.href);
     cleanParams(url);
@@ -74,7 +81,7 @@ const useProblemPage = (
     return url.toString();
   }, [seed, getSettingsParams, cleanParams]);
 
-  return { seed, showAnswers, showSettings, setShowSettings, handleNew, handleToggleAnswers, regen, qrUrl };
+  return { seed, showAnswers, showSettings, setShowSettings, handleNew, handleToggleAnswers, regen, updateParams, qrUrl };
 };
 
 export default useProblemPage;

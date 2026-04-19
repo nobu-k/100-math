@@ -142,4 +142,30 @@ describe("generateAddSub1", () => {
       }
     }
   });
+
+  it("hiragana script: questions and answers contain no CJK kanji", () => {
+    const hasKanji = (s: string) => /[\u4e00-\u9fff]/.test(s);
+    for (const seed of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 42, 100]) {
+      for (const p of generateAddSub1(seed, 20, "mixed", "hiragana")) {
+        expect(hasKanji(p.question), `question: ${p.question}`).toBe(false);
+        expect(hasKanji(p.answer), `answer: ${p.answer}`).toBe(false);
+      }
+    }
+  });
+
+  it("hiragana script preserves math correctness", () => {
+    for (const seed of seeds) {
+      for (const p of generateAddSub1(seed, 10, "mixed", "hiragana")) {
+        const [a, b] = extractNumbers(p.question);
+        const ans = parseAnswer(p.answer);
+        const isAdd = ans === a + b;
+        const isSub = a >= b && ans === a - b;
+        expect(isAdd || isSub).toBe(true);
+      }
+    }
+  });
+
+  it("kanji script is the default (unchanged from omitted arg)", () => {
+    expect(generateAddSub1(42, 10, "mixed")).toEqual(generateAddSub1(42, 10, "mixed", "kanji"));
+  });
 });

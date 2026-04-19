@@ -2,14 +2,16 @@ import { useState, useCallback, useMemo } from "react";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
 import { renderTextProblems } from "../shared/renderHelpers";
-import { generateAddSub1, type WordProblemMode } from "./add-sub-1";
+import { generateAddSub1, type WordProblemMode, type WordProblemScript } from "./add-sub-1";
 import { parseEnum } from "../shared/enum-utils";
 
 const MODE_DEF: WordProblemMode = "mixed";
 const MODE_VALUES: readonly WordProblemMode[] = ["mixed", "add", "sub"];
+const SCRIPT_DEF: WordProblemScript = "kanji";
+const SCRIPT_VALUES: readonly WordProblemScript[] = ["kanji", "hiragana"];
 const MAX_DEF = 10;
 const MAX_VALUES = [10, 20] as const;
-const PARAM_KEYS = ["mode", "max"];
+const PARAM_KEYS = ["mode", "max", "script"];
 
 const AddSub1 = () => {
   const [initial] = useState(() => {
@@ -18,45 +20,64 @@ const AddSub1 = () => {
     const max = (MAX_VALUES as readonly number[]).includes(maxRaw) ? maxRaw : MAX_DEF;
     return {
       mode: parseEnum(p.get("mode"), MODE_VALUES, MODE_DEF),
+      script: parseEnum(p.get("script"), SCRIPT_VALUES, SCRIPT_DEF),
       max,
     };
   });
 
   const [mode, setMode] = useState(initial.mode);
   const [max, setMax] = useState(initial.max);
+  const [script, setScript] = useState(initial.script);
 
   const getSettingsParams = useCallback((): Record<string, string> => {
     const m: Record<string, string> = {};
     if (mode !== MODE_DEF) m.mode = mode;
     if (max !== MAX_DEF) m.max = String(max);
+    if (script !== SCRIPT_DEF) m.script = script;
     return m;
-  }, [mode, max]);
+  }, [mode, max, script]);
 
-  const { seed, showAnswers, showSettings, setShowSettings, handleNew, handleToggleAnswers, regen, qrUrl } =
+  const { seed, showAnswers, showSettings, setShowSettings, handleNew, handleToggleAnswers, regen, updateParams, qrUrl } =
     useProblemPage(PARAM_KEYS, getSettingsParams);
+
+  const currentParams = (): Record<string, string> => {
+    const p: Record<string, string> = {};
+    if (mode !== MODE_DEF) p.mode = mode;
+    if (max !== MAX_DEF) p.max = String(max);
+    if (script !== SCRIPT_DEF) p.script = script;
+    return p;
+  };
 
   const onModeChange = useCallback((v: WordProblemMode) => {
     setMode(v);
-    const p: Record<string, string> = {};
+    const p = currentParams();
     if (v !== MODE_DEF) p.mode = v;
-    if (max !== MAX_DEF) p.max = String(max);
+    else delete p.mode;
     regen(p);
-  }, [regen, max]);
+  }, [regen, max, script]);
 
   const onMaxChange = useCallback((v: number) => {
     setMax(v);
-    const p: Record<string, string> = {};
-    if (mode !== MODE_DEF) p.mode = mode;
+    const p = currentParams();
     if (v !== MAX_DEF) p.max = String(v);
+    else delete p.max;
     regen(p);
-  }, [regen, mode]);
+  }, [regen, mode, script]);
 
-  const problems = useMemo(() => generateAddSub1(seed, max, mode), [seed, max, mode]);
+  const onScriptChange = useCallback((v: WordProblemScript) => {
+    setScript(v);
+    const p = currentParams();
+    if (v !== SCRIPT_DEF) p.script = v;
+    else delete p.script;
+    updateParams(p);
+  }, [updateParams, mode, max]);
+
+  const problems = useMemo(() => generateAddSub1(seed, max, mode, script), [seed, max, mode, script]);
 
   const settingsPanel = (
     <div className="no-print settings-panel">
       <label>
-        しゅるい{" "}
+        種類{" "}
         <select className="operator-select" value={mode}
           onChange={(e) => onModeChange(e.target.value as WordProblemMode)}>
           <option value="mixed">たし算・ひき算</option>
@@ -65,11 +86,19 @@ const AddSub1 = () => {
         </select>
       </label>
       <label>
-        かずのはんい{" "}
+        数の範囲{" "}
         <select className="operator-select" value={max}
           onChange={(e) => onMaxChange(Number(e.target.value))}>
           <option value={10}>10まで</option>
           <option value={20}>20まで</option>
+        </select>
+      </label>
+      <label>
+        文字{" "}
+        <select className="operator-select" value={script}
+          onChange={(e) => onScriptChange(e.target.value as WordProblemScript)}>
+          <option value="kanji">漢字あり</option>
+          <option value="hiragana">ひらがなのみ</option>
         </select>
       </label>
     </div>

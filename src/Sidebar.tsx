@@ -189,7 +189,7 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
         );
       }
       const needsPrefix = dupLabels.has(op.label)
-        || groupId === "grid100" || groupId === "hissan";
+        || groupId === "grid100" || groupId === "hissan" || groupId === "word-problems";
       const label = needsPrefix
         ? `${op.label}（${groupLabel}）`
         : op.label;
