@@ -49,6 +49,7 @@ const KANJI_PAIRS: [string, string][] = [
   ["赤くない", "あかくない"],
   ["青くない", "あおくない"],
   ["白くない", "しろくない"],
+  ["黒くない", "くろくない"],
   ["男の子", "おとこのこ"],
   ["女の子", "おんなのこ"],
   ["子ども", "こども"],
@@ -56,6 +57,7 @@ const KANJI_PAIRS: [string, string][] = [
   ["赤い", "あかい"],
   ["青い", "あおい"],
   ["白い", "しろい"],
+  ["黒い", "くろい"],
   ["人", "にん"],
   ["木", "き"],
 ];
@@ -108,10 +110,21 @@ const shuffle = <T>(arr: readonly T[], rng: () => number): T[] => {
 
 // ---------- Object dictionaries ----------
 
-const FOODS = ["りんご", "みかん", "いちご", "ドーナツ", "ケーキ", "あめ", "クッキー", "おにぎり"] as const;
-const FRAGILE = ["たまご", "ふうせん", "おさら", "コップ"] as const;
-const BIRDS = ["とり", "はと", "すずめ"] as const;
-const COLORS = ["赤い", "青い", "白い", "黄色い"] as const;
+const FOODS = [
+  "りんご", "みかん", "いちご", "バナナ", "もも", "なし", "メロン", "ぶどう",
+  "ドーナツ", "ケーキ", "プリン", "ゼリー", "あめ", "チョコ", "クッキー",
+  "ビスケット", "グミ", "まんじゅう", "だんご", "パン", "おにぎり",
+] as const;
+const FRAGILE = ["たまご", "ふうせん", "おさら", "コップ", "グラス", "おちゃわん"] as const;
+const BIRDS = ["とり", "はと", "すずめ", "からす", "つばめ", "ひよこ", "にわとり"] as const;
+const COLORS = ["赤い", "青い", "白い", "黄色い", "黒い"] as const;
+
+const ANIMALS_HIKI = [
+  "いぬ", "ねこ", "うさぎ", "ハムスター", "リス", "きんぎょ", "かめ", "かえる",
+] as const;
+const INSECTS_HIKI = [
+  "ちょう", "はち", "アリ", "てんとうむし", "かぶとむし", "バッタ", "せみ",
+] as const;
 
 interface ObjectCtr {
   name: string;
@@ -122,33 +135,47 @@ const COLORABLE: ObjectCtr[] = [
   { name: "おりがみ", counter: "まい" },
   { name: "カード", counter: "まい" },
   { name: "シール", counter: "まい" },
+  { name: "ハンカチ", counter: "まい" },
   { name: "ふうせん", counter: "こ" },
   { name: "ボール", counter: "こ" },
+  { name: "ぼうし", counter: "こ" },
 ];
 
 const GIFTABLES: ObjectCtr[] = [
   { name: "あめ", counter: "こ" },
   { name: "クッキー", counter: "こ" },
+  { name: "チョコ", counter: "こ" },
+  { name: "プリン", counter: "こ" },
   { name: "ボール", counter: "こ" },
   { name: "おもちゃ", counter: "こ" },
+  { name: "ぬいぐるみ", counter: "こ" },
   { name: "おりがみ", counter: "まい" },
   { name: "シール", counter: "まい" },
   { name: "カード", counter: "まい" },
+  { name: "ハンカチ", counter: "まい" },
 ];
 
 const USABLES: ObjectCtr[] = [
   { name: "おりがみ", counter: "まい" },
   { name: "シール", counter: "まい" },
   { name: "カード", counter: "まい" },
+  { name: "がようし", counter: "まい" },
+  { name: "メモようし", counter: "まい" },
 ];
 
 const BUYABLES: ObjectCtr[] = [
   { name: "りんご", counter: "こ" },
   { name: "みかん", counter: "こ" },
+  { name: "バナナ", counter: "こ" },
+  { name: "メロン", counter: "こ" },
   { name: "あめ", counter: "こ" },
+  { name: "チョコ", counter: "こ" },
   { name: "ドーナツ", counter: "こ" },
+  { name: "プリン", counter: "こ" },
+  { name: "ぬいぐるみ", counter: "こ" },
   { name: "ふうせん", counter: "こ" },
   { name: "おりがみ", counter: "まい" },
+  { name: "シール", counter: "まい" },
 ];
 
 // ---------- Templates ----------
@@ -222,6 +249,26 @@ const TEMPLATES: Template[] = [
       };
     },
   },
+  {
+    kind: "add",
+    make: (a, b, pick) => {
+      const [an1, an2] = pickTwoDistinct(ANIMALS_HIKI, pick);
+      return {
+        question: `${an1}が${a}ひきと、${an2}が${b}ひきいます。あわせてなんひきですか。`,
+        answer: `${a + b}ひき`,
+      };
+    },
+  },
+  {
+    kind: "add",
+    make: (a, b, pick) => {
+      const ins = pick(INSECTS_HIKI);
+      return {
+        question: `はなに${ins}が${a}ひきとまっていました。そこへ${b}ひきとんできました。ぜんぶでなんひきになりましたか。`,
+        answer: `${a + b}ひき`,
+      };
+    },
+  },
 
   // 求残 (take-away): start with some, remove some, find remainder
   {
@@ -281,6 +328,16 @@ const TEMPLATES: Template[] = [
       };
     },
   },
+  {
+    kind: "sub",
+    make: (a, b, pick) => {
+      const ins = pick(INSECTS_HIKI);
+      return {
+        question: `はなに${ins}が${a}ひきとまっていました。${b}ひきとんでいきました。のこりはなんひきですか。`,
+        answer: `${a - b}ひき`,
+      };
+    },
+  },
 
   // 求差 (difference): compare two groups, find how many more
   {
@@ -298,6 +355,16 @@ const TEMPLATES: Template[] = [
       return {
         question: `${c1}${o.name}が${a}${o.counter}、${c2}${o.name}が${b}${o.counter}あります。${c1}${o.name}は${c2}${o.name}よりなん${o.counter}おおいですか。`,
         answer: `${a - b}${o.counter}`,
+      };
+    },
+  },
+  {
+    kind: "sub",
+    make: (a, b, pick) => {
+      const [an1, an2] = pickTwoDistinct(ANIMALS_HIKI, pick);
+      return {
+        question: `${an1}が${a}ひき、${an2}が${b}ひきいます。${an1}は${an2}よりなんひきおおいですか。`,
+        answer: `${a - b}ひき`,
       };
     },
   },
