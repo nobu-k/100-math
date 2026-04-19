@@ -39,7 +39,7 @@ export const generateAddSub1 = (
   let subIdx = 0;
   const idx2: Record<Pattern2, number> = { "++": 0, "+-": 0, "-+": 0, "--": 0 };
   const problems: TextProblem[] = [];
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 8; i++) {
     if (chooseOpCount(operators, rng) === 1) {
       const kind = chooseKind(mode, rng);
       const template = kind === "add"

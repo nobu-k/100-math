@@ -9,8 +9,8 @@ const extractNumbers = (s: string): number[] =>
 const parseAnswer = (s: string): number => Number(s.match(/=(\d+)/)![1]);
 
 describe("generateAddSub1", () => {
-  it("returns 10 problems", () => {
-    expect(generateAddSub1(42, 10, "mixed")).toHaveLength(10);
+  it("returns 8 problems", () => {
+    expect(generateAddSub1(42, 10, "mixed")).toHaveLength(8);
   });
 
   it("every problem has a non-empty question and answer", () => {

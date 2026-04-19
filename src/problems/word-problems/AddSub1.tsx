@@ -1,9 +1,9 @@
 import { useState, useCallback, useMemo } from "react";
 import useProblemPage from "../shared/useProblemPage";
 import ProblemPageLayout from "../shared/ProblemPageLayout";
-import { renderTextProblems } from "../shared/renderHelpers";
 import { generateAddSub1, type WordProblemMode, type WordProblemScript, type WordProblemOperators } from "./add-sub-1";
 import { parseEnum } from "../shared/enum-utils";
+import "./word-problems.css";
 
 const MODE_DEF: WordProblemMode = "mixed";
 const MODE_VALUES: readonly WordProblemMode[] = ["mixed", "add", "sub"];
@@ -137,7 +137,20 @@ const AddSub1 = () => {
       settingsPanel={settingsPanel}
       qrUrl={qrUrl}
     >
-      {renderTextProblems(problems, showAnswers)}
+      <div className="wp-page print-spread">
+        {problems.map((p, i) => (
+          <div key={i} className="wp-problem">
+            <div className="wp-q-row">
+              <span className="ws-num">({i + 1})</span>
+              <span className="wp-q-text">{p.question}</span>
+            </div>
+            <div className="wp-a-row">
+              <span className="wp-a-label">答え:</span>
+              <span className="wp-a-blank">{showAnswers ? p.answer : ""}</span>
+            </div>
+          </div>
+        ))}
+      </div>
     </ProblemPageLayout>
   );
 };
