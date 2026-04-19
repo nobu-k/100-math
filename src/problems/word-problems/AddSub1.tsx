@@ -7,7 +7,7 @@ import { parseEnum } from "../shared/enum-utils";
 
 const MODE_DEF: WordProblemMode = "mixed";
 const MODE_VALUES: readonly WordProblemMode[] = ["mixed", "add", "sub"];
-const SCRIPT_DEF: WordProblemScript = "kanji";
+const SCRIPT_DEF: WordProblemScript = "hiragana";
 const SCRIPT_VALUES: readonly WordProblemScript[] = ["kanji", "hiragana"];
 const OPS_DEF: WordProblemOperators = "one";
 const OPS_VALUES: readonly WordProblemOperators[] = ["one", "two", "mixed"];

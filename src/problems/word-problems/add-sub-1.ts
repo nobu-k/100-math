@@ -22,7 +22,7 @@ export const generateAddSub1 = (
   seed: number,
   max: number,
   mode: WordProblemMode,
-  script: WordProblemScript = "kanji",
+  script: WordProblemScript = "hiragana",
   operators: WordProblemOperators = "one",
 ): TextProblem[] => {
   const rng = mulberry32(seed);
@@ -46,13 +46,17 @@ export const generateAddSub1 = (
         ? addQueue[addIdx++ % addQueue.length]
         : subQueue[subIdx++ % subQueue.length];
       const [a, b] = pickNumbers(rng, kind, max);
-      problems.push(template.make(a, b, pick));
+      const p = template.make(a, b, pick);
+      const expr = `${a}${kind === "add" ? "+" : "-"}${b}`;
+      problems.push({ question: p.question, answer: `${expr}=${p.answer}` });
     } else {
       const pattern = choosePattern2(mode, rng);
       const queue = q2[pattern];
       const template = queue[idx2[pattern]++ % queue.length];
       const [a, b, c] = pickNumbers3(rng, pattern, max);
-      problems.push(template.make(a, b, c, pick));
+      const p = template.make(a, b, c, pick);
+      const expr = `${a}${pattern[0]}${b}${pattern[1]}${c}`;
+      problems.push({ question: p.question, answer: `${expr}=${p.answer}` });
     }
   }
   return script === "hiragana" ? problems.map(toHiraganaProblem) : problems;

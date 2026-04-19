@@ -6,7 +6,7 @@ const seeds = [1, 2, 42, 100, 999];
 const extractNumbers = (s: string): number[] =>
   [...s.matchAll(/\d+/g)].map((m) => Number(m[0]));
 
-const parseAnswer = (s: string): number => Number(s.match(/\d+/)![0]);
+const parseAnswer = (s: string): number => Number(s.match(/=(\d+)/)![1]);
 
 describe("generateAddSub1", () => {
   it("returns 10 problems", () => {
@@ -165,8 +165,8 @@ describe("generateAddSub1", () => {
     }
   });
 
-  it("kanji script is the default (unchanged from omitted arg)", () => {
-    expect(generateAddSub1(42, 10, "mixed")).toEqual(generateAddSub1(42, 10, "mixed", "kanji"));
+  it("hiragana script is the default (unchanged from omitted arg)", () => {
+    expect(generateAddSub1(42, 10, "mixed")).toEqual(generateAddSub1(42, 10, "mixed", "hiragana"));
   });
 
   // -------------------------------------------------------------------------
