@@ -3,6 +3,8 @@ import type { TextProblem } from "../shared/types";
 
 export type WordProblemMode = "add" | "sub" | "mixed";
 export type WordProblemScript = "kanji" | "hiragana";
+export type WordProblemOperators = "one" | "two" | "mixed";
+export type Pattern2 = "++" | "+-" | "-+" | "--";
 
 type Pick = <T>(arr: readonly T[]) => T;
 
@@ -11,26 +13,47 @@ interface Template {
   make: (a: number, b: number, pick: Pick) => TextProblem;
 }
 
+interface Template2 {
+  pattern: Pattern2;
+  make: (a: number, b: number, c: number, pick: Pick) => TextProblem;
+}
+
 export const generateAddSub1 = (
   seed: number,
   max: number,
   mode: WordProblemMode,
   script: WordProblemScript = "kanji",
+  operators: WordProblemOperators = "one",
 ): TextProblem[] => {
   const rng = mulberry32(seed);
   const pick = makePick(rng);
   const addQueue = shuffle(TEMPLATES.filter((t) => t.kind === "add"), rng);
   const subQueue = shuffle(TEMPLATES.filter((t) => t.kind === "sub"), rng);
+  const q2 = {
+    "++": shuffle(TEMPLATES_2OP.filter((t) => t.pattern === "++"), rng),
+    "+-": shuffle(TEMPLATES_2OP.filter((t) => t.pattern === "+-"), rng),
+    "-+": shuffle(TEMPLATES_2OP.filter((t) => t.pattern === "-+"), rng),
+    "--": shuffle(TEMPLATES_2OP.filter((t) => t.pattern === "--"), rng),
+  };
   let addIdx = 0;
   let subIdx = 0;
+  const idx2: Record<Pattern2, number> = { "++": 0, "+-": 0, "-+": 0, "--": 0 };
   const problems: TextProblem[] = [];
   for (let i = 0; i < 10; i++) {
-    const kind = chooseKind(mode, rng);
-    const template = kind === "add"
-      ? addQueue[addIdx++ % addQueue.length]
-      : subQueue[subIdx++ % subQueue.length];
-    const [a, b] = pickNumbers(rng, kind, max);
-    problems.push(template.make(a, b, pick));
+    if (chooseOpCount(operators, rng) === 1) {
+      const kind = chooseKind(mode, rng);
+      const template = kind === "add"
+        ? addQueue[addIdx++ % addQueue.length]
+        : subQueue[subIdx++ % subQueue.length];
+      const [a, b] = pickNumbers(rng, kind, max);
+      problems.push(template.make(a, b, pick));
+    } else {
+      const pattern = choosePattern2(mode, rng);
+      const queue = q2[pattern];
+      const template = queue[idx2[pattern]++ % queue.length];
+      const [a, b, c] = pickNumbers3(rng, pattern, max);
+      problems.push(template.make(a, b, c, pick));
+    }
   }
   return script === "hiragana" ? problems.map(toHiraganaProblem) : problems;
 };
@@ -74,6 +97,19 @@ const chooseKind = (mode: WordProblemMode, rng: () => number): "add" | "sub" => 
   return rng() < 0.5 ? "add" : "sub";
 };
 
+const chooseOpCount = (operators: WordProblemOperators, rng: () => number): 1 | 2 => {
+  if (operators === "one") return 1;
+  if (operators === "two") return 2;
+  return rng() < 0.5 ? 1 : 2;
+};
+
+const choosePattern2 = (mode: WordProblemMode, rng: () => number): Pattern2 => {
+  if (mode === "add") return "++";
+  if (mode === "sub") return "--";
+  const patterns: Pattern2[] = ["++", "+-", "-+", "--"];
+  return patterns[Math.floor(rng() * patterns.length)];
+};
+
 const pickNumbers = (
   rng: () => number,
   kind: "add" | "sub",
@@ -89,6 +125,44 @@ const pickNumbers = (
   return [a, b];
 };
 
+// For two-operator problems we enforce:
+// - every operand and every intermediate value is >= 1 (no negatives, no zero)
+// - the final result is <= max
+const pickNumbers3 = (
+  rng: () => number,
+  pattern: Pattern2,
+  max: number,
+): [number, number, number] => {
+  switch (pattern) {
+    case "++": {
+      const total = 3 + Math.floor(rng() * (max - 2));
+      const a = 1 + Math.floor(rng() * (total - 2));
+      const b = 1 + Math.floor(rng() * (total - a - 1));
+      return [a, b, total - a - b];
+    }
+    case "+-": {
+      const s = 2 + Math.floor(rng() * (max - 1));
+      const a = 1 + Math.floor(rng() * (s - 1));
+      const b = s - a;
+      const c = 1 + Math.floor(rng() * (s - 1));
+      return [a, b, c];
+    }
+    case "-+": {
+      const a = 2 + Math.floor(rng() * (max - 1));
+      const b = 1 + Math.floor(rng() * (a - 1));
+      const space = max - (a - b);
+      const c = 1 + Math.floor(rng() * space);
+      return [a, b, c];
+    }
+    case "--": {
+      const a = 3 + Math.floor(rng() * (max - 2));
+      const b = 1 + Math.floor(rng() * (a - 2));
+      const c = 1 + Math.floor(rng() * (a - b - 1));
+      return [a, b, c];
+    }
+  }
+};
+
 const makePick = (rng: () => number): Pick => <T>(arr: readonly T[]): T =>
   arr[Math.floor(rng() * arr.length)];
 
@@ -97,6 +171,15 @@ const pickTwoDistinct = <T>(arr: readonly T[], pick: Pick): [T, T] => {
   let b = pick(arr);
   while (b === a && arr.length > 1) b = pick(arr);
   return [a, b];
+};
+
+const pickThreeDistinct = <T>(arr: readonly T[], pick: Pick): [T, T, T] => {
+  const a = pick(arr);
+  let b = pick(arr);
+  while (b === a) b = pick(arr);
+  let c = pick(arr);
+  while (c === a || c === b) c = pick(arr);
+  return [a, b, c];
 };
 
 const shuffle = <T>(arr: readonly T[], rng: () => number): T[] => {
@@ -386,6 +469,151 @@ const TEMPLATES: Template[] = [
       return {
         question: `${o.name}が${a}${o.counter}あります。そのうち${color}${o.name}は${b}${o.counter}です。${negColor}${o.name}はなん${o.counter}ですか。`,
         answer: `${a - b}${o.counter}`,
+      };
+    },
+  },
+];
+
+// ---------- Two-operator templates ----------
+
+const TEMPLATES_2OP: Template2[] = [
+  // ++ (three addends)
+  {
+    pattern: "++",
+    make: (a, b, c, pick) => {
+      const [c1, c2, c3] = pickThreeDistinct(COLORS, pick);
+      const o = pick(COLORABLE);
+      return {
+        question: `${c1}${o.name}が${a}${o.counter}、${c2}${o.name}が${b}${o.counter}、${c3}${o.name}が${c}${o.counter}あります。ぜんぶでなん${o.counter}ありますか。`,
+        answer: `${a + b + c}${o.counter}`,
+      };
+    },
+  },
+  {
+    pattern: "++",
+    make: (a, b, c, pick) => {
+      const [f1, f2, f3] = pickThreeDistinct(FOODS, pick);
+      return {
+        question: `${f1}が${a}こ、${f2}が${b}こ、${f3}が${c}こあります。ぜんぶでなんこありますか。`,
+        answer: `${a + b + c}こ`,
+      };
+    },
+  },
+  {
+    pattern: "++",
+    make: (a, b, c, pick) => {
+      const g = pick(GIFTABLES);
+      return {
+        question: `${g.name}が${a}${g.counter}ありました。${b}${g.counter}もらいました。そのあと${c}${g.counter}もらいました。ぜんぶでなん${g.counter}になりましたか。`,
+        answer: `${a + b + c}${g.counter}`,
+      };
+    },
+  },
+  {
+    pattern: "++",
+    make: (a, b, c) => ({
+      question: `こうえんに子どもが${a}人いました。${b}人きました。そのあと${c}人きました。みんなでなん人になりましたか。`,
+      answer: `${a + b + c}人`,
+    }),
+  },
+
+  // +- (add then take away)
+  {
+    pattern: "+-",
+    make: (a, b, c, pick) => {
+      const f = pick(FOODS);
+      return {
+        question: `${f}が${a}こありました。${b}こもらいました。そのあと${c}こたべました。のこりはなんこですか。`,
+        answer: `${a + b - c}こ`,
+      };
+    },
+  },
+  {
+    pattern: "+-",
+    make: (a, b, c) => ({
+      question: `バスに子どもが${a}人のっていました。${b}人のってきました。そのあと${c}人おりました。いまなん人のっていますか。`,
+      answer: `${a + b - c}人`,
+    }),
+  },
+  {
+    pattern: "+-",
+    make: (a, b, c) => ({
+      question: `こうえんに子どもが${a}人いました。${b}人きました。そのあと${c}人かえりました。いまなん人いますか。`,
+      answer: `${a + b - c}人`,
+    }),
+  },
+
+  // -+ (take away then add)
+  {
+    pattern: "-+",
+    make: (a, b, c, pick) => {
+      const f = pick(FOODS);
+      return {
+        question: `${f}が${a}こありました。${b}こたべました。そのあと${c}こもらいました。いまなんこありますか。`,
+        answer: `${a - b + c}こ`,
+      };
+    },
+  },
+  {
+    pattern: "-+",
+    make: (a, b, c, pick) => {
+      const u = pick(USABLES);
+      return {
+        question: `${u.name}が${a}${u.counter}ありました。${b}${u.counter}つかいました。そのあと${c}${u.counter}もらいました。いまなん${u.counter}ありますか。`,
+        answer: `${a - b + c}${u.counter}`,
+      };
+    },
+  },
+  {
+    pattern: "-+",
+    make: (a, b, c) => ({
+      question: `こうえんに子どもが${a}人いました。${b}人かえりました。そのあと${c}人きました。いまなん人いますか。`,
+      answer: `${a - b + c}人`,
+    }),
+  },
+  {
+    pattern: "-+",
+    make: (a, b, c) => ({
+      question: `バスに子どもが${a}人のっていました。${b}人おりました。そのあと${c}人のってきました。いまなん人のっていますか。`,
+      answer: `${a - b + c}人`,
+    }),
+  },
+
+  // -- (two take-aways)
+  {
+    pattern: "--",
+    make: (a, b, c, pick) => {
+      const f = pick(FOODS);
+      return {
+        question: `${f}が${a}こありました。${b}こたべました。そのあと${c}こあげました。のこりはなんこですか。`,
+        answer: `${a - b - c}こ`,
+      };
+    },
+  },
+  {
+    pattern: "--",
+    make: (a, b, c, pick) => {
+      const f = pick(FOODS);
+      return {
+        question: `${f}が${a}こありました。あさ${b}こたべました。ひるに${c}こたべました。のこりはなんこですか。`,
+        answer: `${a - b - c}こ`,
+      };
+    },
+  },
+  {
+    pattern: "--",
+    make: (a, b, c) => ({
+      question: `こうえんに子どもが${a}人いました。${b}人かえりました。そのあと${c}人かえりました。のこりはなん人ですか。`,
+      answer: `${a - b - c}人`,
+    }),
+  },
+  {
+    pattern: "--",
+    make: (a, b, c, pick) => {
+      const bird = pick(BIRDS);
+      return {
+        question: `木に${bird}が${a}わとまっていました。${b}わとんでいきました。そのあと${c}わとんでいきました。のこりはなんわですか。`,
+        answer: `${a - b - c}わ`,
       };
     },
   },

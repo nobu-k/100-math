@@ -168,4 +168,115 @@ describe("generateAddSub1", () => {
   it("kanji script is the default (unchanged from omitted arg)", () => {
     expect(generateAddSub1(42, 10, "mixed")).toEqual(generateAddSub1(42, 10, "mixed", "kanji"));
   });
+
+  // -------------------------------------------------------------------------
+  // Two-operator (three-operand) problems
+  // -------------------------------------------------------------------------
+
+  it("ops=two with mode=mixed produces all four patterns across seeds", () => {
+    const found = new Set<string>();
+    for (let seed = 1; seed <= 40; seed++) {
+      for (const p of generateAddSub1(seed, 20, "mixed", "kanji", "two")) {
+        const [a, b, c] = extractNumbers(p.question);
+        const ans = parseAnswer(p.answer);
+        if (ans === a + b + c) found.add("++");
+        else if (ans === a + b - c) found.add("+-");
+        else if (ans === a - b + c) found.add("-+");
+        else if (ans === a - b - c) found.add("--");
+      }
+    }
+    expect(found.has("++")).toBe(true);
+    expect(found.has("+-")).toBe(true);
+    expect(found.has("-+")).toBe(true);
+    expect(found.has("--")).toBe(true);
+  });
+
+  it("ops=two with mode=add produces only ++ pattern", () => {
+    for (const seed of seeds) {
+      for (const p of generateAddSub1(seed, 20, "add", "kanji", "two")) {
+        const [a, b, c] = extractNumbers(p.question);
+        expect(parseAnswer(p.answer)).toBe(a + b + c);
+      }
+    }
+  });
+
+  it("ops=two with mode=sub produces only -- pattern", () => {
+    for (const seed of seeds) {
+      for (const p of generateAddSub1(seed, 20, "sub", "kanji", "two")) {
+        const [a, b, c] = extractNumbers(p.question);
+        expect(parseAnswer(p.answer)).toBe(a - b - c);
+      }
+    }
+  });
+
+  it("ops=two: every intermediate value stays >= 1 (no negatives mid-problem)", () => {
+    for (const seed of seeds) {
+      for (const p of generateAddSub1(seed, 20, "mixed", "kanji", "two")) {
+        const [a, b, c] = extractNumbers(p.question);
+        const ans = parseAnswer(p.answer);
+        if (ans === a + b - c) {
+          // a+b is the intermediate; must be >= c and result >= 1
+          expect(a + b - c).toBeGreaterThanOrEqual(1);
+        } else if (ans === a - b + c) {
+          expect(a - b).toBeGreaterThanOrEqual(1);
+          expect(a - b + c).toBeGreaterThanOrEqual(1);
+        } else if (ans === a - b - c) {
+          expect(a - b).toBeGreaterThanOrEqual(1);
+          expect(a - b - c).toBeGreaterThanOrEqual(1);
+        }
+      }
+    }
+  });
+
+  it("ops=two: operands and result respect max bound", () => {
+    for (const seed of seeds) {
+      for (const p of generateAddSub1(seed, 20, "mixed", "kanji", "two")) {
+        const nums = extractNumbers(p.question);
+        const ans = parseAnswer(p.answer);
+        for (const n of nums) expect(n).toBeLessThanOrEqual(20);
+        expect(ans).toBeLessThanOrEqual(20);
+        expect(ans).toBeGreaterThanOrEqual(1);
+      }
+    }
+  });
+
+  it("ops=two works with hiragana script (no kanji)", () => {
+    const hasKanji = (s: string) => /[\u4e00-\u9fff]/.test(s);
+    for (const seed of [1, 2, 3, 4, 5]) {
+      for (const p of generateAddSub1(seed, 20, "mixed", "hiragana", "two")) {
+        expect(hasKanji(p.question), `question: ${p.question}`).toBe(false);
+        expect(hasKanji(p.answer), `answer: ${p.answer}`).toBe(false);
+      }
+    }
+  });
+
+  it("ops=mixed produces both one-operator and two-operator problems", () => {
+    let has1 = false;
+    let has2 = false;
+    for (let seed = 1; seed <= 30; seed++) {
+      for (const p of generateAddSub1(seed, 20, "mixed", "kanji", "mixed")) {
+        const nums = extractNumbers(p.question);
+        if (nums.length === 2) has1 = true;
+        if (nums.length === 3) has2 = true;
+      }
+    }
+    expect(has1).toBe(true);
+    expect(has2).toBe(true);
+  });
+
+  it("ops=two uses temporal markers (そのあと, etc.) cueing a second step", () => {
+    const markers = ["そのあと", "つぎ", "あさ", "ひる"];
+    let count = 0;
+    for (const seed of seeds) {
+      for (const p of generateAddSub1(seed, 20, "mixed", "kanji", "two")) {
+        if (markers.some((m) => p.question.includes(m))) count++;
+      }
+    }
+    expect(count).toBeGreaterThan(0);
+  });
+
+  it("ops=two is deterministic with the same seed", () => {
+    expect(generateAddSub1(42, 20, "mixed", "kanji", "two"))
+      .toEqual(generateAddSub1(42, 20, "mixed", "kanji", "two"));
+  });
 });
