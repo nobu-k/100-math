@@ -33,6 +33,7 @@ const CATEGORY_LABELS: [string, string][] = [
   ["measurement", "測定"],
   ["relations", "変化と関係"],
   ["data", "データ・統計"],
+  ["word-problems", "文章題"],
   ["hs-expr", "式の計算"],
   ["hs-equation", "方程式・不等式"],
   ["hs-function", "関数"],

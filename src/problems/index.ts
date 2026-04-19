@@ -11,6 +11,7 @@ export { geometry } from "./Geometry";
 export { measurement } from "./Measurement";
 export { relations } from "./Relations";
 export { data } from "./Data";
+export { wordProblems } from "./WordProblems";
 export { math1 } from "./Math1";
 export { mathA } from "./MathA";
 export { math2 } from "./Math2";
@@ -30,6 +31,7 @@ import { geometry } from "./Geometry";
 import { measurement } from "./Measurement";
 import { relations } from "./Relations";
 import { data } from "./Data";
+import { wordProblems } from "./WordProblems";
 import { math1 } from "./Math1";
 import { mathA } from "./MathA";
 import { math2 } from "./Math2";
@@ -42,5 +44,6 @@ export const problemGroups: ProblemGroup[] = [
   grid100, hissan, integer,
   computation, numbers, fractions, decimals, equations,
   geometry, measurement, relations, data,
+  wordProblems,
   math1, mathA, math2, mathB, math3, mathC,
 ];
