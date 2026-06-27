@@ -1,5 +1,6 @@
 import type { ProblemGroup } from "./types";
 import FillBlank from "./computation/FillBlank";
+import SubOneDigit from "./computation/SubOneDigit";
 import KukuBlank from "./computation/KukuBlank";
 import Mushikui from "./computation/Mushikui";
 import Division from "./computation/Division";
@@ -20,6 +21,7 @@ export const computation: ProblemGroup = {
   label: "計算",
   operators: [
     { operator: "fill-blank", label: "穴埋め加減", grades: [1], category: "computation", Component: FillBlank },
+    { operator: "sub-1digit", label: "1けたのひき算", grades: [1], category: "computation", Component: SubOneDigit },
     { operator: "kuku-blank", label: "九九の穴埋め", grades: [2], category: "computation", Component: KukuBlank },
     { operator: "mushikui", label: "虫食い算", grades: [2], category: "computation", Component: Mushikui },
     { operator: "division", label: "わり算", grades: [3], category: "computation", Component: Division },
