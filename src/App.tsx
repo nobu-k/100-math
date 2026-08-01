@@ -1,5 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
-import { Outlet, useMatches } from "react-router-dom";
+import {
+  Outlet,
+  ScrollRestoration,
+  useLocation,
+  useMatches,
+  useNavigate,
+} from "react-router-dom";
 import Sidebar from "./Sidebar";
 import "./styles/layout.css";
 import "./problems/shared/worksheet.css";
@@ -11,8 +17,24 @@ const App = () => {
   const handle = matches[matches.length - 1]?.handle as
     { groupLabel?: string; opLabel?: string; isExam?: boolean } | undefined;
   const isExam = handle?.isExam === true;
-  const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const menuOpen =
+    (location.state as { menuOpen?: boolean } | null)?.menuOpen === true;
   const [controlsOpen, setControlsOpen] = useState(false);
+
+  // The open menu is its own history entry, so the back button from a
+  // worksheet returns to the menu (ScrollRestoration brings back its
+  // scroll position), and closing it pops the entry again.
+  const toggleMenu = useCallback(() => {
+    if (menuOpen) {
+      navigate(-1);
+    } else {
+      navigate(location.pathname + location.search + location.hash, {
+        state: { menuOpen: true },
+      });
+    }
+  }, [menuOpen, navigate, location]);
 
   /* ---- copy handler: replace KaTeX with plain-text from data-text ---- */
   useEffect(() => {
@@ -41,16 +63,22 @@ const App = () => {
     return () => document.removeEventListener("copy", onCopy);
   }, []);
 
-  const closeMenu = useCallback(() => setMenuOpen(false), []);
-
-  if (isExam) return <Outlet />;
+  if (isExam) {
+    return (
+      <>
+        <ScrollRestoration />
+        <Outlet />
+      </>
+    );
+  }
 
   return (
     <div className={`layout${controlsOpen ? " controls-open" : ""}`}>
+      <ScrollRestoration />
       <div className="mobile-toolbar no-print">
         <button
           className="menu-toggle"
-          onClick={() => setMenuOpen((v) => !v)}
+          onClick={toggleMenu}
         >
           ☰
         </button>
@@ -61,7 +89,7 @@ const App = () => {
           ⚙
         </button>
       </div>
-      <Sidebar menuOpen={menuOpen} onClose={closeMenu} />
+      <Sidebar menuOpen={menuOpen} />
       <div className="app">
         {handle?.groupLabel && handle?.opLabel && (
           <h1 className="print-title">{handle.groupLabel} {handle.opLabel}</h1>

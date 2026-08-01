@@ -14,7 +14,6 @@ interface GradeEntry {
 
 interface SidebarProps {
   menuOpen: boolean;
-  onClose: () => void;
 }
 
 const GRADE_LABELS: Record<number, string> = {
@@ -48,7 +47,9 @@ const CATEGORY_LABELS: [string, string][] = [
   ["hs-complex", "複素数平面"],
 ];
 
-const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
+// Selecting a link pushes a new history entry without the menuOpen state,
+// so the menu closes on navigation with no explicit close callback.
+const Sidebar = ({ menuOpen }: SidebarProps) => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState<Set<string>>(initCollapsed);
   const [viewMode, setViewMode] = useState<ViewMode>(getInitialViewMode);
@@ -150,10 +151,7 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
                   const needsPrefix = !isHighSchool && groupId !== catKey;
                   return (
                     <li key={`${groupId}-${op.operator}`} className="sidebar-item">
-                      <NavLink
-                        to={`/${groupId}/${op.operator}`}
-                        onClick={onClose}
-                      >
+                      <NavLink to={`/${groupId}/${op.operator}`}>
                         <span className="sidebar-item-label">
                           {needsPrefix ? `${groupLabel}（${op.label}）` : op.label}
                           {renderGradeBadges(op)}
@@ -195,10 +193,7 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
         : op.label;
       items.push(
         <li key={`${groupId}-${op.operator}`} className="sidebar-item">
-          <NavLink
-            to={`/${groupId}/${op.operator}`}
-            onClick={onClose}
-          >
+          <NavLink to={`/${groupId}/${op.operator}`}>
             <span className="sidebar-item-label">
               {label}
             </span>
@@ -241,7 +236,7 @@ const Sidebar = ({ menuOpen, onClose }: SidebarProps) => {
   return (
     <nav className={`sidebar no-print${menuOpen ? " menu-open" : ""}`}>
       <div className="sidebar-header">
-        <NavLink to="/exam" className="sidebar-exam-link" onClick={onClose}>
+        <NavLink to="/exam" className="sidebar-exam-link">
           試験作成
         </NavLink>
         <div className="sidebar-view-toggle">
