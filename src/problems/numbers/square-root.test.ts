@@ -108,6 +108,20 @@ describe("generateSqrt", () => {
     }
   });
 
+  it("find mode sometimes squares a root, e.g. (√2)²", () => {
+    const squaring: { expr: string; answerDisplay: string }[] = [];
+    for (let seed = 1; seed <= 30; seed++) {
+      for (const p of generateSqrt(seed, "find")) {
+        if (/^\(−?√\d+\)²$/.test(p.expr)) squaring.push(p);
+      }
+    }
+    expect(squaring.length).toBeGreaterThan(0);
+    for (const p of squaring) {
+      const n = Number(p.expr.match(/√(\d+)/)![1]);
+      expect(p.answerDisplay).toBe(`${n}`);
+    }
+  });
+
   it("rationalize problems: expr contains fraction with root", () => {
     for (const seed of seeds) {
       const problems = generateSqrt(seed, "rationalize");

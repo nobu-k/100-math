@@ -28,20 +28,28 @@ export const generateSqrt = (
       let answerDisplay: string;
 
       if (type === "find") {
-        const perfectSquares = [1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144];
-        const n = perfectSquares[Math.floor(rng() * perfectSquares.length)];
-        const root = Math.sqrt(n);
         const variant = rng();
-        if (variant < 0.4) {
-          expr = `√${n}`;
-          answerDisplay = `${root}`;
-        } else if (variant < 0.7) {
-          expr = `${n} の平方根`;
-          answerDisplay = `±${root}`;
+        if (variant < 0.75) {
+          const perfectSquares = [1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144];
+          const n = perfectSquares[Math.floor(rng() * perfectSquares.length)];
+          const root = Math.sqrt(n);
+          if (variant < 0.3) {
+            expr = `√${n}`;
+            answerDisplay = `${root}`;
+          } else if (variant < 0.55) {
+            expr = `${n} の平方根`;
+            answerDisplay = `±${root}`;
+          } else {
+            // negative square
+            expr = `(−${root})² の平方根`;
+            answerDisplay = `±${root}`;
+          }
         } else {
-          // negative square
-          expr = `(−${root})² の平方根`;
-          answerDisplay = `±${root}`;
+          // square a root: (√n)² = n, (−√n)² = n
+          const nonSquares = [2, 3, 5, 6, 7, 10, 11, 13, 15, 17];
+          const n = nonSquares[Math.floor(rng() * nonSquares.length)];
+          expr = rng() < 0.5 ? `(√${n})²` : `(−√${n})²`;
+          answerDisplay = `${n}`;
         }
       } else if (type === "simplify") {
         // √n where n has perfect square factors
