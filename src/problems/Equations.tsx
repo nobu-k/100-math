@@ -7,6 +7,7 @@ import LinearExpr from "./equations/LinearExpr";
 import LinearEq from "./equations/LinearEq";
 import SimultaneousEq from "./equations/SimultaneousEq";
 import Expansion from "./equations/Expansion";
+import SqrtExpansion from "./equations/SqrtExpansion";
 import Factoring from "./equations/Factoring";
 import QuadraticEq from "./equations/QuadraticEq";
 
@@ -22,6 +23,7 @@ export const equations: ProblemGroup = {
     { operator: "linear-eq", label: "一次方程式", grades: [7], category: "equations", Component: LinearEq },
     { operator: "simultaneous-eq", label: "連立方程式", grades: [8], category: "equations", Component: SimultaneousEq },
     { operator: "expansion", label: "式の展開", grades: [9], category: "equations", Component: Expansion },
+    { operator: "sqrt-expansion", label: "式の展開（平方根）", grades: [9], category: "equations", Component: SqrtExpansion },
     { operator: "factoring", label: "因数分解", grades: [9], category: "equations", Component: Factoring },
     { operator: "quadratic-eq", label: "二次方程式", grades: [9], category: "equations", Component: QuadraticEq },
   ],

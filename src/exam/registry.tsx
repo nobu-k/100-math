@@ -29,6 +29,7 @@ import { generateLiteralExpr } from "../problems/equations/literal-expr";
 import { generateLinearEq } from "../problems/equations/linear-eq";
 import { generateSimEq } from "../problems/equations/simultaneous-eq";
 import { generateExpansion } from "../problems/equations/expansion";
+import { generateSqrtExpansion } from "../problems/equations/sqrt-expansion";
 import { generateFactoring } from "../problems/equations/factoring";
 import { generateQuadEq } from "../problems/equations/quadratic-eq";
 import { generateSqrt } from "../problems/numbers/square-root";
@@ -691,6 +692,15 @@ const definitions: ExamOperatorDef[] = [
     defaultCount: 6,
     maxCount: 12,
     gen: (seed, count) => generateExpansion(seed, "mixed", count),
+  }),
+  exprOperator({
+    key: "equations/sqrt-expansion",
+    label: "展開（平方根）",
+    groupLabel: "式・方程式",
+    instruction: "次の式を展開しなさい。",
+    defaultCount: 6,
+    maxCount: 12,
+    gen: (seed, count) => generateSqrtExpansion(seed, "mixed", count),
   }),
   exprOperator({
     key: "equations/factoring",
